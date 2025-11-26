@@ -1,8 +1,11 @@
-import { auth } from '$lib/workos.server';
-import type { Handle } from '@sveltejs/kit';
+import { configureAuthKit, authKitHandle } from '@workos/authkit-sveltekit';
+import { env } from '$lib/env.server';
 
-export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.auth = () => auth(event);
+configureAuthKit({
+	clientId: env.PUBLIC_WORKOS_CLIENT_ID,
+	apiKey: env.WORKOS_API_KEY,
+	redirectUri: env.PUBLIC_WORKOS_REDIRECT_URI,
+	cookiePassword: env.WORKOS_COOKIE_PASSWORD
+});
 
-	return resolve(event);
-};
+export const handle = authKitHandle();

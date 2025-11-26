@@ -8,7 +8,7 @@
  * @module
  */
 
-import type * as workos from "../workos.js";
+import type * as chat from "../chat.js";
 
 import type {
   ApiFromModules,
@@ -17,7 +17,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  workos: typeof workos;
+  chat: typeof chat;
 }>;
 
 /**

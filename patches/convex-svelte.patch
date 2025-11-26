@@ -1,0 +1,39 @@
+diff --git a/dist/client.svelte.d.ts b/dist/client.svelte.d.ts
+index d82b755f97251d8ca86ce09966659e1a17b16fa3..df558b87a75dbf7d2cc550dc844b1370def9fce2 100644
+--- a/dist/client.svelte.d.ts
++++ b/dist/client.svelte.d.ts
+@@ -1,8 +1,8 @@
+ import { ConvexClient, type ConvexClientOptions } from 'convex/browser';
+ import { type FunctionReference, type FunctionArgs, type FunctionReturnType } from 'convex/server';
+ export declare const useConvexClient: () => ConvexClient;
+-export declare const setConvexClientContext: (client: ConvexClient) => void;
+-export declare const setupConvex: (url: string, options?: ConvexClientOptions) => void;
++export declare const setConvexClientContext: (client: ConvexClient) => ConvexClient;
++export declare const setupConvex: (url: string, options?: ConvexClientOptions) => ConvexClient;
+ type UseQueryOptions<Query extends FunctionReference<'query'>> = {
+     initialData?: FunctionReturnType<Query>;
+     keepPreviousData?: boolean;
+diff --git a/dist/client.svelte.js b/dist/client.svelte.js
+index d6e58f39d6623a34b3df73cca222e3db23eea4e3..44e3e1000374a0f5174789400325842d41dad065 100644
+--- a/dist/client.svelte.js
++++ b/dist/client.svelte.js
+@@ -12,16 +12,16 @@ export const useConvexClient = () => {
+     return client;
+ };
+ export const setConvexClientContext = (client) => {
+-    setContext(_contextKey, client);
++    return setContext(_contextKey, client);
+ };
+ export const setupConvex = (url, options = {}) => {
+     if (!url || typeof url !== 'string') {
+         throw new Error('Expected string url property for setupConvex');
+     }
+     const optionsWithDefaults = { disabled: !BROWSER, ...options };
+-    const client = new ConvexClient(url, optionsWithDefaults);
+-    setConvexClientContext(client);
++    const client = setConvexClientContext(new ConvexClient(url, optionsWithDefaults));
+     $effect(() => () => client.close());
++    return client;
+ };
+ // Internal sentinel for "skip" so we don't pass the literal string through everywhere
+ const SKIP = Symbol('convex.useQuery.skip');

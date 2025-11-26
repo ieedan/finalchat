@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  convex-svelte:
+    hash: 0cbda42873f10880d19ab3a5d6e778eb090ee338fd17ef8cfabb25aebedefee8
+    path: patches/convex-svelte.patch
+
 importers:
 
   .:
@@ -44,6 +49,9 @@ importers:
       '@workos-inc/node':
         specifier: ^7.74.2
         version: 7.74.2
+      '@workos/authkit-sveltekit':
+        specifier: 0.0.1-alpha.0
+        version: 0.0.1-alpha.0(@sveltejs/kit@2.49.0(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))
       bits-ui:
         specifier: ^2.14.4
         version: 2.14.4(@internationalized/date@3.10.0)(@sveltejs/kit@2.49.0(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.44.1)
@@ -61,7 +69,7 @@ importers:
         version: 0.1.106(@standard-schema/spec@1.0.0)(convex@1.29.3)(typescript@5.9.3)(zod@4.1.13)
       convex-svelte:
         specifier: ^0.0.12
-        version: 0.0.12(convex@1.29.3)(svelte@5.44.1)
+        version: 0.0.12(patch_hash=0cbda42873f10880d19ab3a5d6e778eb090ee338fd17ef8cfabb25aebedefee8)(convex@1.29.3)(svelte@5.44.1)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
@@ -74,6 +82,9 @@ importers:
       jsrepo:
         specifier: ^3.0.5
         version: 3.0.5(svelte@5.44.1)
+      jwt-decode:
+        specifier: ^4.0.0
+        version: 4.0.0
       mode-watcher:
         specifier: ^1.1.0
         version: 1.1.0(svelte@5.44.1)
@@ -1104,6 +1115,16 @@ packages:
     resolution: {integrity: sha512-uXLEUqNo7AkM8oBzVPY29uyEpU0r8Jt2SppL2KzwFWB3f0hLLzp51wrIQ4PNJgd9qI5L/+kP62SoZFc8byI+4g==}
     engines: {node: '>=16'}
 
+  '@workos/authkit-session@0.0.1-alpha.3':
+    resolution: {integrity: sha512-bLlZfvR/cg0afW4OT3yMWC/5F3GP4x3td+4+KlBLN2DIOPCt8ORJKwfZ9om4twvreeQVW0KVsPnX+qyWWwafqQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@workos/authkit-sveltekit@0.0.1-alpha.0':
+    resolution: {integrity: sha512-FTuWzx6ytl2kFElynm95DESaMNGwJwzbQ77UJsJH1+PWPxmvua4NmrbiVulOyBS/YLwLp369Sqczmh6f77MAHg==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@sveltejs/kit': '>=2.0.0'
+
   abbrev@4.0.0:
     resolution: {integrity: sha512-a1wflyaL0tHtJSmLSOVybYhy22vRih4eduhhrkcjgrWGnRfrZtovJ2FRjxuTtkkj47O/baf0R86QU5OuYpz8fA==}
     engines: {node: ^20.17.0 || >=22.9.0}
@@ -1291,6 +1312,14 @@ packages:
   cookie@0.6.0:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
+
+  cookie@0.7.2:
+    resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
+    engines: {node: '>= 0.6'}
+
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -1588,8 +1617,14 @@ packages:
       next:
         optional: true
 
+  iron-session@8.0.4:
+    resolution: {integrity: sha512-9ivNnaKOd08osD0lJ3i6If23GFS2LsxyMU8Gf/uBUEgm8/8CC1hrrCHFDpMo3IFbpBgwoo/eairRsaD3c5itxA==}
+
   iron-webcrypto@0.2.8:
     resolution: {integrity: sha512-YPdCvjFMOBjXaYuDj5tiHst5CEk6Xw84Jo8Y2+jzhMceclAnb3+vNPP/CTtb5fO2ZEuXEaO4N+w62Vfko757KA==}
+
+  iron-webcrypto@1.2.1:
+    resolution: {integrity: sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg==}
 
   is-extglob@2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
@@ -1624,6 +1659,9 @@ packages:
   jose@5.6.3:
     resolution: {integrity: sha512-1Jh//hEEwMhNYPDDLwXHa2ePWgWiFNNUadVmguAAw2IJ6sj9mNxV5tGXJNqlMkJAybF6Lgw1mISDxTePP/187g==}
 
+  jose@6.1.2:
+    resolution: {integrity: sha512-MpcPtHLE5EmztuFIqB0vzHAWJPpmN1E6L4oo+kze56LIs3MyXIj9ZHMDxqOvkP38gBR7K1v3jqd4WU2+nrfONQ==}
+
   js-yaml@4.1.1:
     resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
@@ -1648,6 +1686,10 @@ packages:
         optional: true
       vue:
         optional: true
+
+  jwt-decode@4.0.0:
+    resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
+    engines: {node: '>=18'}
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -2199,6 +2241,9 @@ packages:
 
   unconfig@7.4.1:
     resolution: {integrity: sha512-uyQ7LElcGizrOGZyIq9KU+xkuEjcRf9IpmDTkCSYv5mEeZzrXSj6rb51C0L+WTedsmAoVxW9WKrLWhSwebIM9Q==}
+
+  uncrypto@0.1.3:
+    resolution: {integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==}
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
@@ -3153,6 +3198,27 @@ snapshots:
       - koa
       - next
 
+  '@workos/authkit-session@0.0.1-alpha.3':
+    dependencies:
+      '@workos-inc/node': 7.74.2
+      iron-session: 8.0.4
+      iron-webcrypto: 1.2.1
+      jose: 6.1.2
+    transitivePeerDependencies:
+      - express
+      - koa
+      - next
+
+  '@workos/authkit-sveltekit@0.0.1-alpha.0(@sveltejs/kit@2.49.0(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))':
+    dependencies:
+      '@sveltejs/kit': 2.49.0(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2))
+      '@workos/authkit-session': 0.0.1-alpha.3
+      cookie: 1.1.1
+    transitivePeerDependencies:
+      - express
+      - koa
+      - next
+
   abbrev@4.0.0: {}
 
   acorn-import-attributes@1.9.5(acorn@8.15.0):
@@ -3291,7 +3357,7 @@ snapshots:
       typescript: 5.9.3
       zod: 4.1.13
 
-  convex-svelte@0.0.12(convex@1.29.3)(svelte@5.44.1):
+  convex-svelte@0.0.12(patch_hash=0cbda42873f10880d19ab3a5d6e778eb090ee338fd17ef8cfabb25aebedefee8)(convex@1.29.3)(svelte@5.44.1):
     dependencies:
       convex: 1.29.3
       esm-env: 1.2.2
@@ -3306,6 +3372,10 @@ snapshots:
   cookie@0.5.0: {}
 
   cookie@0.6.0: {}
+
+  cookie@0.7.2: {}
+
+  cookie@1.1.1: {}
 
   cross-spawn@7.0.6:
     dependencies:
@@ -3645,9 +3715,17 @@ snapshots:
       cookie: 0.5.0
       iron-webcrypto: 0.2.8
 
+  iron-session@8.0.4:
+    dependencies:
+      cookie: 0.7.2
+      iron-webcrypto: 1.2.1
+      uncrypto: 0.1.3
+
   iron-webcrypto@0.2.8:
     dependencies:
       buffer: 6.0.3
+
+  iron-webcrypto@1.2.1: {}
 
   is-extglob@2.1.1: {}
 
@@ -3671,6 +3749,8 @@ snapshots:
 
   jose@5.6.3: {}
 
+  jose@6.1.2: {}
+
   js-yaml@4.1.1:
     dependencies:
       argparse: 2.0.1
@@ -3688,6 +3768,8 @@ snapshots:
       unconfig: 7.4.1
     optionalDependencies:
       svelte: 5.44.1
+
+  jwt-decode@4.0.0: {}
 
   keyv@4.5.4:
     dependencies:
@@ -4217,6 +4299,8 @@ snapshots:
       jiti: 2.6.1
       quansync: 0.2.11
       unconfig-core: 7.4.1
+
+  uncrypto@0.1.3: {}
 
   undici-types@6.21.0: {}
 
