@@ -21,11 +21,11 @@ class PromptInputRootState {
 		this.loading = true;
 
 		try {
-            this.error = null;
+			this.error = null;
 
 			await this.opts.onSubmit.current(input);
 
-            this.opts.value.current = '';
+			this.opts.value.current = '';
 		} catch (error) {
 			this.error =
 				error instanceof Error
@@ -88,7 +88,35 @@ class PromptInputSubmitState {
 	}));
 }
 
+type PromptInputBannerStateOptions = ReadableBoxedValues<{
+	onDismiss: () => void;
+}>;
+
+class PromptInputBannerState {
+	constructor(readonly opts: PromptInputBannerStateOptions, readonly rootState: PromptInputRootState) {}
+}
+
+type PromptInputBannerDismissStateOptions = ReadableBoxedValues<{
+	onclick: ButtonElementProps['onclick'];
+}>;
+
+class PromptInputBannerDismissState {
+	constructor(readonly opts: PromptInputBannerDismissStateOptions, readonly rootState: PromptInputBannerState) {
+
+    }
+
+    onclick(e: Parameters<NonNullable<ButtonElementProps['onclick']>>[0]) {
+        this.rootState.opts.onDismiss.current?.();
+        this.opts.onclick?.current?.(e);
+    }
+
+    props = $derived.by(() => ({
+        onclick: this.onclick.bind(this)
+    }));
+}
+
 const ctx = new Context<PromptInputRootState>('prompt-input-root-state');
+const bannerCtx = new Context<PromptInputBannerState>('prompt-input-banner-state');
 
 export function usePromptInput(props: PromptInputRootStateOptions) {
 	return ctx.set(new PromptInputRootState(props));
@@ -100,4 +128,12 @@ export function usePromptInputTextarea(props: PromptInputTextareaStateOptions) {
 
 export function usePromptInputSubmit(props: PromptInputSubmitStateOptions) {
 	return new PromptInputSubmitState(props, ctx.get());
+}
+
+export function usePromptInputBanner(props: PromptInputBannerStateOptions) {
+	return bannerCtx.set(new PromptInputBannerState(props, ctx.get()));
+}
+
+export function usePromptInputBannerDismiss(props: PromptInputBannerDismissStateOptions) {
+	return new PromptInputBannerDismissState(props, bannerCtx.get());
 }

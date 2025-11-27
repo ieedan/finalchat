@@ -4,7 +4,9 @@
 	import { usePromptInput } from './prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
 	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
-	import XIcon from '@lucide/svelte/icons/x';
+	import PromptInputBannerContent from './prompt-input-banner-content.svelte';
+	import PromptInputBanner from './prompt-input-banner.svelte';
+	import PromptInputBannerDismiss from './prompt-input-banner-dismiss.svelte';
 
 	let {
 		class: className,
@@ -32,40 +34,19 @@
 	});
 </script>
 
-<div class="relative">
-	<div
-		class={cn(
-			'ease-in-out border bg-sidebar rounded-lg h-full absolute z-0 w-full flex items-start justify-between gap-4 px-3 duration-150',
-			{
-				'-translate-y-8': promptInputState.error !== null
-			}
-		)}
+<div class={cn('relative', className)} {...rest}>
+	<PromptInputBanner
+		dismissed={promptInputState.error === null}
+		dismissedByError={false}
+		onDismiss={() => (promptInputState.error = null)}
 	>
-		<div class="flex items-center justify-between w-full py-1.5">
+		<PromptInputBannerContent>
 			<div class="flex items-center gap-1.5">
-				<AlertCircleIcon
-					class={cn('size-4 text-destructive', {
-						hidden: promptInputState.error === null
-					})}
-				/>
+				<AlertCircleIcon class="size-4 text-destructive" />
 				<span class="text-sm text-destructive">{promptInputState.error}</span>
 			</div>
-			<button
-				type="button"
-				class="text-muted-foreground cursor-pointer size-5 flex items-center justify-center"
-				onclick={() => (promptInputState.error = null)}
-			>
-				<XIcon class="size-4" />
-			</button>
-		</div>
-	</div>
-	<div
-		class={cn(
-			'rounded-lg relative z-10 border bg-background flex flex-col',
-			className
-		)}
-		{...rest}
-	>
-		{@render children?.()}
-	</div>
+			<PromptInputBannerDismiss />
+		</PromptInputBannerContent>
+	</PromptInputBanner>
+	{@render children?.()}
 </div>
