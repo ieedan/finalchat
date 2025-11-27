@@ -94,6 +94,7 @@
 	role={href && disabled ? 'link' : undefined}
 	tabindex={href && disabled ? -1 : tabindex}
 	class={cn(buttonVariants({ variant, size }), className)}
+	data-loading={loading}
 	bind:this={ref}
 	onclick={async (
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any

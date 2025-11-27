@@ -22,12 +22,15 @@ importers:
       '@eslint/js':
         specifier: ^9.39.1
         version: 9.39.1
+      '@internationalized/date':
+        specifier: ^3.10.0
+        version: 3.10.0
       '@jsrepo/transform-prettier':
         specifier: ^0.0.6
         version: 0.0.6(jsrepo@3.0.5(svelte@5.44.1))(prettier@3.6.2)
       '@lucide/svelte':
-        specifier: ^0.554.0
-        version: 0.554.0(svelte@5.44.1)
+        specifier: ^0.544.0
+        version: 0.544.0(svelte@5.44.1)
       '@sveltejs/adapter-vercel':
         specifier: ^6.1.1
         version: 6.1.2(@sveltejs/kit@2.49.0(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(rollup@4.53.3)
@@ -103,6 +106,9 @@ importers:
       svelte-check:
         specifier: ^4.3.4
         version: 4.3.4(picomatch@4.0.3)(svelte@5.44.1)(typescript@5.9.3)
+      svelte-toolbelt:
+        specifier: ^0.10.6
+        version: 0.10.6(@sveltejs/kit@2.49.0(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.44.1)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.44.1)
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
@@ -567,8 +573,8 @@ packages:
       jsrepo: 3.0.5
       prettier: 3.x
 
-  '@lucide/svelte@0.554.0':
-    resolution: {integrity: sha512-CM6wLEH8uk3WBpC42t8R0hF7SlQrsYEL6qGuXdB99xKZwKglpWmX5XgYu7FIYOCBYOyC1rm4dNhIe6uF9pOXqw==}
+  '@lucide/svelte@0.544.0':
+    resolution: {integrity: sha512-9f9O6uxng2pLB01sxNySHduJN3HTl5p0HDu4H26VR51vhZfiMzyOMe9Mhof3XAk4l813eTtl+/DYRvGyoRR+yw==}
     peerDependencies:
       svelte: ^5
 
@@ -2667,7 +2673,7 @@ snapshots:
       jsrepo: 3.0.5(svelte@5.44.1)
       prettier: 3.6.2
 
-  '@lucide/svelte@0.554.0(svelte@5.44.1)':
+  '@lucide/svelte@0.544.0(svelte@5.44.1)':
     dependencies:
       svelte: 5.44.1
 
