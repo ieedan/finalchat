@@ -8,21 +8,21 @@ import BannerContent from './prompt-input-banner-content.svelte';
 import BannerDismiss from './prompt-input-banner-dismiss.svelte';
 
 export {
-    Root,
-    Textarea,
-    Footer,
-    Submit,
-    Banner,
-    Content,
-    BannerContent,
-    BannerDismiss,
-    //
-    Root as PromptInput,
-    Textarea as PromptInputTextarea,
-    Footer as PromptInputFooter,
-    Submit as PromptInputSubmit,
-    Banner as PromptInputBanner,
-    Content as PromptInputContent,
-    BannerContent as PromptInputBannerContent,
-    BannerDismiss as PromptInputBannerDismiss,
+	Root,
+	Textarea,
+	Footer,
+	Submit,
+	Banner,
+	Content,
+	BannerContent,
+	BannerDismiss,
+	//
+	Root as PromptInput,
+	Textarea as PromptInputTextarea,
+	Footer as PromptInputFooter,
+	Submit as PromptInputSubmit,
+	Banner as PromptInputBanner,
+	Content as PromptInputContent,
+	BannerContent as PromptInputBannerContent,
+	BannerDismiss as PromptInputBannerDismiss
 };

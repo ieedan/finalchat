@@ -1,5 +1,8 @@
-import { configureAuthKit, authKitHandle } from '@workos/authkit-sveltekit';
+import { authKitHandle, configureAuthKit } from '@workos/authkit-sveltekit';
 import { env } from '$lib/env.server';
+import type { Handle } from '@sveltejs/kit';
+import { ConvexClient } from 'convex/browser';
+import { sequence } from '@sveltejs/kit/hooks';
 
 configureAuthKit({
 	clientId: env.PUBLIC_WORKOS_CLIENT_ID,
@@ -8,4 +11,19 @@ configureAuthKit({
 	cookiePassword: env.WORKOS_COOKIE_PASSWORD
 });
 
-export const handle = authKitHandle();
+const authHandle = authKitHandle();
+
+const injectConvex: Handle = async ({ event, resolve }) => {
+	const convex = new ConvexClient(env.PUBLIC_CONVEX_URL);
+
+	if (event.locals.auth.accessToken) {
+		// where it's needed we should already be keeping the token up to date with authKit
+		convex.setAuth(async () => event.locals.auth.accessToken);
+	}
+
+	event.locals.convex = convex;
+
+	return resolve(event);
+};
+
+export const handle = sequence(authHandle, injectConvex);

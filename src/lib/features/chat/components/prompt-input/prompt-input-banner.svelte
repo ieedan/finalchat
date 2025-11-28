@@ -9,17 +9,17 @@
 		children,
 		dismissed = $bindable(false),
 		dismissedByError = true,
-        onDismiss,
+		onDismiss,
 		...rest
 	}: HTMLAttributes<HTMLDivElement> & {
 		dismissed?: boolean;
 		dismissedByError?: boolean;
-        onDismiss?: () => void;
+		onDismiss?: () => void;
 	} = $props();
 
 	const bannerState = usePromptInputBanner({
-        onDismiss: box.with(() => onDismiss ?? (() => {}))
-    });
+		onDismiss: box.with(() => onDismiss ?? (() => {}))
+	});
 </script>
 
 <div

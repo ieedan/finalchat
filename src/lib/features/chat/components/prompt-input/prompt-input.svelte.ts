@@ -6,7 +6,7 @@ import type { KeyboardEventHandler } from 'svelte/elements';
 type PromptInputRootStateOptions = ReadableBoxedValues<{
 	onSubmit: (input: string) => Promise<void>;
 	submitOnEnter?: boolean;
-    optimisticClear?: boolean;
+	optimisticClear?: boolean;
 }> &
 	WritableBoxedValues<{
 		value: string;
@@ -19,10 +19,10 @@ class PromptInputRootState {
 	constructor(readonly opts: PromptInputRootStateOptions) {}
 
 	async submit(input: string) {
-        const previousValue = this.opts.value.current;
-        if (this.opts.optimisticClear?.current) {
-            this.opts.value.current = '';
-        }
+		const previousValue = this.opts.value.current;
+		if (this.opts.optimisticClear?.current) {
+			this.opts.value.current = '';
+		}
 		this.loading = true;
 
 		try {
@@ -36,7 +36,7 @@ class PromptInputRootState {
 				error instanceof Error
 					? error.message
 					: 'An unknown error occurred while trying to submit your message.';
-            this.opts.value.current = previousValue;
+			this.opts.value.current = previousValue;
 		} finally {
 			this.loading = false;
 		}
@@ -99,7 +99,10 @@ type PromptInputBannerStateOptions = ReadableBoxedValues<{
 }>;
 
 class PromptInputBannerState {
-	constructor(readonly opts: PromptInputBannerStateOptions, readonly rootState: PromptInputRootState) {}
+	constructor(
+		readonly opts: PromptInputBannerStateOptions,
+		readonly rootState: PromptInputRootState
+	) {}
 }
 
 type PromptInputBannerDismissStateOptions = ReadableBoxedValues<{
@@ -107,18 +110,19 @@ type PromptInputBannerDismissStateOptions = ReadableBoxedValues<{
 }>;
 
 class PromptInputBannerDismissState {
-	constructor(readonly opts: PromptInputBannerDismissStateOptions, readonly rootState: PromptInputBannerState) {
+	constructor(
+		readonly opts: PromptInputBannerDismissStateOptions,
+		readonly rootState: PromptInputBannerState
+	) {}
 
-    }
+	onclick(e: Parameters<NonNullable<ButtonElementProps['onclick']>>[0]) {
+		this.rootState.opts.onDismiss.current?.();
+		this.opts.onclick?.current?.(e);
+	}
 
-    onclick(e: Parameters<NonNullable<ButtonElementProps['onclick']>>[0]) {
-        this.rootState.opts.onDismiss.current?.();
-        this.opts.onclick?.current?.(e);
-    }
-
-    props = $derived.by(() => ({
-        onclick: this.onclick.bind(this)
-    }));
+	props = $derived.by(() => ({
+		onclick: this.onclick.bind(this)
+	}));
 }
 
 const ctx = new Context<PromptInputRootState>('prompt-input-root-state');

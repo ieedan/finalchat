@@ -16,7 +16,7 @@
 		maxHeight?: number;
 	} = $props();
 
-    const textareaState = usePromptInputTextarea({
+	const textareaState = usePromptInputTextarea({
 		onkeydown: box.with(() => onkeydown)
 	});
 
@@ -31,7 +31,10 @@
 <textarea
 	bind:value={textareaState.rootState.opts.value.current}
 	bind:this={ref}
-	class={cn('p-3 outline-none resize-none disabled:cursor-not-allowed disabled:opacity-50', className)}
+	class={cn(
+		'p-3 outline-none resize-none disabled:cursor-not-allowed disabled:opacity-50',
+		className
+	)}
 	{autofocus}
 	{...textareaState.props}
 	{...rest}

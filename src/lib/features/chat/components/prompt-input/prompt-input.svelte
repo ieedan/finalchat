@@ -13,7 +13,7 @@
 		children,
 		onSubmit,
 		submitOnEnter = false,
-        optimisticClear = true,
+		optimisticClear = true,
 		value = $bindable(''),
 		...rest
 	}: HTMLAttributes<HTMLDivElement> & {
@@ -22,7 +22,7 @@
 		 * Whether to submit the form on enter. Otherwise the form will be submitted on shift+enter.
 		 */
 		submitOnEnter?: boolean;
-        optimisticClear?: boolean;
+		optimisticClear?: boolean;
 		value?: string;
 	} = $props();
 
@@ -33,7 +33,7 @@
 			() => value,
 			(v) => (value = v)
 		),
-        optimisticClear: box.with(() => optimisticClear)
+		optimisticClear: box.with(() => optimisticClear)
 	});
 </script>
 

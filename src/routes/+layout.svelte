@@ -16,7 +16,7 @@
 		if (!accessToken) return null;
 		const claims = jwtDecode(accessToken);
 		// if expired
-		if (claims.exp && (claims.exp * 1000) < Date.now()) {
+		if (claims.exp && claims.exp * 1000 < Date.now()) {
 			const response = await fetch('/auth/refresh');
 			const data = await response.json();
 			accessToken = data.accessToken;

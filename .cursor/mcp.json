@@ -2,9 +2,7 @@
 	"mcpServers": {
 		"jsrepo": {
 			"command": "npx",
-			"args": [
-				"@jsrepo/mcp"
-			]
+			"args": ["@jsrepo/mcp"]
 		}
 	}
 }

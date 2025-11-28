@@ -1,5 +1,5 @@
 onlyBuiltDependencies:
   - esbuild
-  
+
 patchedDependencies:
   convex-svelte: patches/convex-svelte.patch
