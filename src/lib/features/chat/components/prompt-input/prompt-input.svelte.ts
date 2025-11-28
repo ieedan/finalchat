@@ -6,6 +6,7 @@ import type { KeyboardEventHandler } from 'svelte/elements';
 type PromptInputRootStateOptions = ReadableBoxedValues<{
 	onSubmit: (input: string) => Promise<void>;
 	submitOnEnter?: boolean;
+    optimisticClear?: boolean;
 }> &
 	WritableBoxedValues<{
 		value: string;
@@ -18,6 +19,10 @@ class PromptInputRootState {
 	constructor(readonly opts: PromptInputRootStateOptions) {}
 
 	async submit(input: string) {
+        const previousValue = this.opts.value.current;
+        if (this.opts.optimisticClear?.current) {
+            this.opts.value.current = '';
+        }
 		this.loading = true;
 
 		try {
@@ -31,6 +36,7 @@ class PromptInputRootState {
 				error instanceof Error
 					? error.message
 					: 'An unknown error occurred while trying to submit your message.';
+            this.opts.value.current = previousValue;
 		} finally {
 			this.loading = false;
 		}
