@@ -6,5 +6,4 @@ export type Model = {
 	id: ModelId;
 	name: string;
 	description?: string;
-	supported_parameters: string[];
 };

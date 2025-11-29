@@ -2,14 +2,16 @@ import type { ButtonElementProps } from '$lib/components/ui/button';
 import { Context } from 'runed';
 import type { ReadableBoxedValues, WritableBoxedValues } from 'svelte-toolbelt';
 import type { KeyboardEventHandler } from 'svelte/elements';
+import type { Model, ModelId } from '../../types';
 
 type PromptInputRootStateOptions = ReadableBoxedValues<{
-	onSubmit: (input: string) => Promise<void>;
+	onSubmit: (opts: { input: string; modelId: ModelId }) => Promise<void>;
 	submitOnEnter?: boolean;
 	optimisticClear?: boolean;
 }> &
 	WritableBoxedValues<{
 		value: string;
+		modelId: ModelId | null;
 	}>;
 
 class PromptInputRootState {
@@ -28,7 +30,7 @@ class PromptInputRootState {
 		try {
 			this.error = null;
 
-			await this.opts.onSubmit.current(input);
+			await this.opts.onSubmit.current({ input, modelId: this.opts.modelId.current! });
 
 			this.opts.value.current = '';
 		} catch (error) {
@@ -125,6 +127,18 @@ class PromptInputBannerDismissState {
 	}));
 }
 
+type ModelPickerStateOptions = ReadableBoxedValues<{
+	models: Model[];
+}>;
+
+class ModelPickerState {
+	constructor(readonly opts: ModelPickerStateOptions, readonly rootState: PromptInputRootState) {
+		if (this.rootState.opts.modelId.current === null) {
+			this.rootState.opts.modelId.current = this.opts.models.current[0].id;
+		}
+	}
+}
+
 const ctx = new Context<PromptInputRootState>('prompt-input-root-state');
 const bannerCtx = new Context<PromptInputBannerState>('prompt-input-banner-state');
 
@@ -146,4 +160,8 @@ export function usePromptInputBanner(props: PromptInputBannerStateOptions) {
 
 export function usePromptInputBannerDismiss(props: PromptInputBannerDismissStateOptions) {
 	return new PromptInputBannerDismissState(props, bannerCtx.get());
+}
+
+export function useModelPicker(props: ModelPickerStateOptions) {
+	return new ModelPickerState(props, ctx.get());
 }

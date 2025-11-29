@@ -35,6 +35,7 @@
 		'p-3 outline-none resize-none disabled:cursor-not-allowed disabled:opacity-50',
 		className
 	)}
+	style="height: 48px;"
 	{autofocus}
 	{...textareaState.props}
 	{...rest}

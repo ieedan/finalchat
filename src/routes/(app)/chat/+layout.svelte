@@ -6,7 +6,7 @@
 
 	let { children, data } = $props();
 
-	const chatState = setupChat({ user: data.user });
+	const chatState = setupChat({ user: data.user, userSettings: data.userSettings });
 </script>
 
 <Sidebar.Provider>

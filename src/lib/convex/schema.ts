@@ -4,6 +4,7 @@ import { v } from 'convex/values';
 export default defineSchema({
 	userSettings: defineTable({
 		userId: v.string(),
+		modelId: v.optional(v.string()),
 		onboarding: v.optional(
 			v.object({
 				mode: v.optional(v.union(v.literal('basic'), v.literal('advanced'))),

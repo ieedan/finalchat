@@ -7,6 +7,7 @@
 	import PromptInputBannerContent from './prompt-input-banner-content.svelte';
 	import PromptInputBanner from './prompt-input-banner.svelte';
 	import PromptInputBannerDismiss from './prompt-input-banner-dismiss.svelte';
+	import type { ModelId } from '../../types.js';
 
 	let {
 		class: className,
@@ -15,15 +16,17 @@
 		submitOnEnter = false,
 		optimisticClear = true,
 		value = $bindable(''),
+		modelId = $bindable(null),
 		...rest
 	}: HTMLAttributes<HTMLDivElement> & {
-		onSubmit: (input: string) => Promise<void>;
+		onSubmit: (opts: { input: string; modelId: ModelId }) => Promise<void>;
 		/**
 		 * Whether to submit the form on enter. Otherwise the form will be submitted on shift+enter.
 		 */
 		submitOnEnter?: boolean;
 		optimisticClear?: boolean;
 		value?: string;
+		modelId?: ModelId | null;
 	} = $props();
 
 	const promptInputState = usePromptInput({
@@ -33,7 +36,11 @@
 			() => value,
 			(v) => (value = v)
 		),
-		optimisticClear: box.with(() => optimisticClear)
+		optimisticClear: box.with(() => optimisticClear),
+		modelId: box.with(
+			() => modelId,
+			(v) => (modelId = v)
+		)
 	});
 </script>
 
