@@ -4,58 +4,56 @@
 	import { api } from '$lib/convex/_generated/api';
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import { useConvexClient } from 'convex-svelte';
-	import * as Password from '$lib/components/ui/password';
-	import * as Select from '$lib/components/ui/select';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import * as Field from '$lib/components/ui/field';
+	import { useLocalApiKey } from '$lib/features/api-keys/local-key-storage.svelte';
+	import ApiKeyInput from '../api-keys/api-key-input.svelte';
+	import { createApiKey } from '$lib/features/api-keys/api-keys.remote';
 
-	let storage = $state<'Local' | 'Remote'>('Local');
+	let storage = $state<'Local' | 'Remote'>('Remote');
+	let apiKey = $state<string>('');
+
+	const localApiKey = useLocalApiKey();
 
 	const convex = useConvexClient();
 
 	async function skip() {
 		await convex.mutation(api.userSettings.completeSetupApiKey, {});
 	}
+
+	const canSubmit = $derived(Boolean(apiKey));
+
+	async function submit() {
+		if (storage === 'Local') {
+			localApiKey.current = apiKey;
+		} else {
+			await createApiKey({ key: apiKey });
+		}
+
+		await convex.mutation(api.userSettings.completeSetupApiKey, {});
+	}
 </script>
 
 <AlertDialog.Header>
 	<AlertDialog.Title>Setup API Key</AlertDialog.Title>
-	<AlertDialog.Description>Enter an OpenRouter API key to get started.</AlertDialog.Description>
+	<AlertDialog.Description>
+		Paste an
+		<a
+			href="https://openrouter.ai/settings/keys"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="underline underline-offset-2 font-medium text-primary"
+		>
+			OpenRouter
+		</a>
+		API key to get started.
+	</AlertDialog.Description>
 </AlertDialog.Header>
 <Field.Group class="gap-2">
-	<div class="flex items-center gap-2">
-		<Select.Root type="single" bind:value={storage}>
-			<Select.Trigger class="w-[115px]">
-				{storage}
-			</Select.Trigger>
-			<Select.Content align="start">
-				<Select.Item value="Local" class="flex flex-col gap-0 items-start">
-					Local
-					<span class="text-sm text-muted-foreground">Stored securely in your browser.</span>
-				</Select.Item>
-				<Select.Item value="Remote" class="flex flex-col gap-0 items-start">
-					Remote
-					<span class="text-sm text-muted-foreground">Stored securely on our servers.</span>
-				</Select.Item>
-			</Select.Content>
-		</Select.Root>
-		<Password.Root class="w-full">
-			<Password.Input class="w-full" placeholder="sk-or-v1-...">
-				<Password.ToggleVisibility />
-			</Password.Input>
-		</Password.Root>
-	</div>
-	{#if storage === 'Remote'}
-		<Field.Field>
-			<Label>Name</Label>
-			<Input type="text" placeholder="Name" />
-		</Field.Field>
-	{/if}
+	<ApiKeyInput bind:apiKey bind:storage />
 </Field.Group>
 <div class="flex items-center justify-between">
 	<Button variant="outline" onClickPromise={skip}>Skip</Button>
-	<Button class="gap-1">
+	<Button class="gap-1" disabled={!canSubmit} onClickPromise={submit}>
 		Next
 		<ArrowRightIcon />
 	</Button>

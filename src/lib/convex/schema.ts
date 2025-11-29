@@ -14,8 +14,10 @@ export default defineSchema({
 	}).index('by_user', ['userId']),
 	apiKeys: defineTable({
 		userId: v.string(),
+        name: v.optional(v.string()),
 		provider: v.union(v.literal('OpenRouter')),
-		key: v.string()
+		key: v.string(),
+        encryptionMode: v.union(v.literal('RSA')),
 	}).index('by_user', ['userId']),
 	chat: defineTable({
 		generating: v.boolean(),

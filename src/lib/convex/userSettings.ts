@@ -51,7 +51,8 @@ export const completeSetupApiKey = mutation({
 
 		await ctx.db.patch(userSettings?._id, {
 			onboarding: merge(userSettings.onboarding ?? {}, {
-				setupApiKey: true
+				setupApiKey: true,
+				completed: true
 			})
 		});
 	}
