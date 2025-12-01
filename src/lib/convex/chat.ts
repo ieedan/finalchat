@@ -14,3 +14,4 @@ export const getAll = query({
 			.collect();
 	}
 });
+
