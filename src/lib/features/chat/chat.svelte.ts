@@ -13,6 +13,7 @@ import type { RemoteQuery } from '@sveltejs/kit';
 import { getApiKey } from '../api-keys/api-keys.remote.js';
 import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
 import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
+import { SvelteSet } from 'svelte/reactivity';
 
 type ChatLayoutOptions = {
 	user: User;
@@ -22,7 +23,7 @@ type ChatLayoutOptions = {
 };
 
 class ChatLayoutState {
-	drivingId = $state<Id<'chat'> | undefined>(undefined);
+	createdMessages = new SvelteSet<Id<'messages'>>();
 	userSettingsQuery: Query<typeof api.userSettings.get>;
 	chatsQuery: Query<typeof api.chat.getAll>;
 	apiKeysQuery: RemoteQuery<Doc<'apiKeys'> | null>;
@@ -71,7 +72,7 @@ class ChatLayoutState {
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId }) => {
-		const { chatId } = await this.client.mutation(api.messages.create, {
+		const { chatId, assistantMessageId } = await this.client.mutation(api.messages.create, {
 			chatId: this.chatId,
 			prompt: {
 				input,
@@ -79,7 +80,7 @@ class ChatLayoutState {
 			}
 		});
 
-		this.drivingId = chatId;
+		this.createdMessages.add(assistantMessageId);
 
 		if (this.chatId !== chatId) {
 			await goto(resolve(`/chat/${chatId}`));

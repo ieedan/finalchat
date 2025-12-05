@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import { Streamdown } from 'svelte-streamdown';
+	import Code from 'svelte-streamdown/code';
 
 	type Props = {
 		content: string;
@@ -19,8 +20,8 @@
 		animateOnMount: true
 	}}
 	baseTheme="shadcn"
-	class={cn(
-		'group-data-[message-role="user"]/message:[&_p,strong,li,h1,h2,h3,h4,h5,h6]:text-primary-foreground!',
-		className
-	)}
+	class={cn(className)}
+	components={{
+		code: Code
+	}}
 />

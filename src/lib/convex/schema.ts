@@ -1,6 +1,7 @@
 import { StreamIdValidator } from '@convex-dev/persistent-text-streaming';
 import { defineSchema, defineTable } from 'convex/server';
 import { Infer, v } from 'convex/values';
+import { Id } from './_generated/dataModel';
 
 export const ChatMessageUser = v.object({
 	chatId: v.id('chat'),
@@ -11,7 +12,10 @@ export const ChatMessageUser = v.object({
 	})
 });
 
-export type ChatMessageUser = Infer<typeof ChatMessageUser>;
+export type ChatMessageUser = Infer<typeof ChatMessageUser> & {
+	_id: Id<'messages'>;
+	_creationTime: number;
+};
 
 export const ChatMessageAssistant = v.object({
 	chatId: v.id('chat'),
@@ -27,7 +31,10 @@ export const ChatMessageAssistant = v.object({
 	})
 });
 
-export type ChatMessageAssistant = Infer<typeof ChatMessageAssistant>;
+export type ChatMessageAssistant = Infer<typeof ChatMessageAssistant> & {
+	_id: Id<'messages'>;
+	_creationTime: number;
+};
 
 export const ChatMessage = v.union(ChatMessageUser, ChatMessageAssistant);
 
@@ -55,7 +62,7 @@ export default defineSchema({
 		userId: v.string(),
 		title: v.string(),
 		updatedAt: v.number(),
-		pinned: v.boolean(),
+		pinned: v.boolean()
 	}).index('by_user', ['userId']),
 	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
 });

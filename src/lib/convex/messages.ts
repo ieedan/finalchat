@@ -24,7 +24,7 @@ export const create = mutation({
 		chatId: v.optional(v.id('chat')),
 		prompt: Prompt
 	},
-	handler: async (ctx, args): Promise<{ chatId: Id<'chat'>; messageId: Id<'messages'> }> => {
+	handler: async (ctx, args): Promise<{ chatId: Id<'chat'>; userMessageId: Id<'messages'>; assistantMessageId: Id<'messages'> }> => {
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) throw new Error('Unauthorized');
 
@@ -44,7 +44,7 @@ export const create = mutation({
 			});
 		}
 
-		const messageId = await ctx.db.insert('messages', {
+		const userMessageId = await ctx.db.insert('messages', {
 			chatId,
 			role: 'user',
 			content: args.prompt.input,
@@ -54,7 +54,7 @@ export const create = mutation({
 		});
 
 		const streamId = await persistentTextStreaming.createStream(ctx);
-		await ctx.db.insert('messages', {
+		const assistantMessageId = await ctx.db.insert('messages', {
 			chatId,
 			role: 'assistant',
 			streamId,
@@ -65,7 +65,8 @@ export const create = mutation({
 
 		return {
 			chatId,
-			messageId
+			assistantMessageId,
+			userMessageId
 		};
 	}
 });
@@ -92,10 +93,11 @@ export const streamMessage = httpAction(async (ctx, request) => {
 		request,
 		streamId,
 		async (ctx, _request, _streamId, append) => {
+			let last: ReturnType<typeof getLastUserAndAssistantMessages> | null = null;
 			try {
 				const messages = await ctx.runQuery(internal.messages.getMessagesForChat, { chatId });
 
-				const last = getLastUserAndAssistantMessages(messages);
+				last = getLastUserAndAssistantMessages(messages);
 				if (!last) {
 					throw new Error('There was a problem getting the previous messages');
 				}
@@ -114,6 +116,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				const { fullStream } = streamText({
 					model: openrouter.chat(last.userMessage.chatSettings.modelId),
 					messages: messages.map(
+						// @ts-expect-error wrong
 						(message) =>
 							({
 								role: message.role,
@@ -136,6 +139,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					content
 				});
 			} catch (error) {
+				if (!last) return;
 				await ctx.runMutation(internal.messages.updateMessageError, {
 					messageId: last.assistantMessage._id,
 					error:

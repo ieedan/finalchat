@@ -17,18 +17,22 @@
 	const accessToken = AccessTokenCtx.get();
 	const chatState = useChatLayout();
 
-	const streamBody = useStream(
-		api.messages.getChatBody,
-		new URL('/messages/stream', env.PUBLIC_CONVEX_SITE_URL),
-		{
-			// svelte-ignore state_referenced_locally
-			chatId: message.chatId,
-			// svelte-ignore state_referenced_locally
-			streamId: message.streamId as StreamId,
-			apiKey: chatState.apiKey,
-			authToken: accessToken?.current
-		}
-	);
+	const streamBody = useStream({
+		getPersistentBody: api.messages.getChatBody,
+		streamUrl: new URL('/messages/stream', env.PUBLIC_CONVEX_SITE_URL),
+		// svelte-ignore state_referenced_locally
+		get driven() {
+			return chatState.createdMessages.has(message._id);
+		},
+		// svelte-ignore state_referenced_locally
+		chatId: message.chatId,
+		// svelte-ignore state_referenced_locally
+		streamId: message.streamId as StreamId,
+		get apiKey() {
+			return chatState.apiKey;
+		},
+		authToken: accessToken?.current
+	});
 </script>
 
 <Streamdown content={streamBody.body.text} />

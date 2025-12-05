@@ -6,31 +6,37 @@ import { onMount } from 'svelte';
 
 export type StreamStatus = 'pending' | 'streaming' | 'done' | 'error';
 
-export function useStream(
-	getPersistentBody: FunctionReference<'query', 'public', { streamId: string }, StreamBody>,
-	streamUrl: URL,
-	{
-		streamId,
-		chatId,
-		authToken,
-		apiKey,
-		headers
-	}: {
-		streamId: StreamId | undefined;
-		chatId: Id<'chat'>;
-		// If provided, this will be passed as the Authorization header.
-		authToken?: string | null;
-		apiKey: string | null;
-		// If provided, these will be passed as additional headers.
-		headers?: Record<string, string>;
-	}
-) {
+export function useStream({
+	getPersistentBody,
+	streamUrl,
+	driven,
+	streamId,
+	chatId,
+	authToken,
+	apiKey,
+	headers
+}: {
+	getPersistentBody: FunctionReference<'query', 'public', { streamId: string }, StreamBody>;
+	streamUrl: URL;
+	/**
+	 * Whether the stream was created by this client
+	 */
+	driven: boolean;
+	streamId: StreamId | undefined;
+	chatId: Id<'chat'>;
+	// If provided, this will be passed as the Authorization header.
+	authToken?: string | null;
+	apiKey: string | null;
+	// If provided, these will be passed as additional headers.
+	headers?: Record<string, string>;
+}) {
 	let streamEnded = $state<boolean | null>(null);
 	let streamBody = $state<string>('');
 	let streamStarted = $state(false);
 
 	const usePersistence = $derived.by(() => {
 		if (!streamEnded) return true;
+		if (!driven) return true;
 		return false;
 	});
 
@@ -40,7 +46,7 @@ export function useStream(
 	);
 
 	onMount(() => {
-		if (streamId && !streamStarted) {
+		if (driven && streamId && !streamStarted) {
 			void (async () => {
 				const success = await startStreaming(
 					streamUrl,
@@ -63,7 +69,7 @@ export function useStream(
 	});
 
 	const body = $derived.by(() => {
-		if (persistentBody) {
+		if (!driven && persistentBody) {
 			if (persistentBody.data) {
 				return {
 					status: persistentBody.data.status,
