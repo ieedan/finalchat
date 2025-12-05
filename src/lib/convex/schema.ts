@@ -2,6 +2,30 @@ import { StreamIdValidator } from '@convex-dev/persistent-text-streaming';
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
+export const ChatMessageUser = v.object({
+	chatId: v.id('chat'),
+	role: v.literal('user'),
+	content: v.string(),
+	chatSettings: v.object({
+		modelId: v.string()
+	})
+});
+
+export const ChatMessageAssistant = v.object({
+	chatId: v.id('chat'),
+	role: v.literal('assistant'),
+	content: v.optional(v.string()),
+	streamId: StreamIdValidator,
+	meta: v.object({
+		modelId: v.string(),
+		cost: v.optional(v.number()),
+		startedGenerating: v.optional(v.number()),
+		stoppedGenerating: v.optional(v.number())
+	})
+});
+
+export const ChatMessage = v.union(ChatMessageUser, ChatMessageAssistant);
+
 export default defineSchema({
 	userSettings: defineTable({
 		userId: v.string(),
@@ -26,14 +50,5 @@ export default defineSchema({
 		userId: v.string(),
 		title: v.optional(v.string())
 	}).index('by_user', ['userId']),
-	messages: defineTable({
-		userId: v.string(),
-		chatId: v.id('chat'),
-		role: v.union(v.literal('user'), v.literal('assistant')),
-		content: v.optional(v.string()),
-		modelId: v.optional(v.string()),
-		streamId: v.optional(StreamIdValidator)
-	})
-		.index('by_stream', ['streamId'])
-		.index('by_chat', ['chatId'])
+	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
 });
