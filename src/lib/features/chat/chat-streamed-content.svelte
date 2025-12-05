@@ -6,14 +6,13 @@
 	import { useStream } from '$lib/utils/persistent-text-streaming.svelte.js';
 	import type { StreamId } from '@convex-dev/persistent-text-streaming';
 	import { useChatLayout } from './chat.svelte';
-	import { Streamdown } from 'svelte-streamdown';
+	import Streamdown from '$lib/features/chat/components/streamdown.svelte';
 
 	type Props = {
 		message: ChatMessageAssistant;
-		driven: boolean;
 	};
 
-	let { message, driven }: Props = $props();
+	let { message }: Props = $props();
 
 	const accessToken = AccessTokenCtx.get();
 	const chatState = useChatLayout();
@@ -21,8 +20,6 @@
 	const streamBody = useStream(
 		api.messages.getChatBody,
 		new URL('/messages/stream', env.PUBLIC_CONVEX_SITE_URL),
-		// svelte-ignore state_referenced_locally
-		driven,
 		{
 			// svelte-ignore state_referenced_locally
 			chatId: message.chatId,

@@ -36,7 +36,7 @@
 			ids: [chat._id]
 		});
 
-		if (page.params.chatId === chat._id) await goto('/');
+		if (page.params.chatId === chat._id) await goto('/chat');
 	}
 
 	async function renameChat(title: string) {

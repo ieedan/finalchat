@@ -17,9 +17,11 @@
 		optimisticClear = true,
 		value = $bindable(''),
 		modelId = $bindable(null),
+		generating = false,
 		...rest
 	}: HTMLAttributes<HTMLDivElement> & {
 		onSubmit: OnSubmit;
+		generating?: boolean;
 		/**
 		 * Whether to submit the form on enter. Otherwise the form will be submitted on shift+enter.
 		 */
@@ -32,6 +34,7 @@
 	const promptInputState = usePromptInput({
 		onSubmit: box.with(() => onSubmit),
 		submitOnEnter: box.with(() => submitOnEnter),
+		generating: box.with(() => generating),
 		value: box.with(
 			() => value,
 			(v) => (value = v)

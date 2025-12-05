@@ -7,7 +7,7 @@ import {
 	StreamId,
 	StreamIdValidator
 } from '@convex-dev/persistent-text-streaming';
-import { Id } from './_generated/dataModel';
+import { Doc, Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { ModelMessage, streamText } from 'ai';
 import { getChatMessages, getLastUserAndAssistantMessages } from './chat.utils';
@@ -86,16 +86,6 @@ export const streamMessage = httpAction(async (ctx, request) => {
 		apiKey: string | undefined;
 	};
 
-	const messages = await ctx.runQuery(internal.messages.getMessagesForChat, { chatId });
-
-	const last = getLastUserAndAssistantMessages(messages);
-	if (!last) {
-		return new Response('There was a problem getting the previous messages', { status: 400 });
-	}
-
-	// remove the assistant message so it's not part of the generation
-	messages.pop();
-
 	const response = await persistentTextStreaming.stream(
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		ctx as any,
@@ -103,6 +93,16 @@ export const streamMessage = httpAction(async (ctx, request) => {
 		streamId,
 		async (ctx, _request, _streamId, append) => {
 			try {
+				const messages = await ctx.runQuery(internal.messages.getMessagesForChat, { chatId });
+
+				const last = getLastUserAndAssistantMessages(messages);
+				if (!last) {
+					throw new Error('There was a problem getting the previous messages');
+				}
+
+				// remove the assistant message so it's not part of the generation
+				messages.pop();
+
 				await ctx.runMutation(internal.messages.startGenerating, {
 					messageId: last.assistantMessage._id
 				});
@@ -167,7 +167,7 @@ export const startGenerating = internalMutation({
 				}
 			}),
 			ctx.db.patch(message.chatId, {
-				generating: true,
+				generating: true
 			})
 		]);
 	}
@@ -177,7 +177,7 @@ export const getMessagesForChat = internalQuery({
 	args: {
 		chatId: v.id('chat')
 	},
-	handler: async (ctx, args) => {
+	handler: async (ctx, args): Promise<Doc<'messages'>[]> => {
 		const chat = await ctx.db.get(args.chatId);
 		const user = await ctx.auth.getUserIdentity();
 
