@@ -6,6 +6,94 @@ import { onMount } from 'svelte';
 
 export type StreamStatus = 'pending' | 'streaming' | 'done' | 'error';
 
+export class UseStreamState {
+	streamEnded = $state<boolean | null>(null);
+	streamBody = $state<string>('');
+	streamStarted = $state(false);
+	usePersistence: boolean;
+	persistentBody;
+	constructor(
+		getPersistentBody: FunctionReference<'query', 'public', { streamId: string }, StreamBody>,
+		streamUrl: URL,
+		driven: boolean,
+		{
+			streamId,
+			chatId,
+			authToken,
+			apiKey,
+			headers
+		}: {
+			streamId: StreamId | undefined;
+			chatId: Id<'chat'>;
+			// If provided, this will be passed as the Authorization header.
+			authToken?: string | null;
+			apiKey: string | null;
+			// If provided, these will be passed as additional headers.
+			headers?: Record<string, string>;
+		}
+	) {
+		this.usePersistence = $derived.by(() => {
+			if (!this.streamEnded === false) return true;
+			if (!driven) return true;
+			return false;
+		});
+
+		this.persistentBody = useQuery(
+			getPersistentBody,
+			this.usePersistence && streamId ? { streamId } : 'skip'
+		);
+
+		onMount(() => {
+			if (driven && streamId && !this.streamStarted) {
+				void (async () => {
+					const success = await startStreaming(
+						streamUrl,
+						{ streamId, chatId, apiKey },
+						(text) => {
+							this.streamBody += text;
+						},
+						{
+							...headers,
+							...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
+						}
+					);
+					this.streamEnded = success;
+				})();
+
+				return () => {
+					this.streamStarted = true;
+				};
+			}
+		});
+	}
+
+	body = $derived.by(() => {
+		if (this.persistentBody) {
+			if (this.persistentBody.data) {
+				return {
+					status: this.persistentBody.data.status,
+					text: this.persistentBody.data.text
+				};
+			}
+
+			return {
+				status: 'pending',
+				text: ''
+			};
+		}
+		let status: StreamStatus;
+		if (this.streamEnded === null) {
+			status = this.streamBody.length > 0 ? 'streaming' : 'pending';
+		} else {
+			status = this.streamEnded ? 'done' : 'error';
+		}
+		return {
+			text: this.streamBody,
+			status: status as StreamStatus
+		};
+	});
+}
+
 export function useStream(
 	getPersistentBody: FunctionReference<'query', 'public', { streamId: string }, StreamBody>,
 	streamUrl: URL,
@@ -64,32 +152,34 @@ export function useStream(
 		}
 	});
 
-	return {
-		get body() {
-			if (persistentBody) {
-				if (persistentBody.data) {
-					return {
-						status: persistentBody.data.status,
-						text: persistentBody.data.text
-					};
-				}
-
+	const body = $derived.by(() => {
+		if (persistentBody) {
+			if (persistentBody.data) {
 				return {
-					status: 'pending',
-					text: ''
+					status: persistentBody.data.status,
+					text: persistentBody.data.text
 				};
 			}
-			let status: StreamStatus;
-			if (streamEnded === null) {
-				status = streamBody.length > 0 ? 'streaming' : 'pending';
-			} else {
-				status = streamEnded ? 'done' : 'error';
-			}
+
 			return {
-				text: streamBody,
-				status: status as StreamStatus
+				status: 'pending',
+				text: ''
 			};
 		}
+		let status: StreamStatus;
+		if (streamEnded === null) {
+			status = streamBody.length > 0 ? 'streaming' : 'pending';
+		} else {
+			status = streamEnded ? 'done' : 'error';
+		}
+		return {
+			text: streamBody,
+			status: status as StreamStatus
+		};
+	});
+
+	return {
+		body
 	};
 }
 

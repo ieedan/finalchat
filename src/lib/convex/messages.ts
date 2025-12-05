@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
-import { httpAction, internalMutation, internalQuery, mutation, query } from './_generated/server';
+import { httpAction, internalQuery, query } from './_generated/server';
+import { mutation, internalMutation } from './functions';
 import { components, internal } from './_generated/api';
 import {
 	PersistentTextStreaming,
@@ -32,7 +33,9 @@ export const create = mutation({
 			chatId = await ctx.db.insert('chat', {
 				userId: user.subject,
 				title: 'Untitled Chat',
-				generating: true
+				generating: true,
+				updatedAt: Date.now(),
+				pinned: false
 			});
 		} else {
 			chatId = args.chatId;
@@ -75,7 +78,11 @@ export const getChatBody = query({
 });
 
 export const streamMessage = httpAction(async (ctx, request) => {
-	const { streamId, chatId, apiKey } = (await request.json()) as { streamId: StreamId; chatId: Id<'chat'>; apiKey: string | undefined };
+	const { streamId, chatId, apiKey } = (await request.json()) as {
+		streamId: StreamId;
+		chatId: Id<'chat'>;
+		apiKey: string | undefined;
+	};
 
 	const messages = await ctx.runQuery(internal.messages.getMessagesForChat, { chatId });
 
@@ -106,7 +113,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 								role: message.role,
 								content: message.content ?? ''
 							}) satisfies ModelMessage
-					),
+					)
 				});
 
 				let content = '';
@@ -163,7 +170,6 @@ export const updateMessageContent = internalMutation({
 		if (!message) throw new Error('Message not found');
 		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
 		await ctx.db.patch(args.messageId, {
-			role: 'assistant',
 			content: args.content,
 			meta: {
 				...message.meta,
@@ -183,7 +189,6 @@ export const updateMessageError = internalMutation({
 		if (!message) throw new Error('Message not found');
 		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
 		await ctx.db.patch(args.messageId, {
-			role: 'assistant',
 			error: args.error,
 			meta: {
 				...message.meta,

@@ -1,6 +1,5 @@
 import { DataModel, Doc, Id } from './_generated/dataModel';
 import type { GenericMutationCtx, GenericQueryCtx } from 'convex/server';
-import { Infer } from 'convex/values'
 import type { ChatMessageAssistant, ChatMessageUser } from './schema';
 
 export async function getChatMessages(
@@ -16,8 +15,8 @@ export async function getChatMessages(
 }
 
 export function getLastUserAndAssistantMessages(messages: Doc<'messages'>[]): {
-	userMessage: Infer<typeof ChatMessageUser> & { _id: Id<'messages'>, _creationTime: number };
-	assistantMessage: Infer<typeof ChatMessageAssistant> & { _id: Id<'messages'>, _creationTime: number };
+	userMessage: ChatMessageUser & { _id: Id<'messages'>, _creationTime: number };
+	assistantMessage: ChatMessageAssistant & { _id: Id<'messages'>, _creationTime: number };
 } | null {
 	if (messages.length < 2) return null;
 

@@ -1,7 +1,8 @@
 import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
-import { query } from './_generated/server';
+import { mutation } from './functions';
 import { getChatMessages } from './chat.utils';
+import { query } from './_generated/server';
 
 export const getAll = query({
 	args: {},
@@ -34,5 +35,59 @@ export const get = query({
 			...chat,
 			messages
 		};
+	}
+});
+
+export const updatePinned = mutation({
+	args: {
+		chatId: v.id('chat'),
+		pinned: v.boolean()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		const chat = await ctx.db.get(args.chatId);
+		if (!chat || chat.userId !== user.subject)
+			throw new Error('Chat not found or you are not authorized to access it');
+
+		await ctx.db.patch(args.chatId, {
+			pinned: args.pinned
+		});
+	}
+});
+
+export const updateTitle = mutation({
+	args: {
+		chatId: v.id('chat'),
+		title: v.string()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		const chat = await ctx.db.get(args.chatId);
+		if (!chat || chat.userId !== user.subject)
+			throw new Error('Chat not found or you are not authorized to access it');
+
+		await ctx.db.patch(args.chatId, {
+			title: args.title
+		});
+	}
+});
+
+export const remove = mutation({
+	args: {
+		chatId: v.id('chat')
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		const chat = await ctx.db.get(args.chatId);
+		if (!chat || chat.userId !== user.subject)
+			throw new Error('Chat not found or you are not authorized to access it');
+
+		await ctx.db.delete(args.chatId);
 	}
 });

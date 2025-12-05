@@ -2,11 +2,11 @@
 	import * as PromptInput from '$lib/features/chat/components/prompt-input';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import ModelPickerBasic from '$lib/features/chat/components/model-picker-basic.svelte';
-	import { PersistedState } from 'runed';
+	import { ModelIdCtx } from '$lib/context.svelte';
 
 	const chatState = useChatLayout();
 
-	const modelId = new PersistedState('modelId', null);
+	const modelId = ModelIdCtx.get();
 </script>
 
 <div class="w-full min-h-svh items-center justify-center flex">

@@ -6,8 +6,10 @@
 	import { setupConvex } from 'convex-svelte';
 	import { page } from '$app/state';
 	import { jwtDecode } from 'jwt-decode';
-	import { AccessTokenCtx } from '$lib/context.svelte';
+	import { AccessTokenCtx, ModelIdCtx } from '$lib/context.svelte';
 	import { box } from 'svelte-toolbelt';
+	import type { ModelId } from '$lib/features/chat/types';
+	import { PersistedState } from 'runed';
 
 	let { children } = $props();
 
@@ -17,6 +19,15 @@
 		box.with(
 			() => accessToken,
 			(v) => (accessToken = v)
+		)
+	);
+
+	const modelId = new PersistedState('modelId', null);
+
+	ModelIdCtx.set(
+		box.with(
+			() => modelId.current,
+			(v) => (modelId.current = v)
 		)
 	);
 

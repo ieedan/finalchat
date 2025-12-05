@@ -4,7 +4,12 @@
 	let { children, data } = $props();
 
 	// svelte-ignore state_referenced_locally
-	setupChatLayout({ user: data.user, userSettings: data.userSettings, apiKey: data.apiKey });
+	setupChatLayout({
+		user: data.user,
+		userSettings: data.userSettings,
+		chats: data.chats,
+		apiKey: data.apiKey
+	});
 </script>
 
 {@render children()}
