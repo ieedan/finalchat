@@ -24,15 +24,5 @@ triggers.register('chat', async (ctx, change) => {
 	}
 });
 
-triggers.register('messages', async (ctx, change) => {  
-    // any changes to messages belonging to a chat will update the chat's updatedAt timestamp
-    if (change.operation === 'insert' || change.operation === 'update') {
-        const chatId = change.newDoc.chatId;
-        await ctx.db.patch(chatId, {
-            updatedAt: Date.now()
-        });
-    }
-});
-
 export const mutation = customMutation(rawMutation, customCtx(triggers.wrapDB));
 export const internalMutation = customMutation(rawInternalMutation, customCtx(triggers.wrapDB));

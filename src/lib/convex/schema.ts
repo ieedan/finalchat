@@ -53,9 +53,9 @@ export default defineSchema({
 	chat: defineTable({
 		generating: v.boolean(),
 		userId: v.string(),
-		title: v.optional(v.string()),
+		title: v.string(),
 		updatedAt: v.number(),
-		pinned: v.boolean()
+		pinned: v.boolean(),
 	}).index('by_user', ['userId']),
 	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
 });

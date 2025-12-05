@@ -8,8 +8,8 @@
 	import { jwtDecode } from 'jwt-decode';
 	import { AccessTokenCtx, ModelIdCtx } from '$lib/context.svelte';
 	import { box } from 'svelte-toolbelt';
-	import type { ModelId } from '$lib/features/chat/types';
 	import { PersistedState } from 'runed';
+	import { ConfirmDeleteDialog } from '$lib/components/ui/confirm-delete-dialog';
 
 	let { children } = $props();
 
@@ -51,5 +51,6 @@
 </svelte:head>
 
 <ModeWatcher />
+<ConfirmDeleteDialog />
 
 {@render children()}

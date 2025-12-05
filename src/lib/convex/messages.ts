@@ -33,12 +33,15 @@ export const create = mutation({
 			chatId = await ctx.db.insert('chat', {
 				userId: user.subject,
 				title: 'Untitled Chat',
-				generating: true,
+				generating: false,
 				updatedAt: Date.now(),
 				pinned: false
 			});
 		} else {
 			chatId = args.chatId;
+			await ctx.db.patch(chatId, {
+				updatedAt: Date.now()
+			});
 		}
 
 		const messageId = await ctx.db.insert('messages', {
@@ -56,8 +59,7 @@ export const create = mutation({
 			role: 'assistant',
 			streamId,
 			meta: {
-				modelId: args.prompt.modelId,
-				startedGenerating: Date.now()
+				modelId: args.prompt.modelId
 			}
 		});
 
@@ -101,6 +103,10 @@ export const streamMessage = httpAction(async (ctx, request) => {
 		streamId,
 		async (ctx, _request, _streamId, append) => {
 			try {
+				await ctx.runMutation(internal.messages.startGenerating, {
+					messageId: last.assistantMessage._id
+				});
+
 				const openrouter = createOpenRouter({
 					apiKey
 				});
@@ -141,8 +147,30 @@ export const streamMessage = httpAction(async (ctx, request) => {
 
 	response.headers.set('Access-Control-Allow-Origin', '*');
 	response.headers.set('Vary', 'Origin');
-
 	return response;
+});
+
+export const startGenerating = internalMutation({
+	args: {
+		messageId: v.id('messages')
+	},
+	handler: async (ctx, args) => {
+		const message = await ctx.db.get(args.messageId);
+		if (!message) throw new Error('Message not found');
+		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
+
+		await Promise.all([
+			ctx.db.patch(args.messageId, {
+				meta: {
+					...message.meta,
+					startedGenerating: Date.now()
+				}
+			}),
+			ctx.db.patch(message.chatId, {
+				generating: true,
+			})
+		]);
+	}
 });
 
 export const getMessagesForChat = internalQuery({
@@ -169,13 +197,19 @@ export const updateMessageContent = internalMutation({
 		const message = await ctx.db.get(args.messageId);
 		if (!message) throw new Error('Message not found');
 		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
-		await ctx.db.patch(args.messageId, {
-			content: args.content,
-			meta: {
-				...message.meta,
-				stoppedGenerating: Date.now()
-			}
-		});
+		await Promise.all([
+			ctx.db.patch(args.messageId, {
+				content: args.content,
+				meta: {
+					...message.meta,
+					stoppedGenerating: Date.now()
+				}
+			}),
+			ctx.db.patch(message.chatId, {
+				generating: false,
+				updatedAt: Date.now()
+			})
+		]);
 	}
 });
 
@@ -188,12 +222,18 @@ export const updateMessageError = internalMutation({
 		const message = await ctx.db.get(args.messageId);
 		if (!message) throw new Error('Message not found');
 		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
-		await ctx.db.patch(args.messageId, {
-			error: args.error,
-			meta: {
-				...message.meta,
-				stoppedGenerating: Date.now()
-			}
-		});
+		await Promise.all([
+			ctx.db.patch(args.messageId, {
+				error: args.error,
+				meta: {
+					...message.meta,
+					stoppedGenerating: Date.now()
+				}
+			}),
+			ctx.db.patch(message.chatId, {
+				generating: false,
+				updatedAt: Date.now()
+			})
+		]);
 	}
 });

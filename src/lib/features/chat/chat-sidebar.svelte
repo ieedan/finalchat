@@ -9,6 +9,7 @@
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import { goto } from '$app/navigation';
 	import { DEFAULT_AGE_GROUPS, getAgedGroups } from '$lib/utils/aged-groups';
+	import ChatButton from './chat-button.svelte';
 
 	const chatContext = useChatLayout();
 
@@ -23,14 +24,14 @@
 <Sidebar.Root>
 	<Sidebar.Header></Sidebar.Header>
 	<Sidebar.Content>
-		{#each Object.entries(groups) as [name, comparisons] (name)}
-			{#if comparisons.length > 0}
+		{#each Object.entries(groups) as [name, chats] (name)}
+			{#if chats.length > 0}
 				<Sidebar.Group class="py-0">
 					<Sidebar.GroupLabel>{name}</Sidebar.GroupLabel>
 					<Sidebar.GroupContent>
 						<Sidebar.Menu>
-							{#each comparisons as comparison (comparison._id)}
-								<ComparisonButton {comparison} />
+							{#each chats as chat (chat._id)}
+								<ChatButton {chat} />
 							{/each}
 						</Sidebar.Menu>
 					</Sidebar.GroupContent>

@@ -3,57 +3,49 @@
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
-	import { session } from '$lib/state/session.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { LoaderCircle, PinIcon, PinOffIcon, TrashIcon } from '@lucide/svelte';
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { confirmDelete } from '$lib/components/site/confirm-delete-dialog/confirm-delete-dialog.svelte';
-	import { warm } from '$lib/cache/cached-query.svelte';
-	import * as ContextMenu from '$lib/components/ui/context-menu';
+	import { confirmDelete } from '$lib/components/ui/confirm-delete-dialog';
 	import * as Rename from '$lib/components/ui/rename';
 	import { useSidebar } from '$lib/components/ui/sidebar';
 	import { navigating } from '$app/state';
 
 	type Props = {
-		comparison: Doc<'comparisons'> & {
-			product_urls: Doc<'product_urls'>[];
-			hasGenerating: boolean;
-		};
+		chat: Doc<'chat'>;
 	};
 
-	let { comparison }: Props = $props();
+	let { chat }: Props = $props();
 
 	const client = useConvexClient();
 
-	async function startDeleteComparison(shiftKey?: boolean) {
+	async function startDeleteChat(shiftKey?: boolean) {
 		confirmDelete({
-			title: 'Are you sure you want to delete this comparison?',
+			title: 'Are you sure you want to delete this chat?',
 			description: 'This action cannot be undone.',
 			skipConfirmation: shiftKey,
-			onConfirm: deleteComparison
+			onConfirm: deleteChat
 		});
 	}
 
-	async function deleteComparison() {
-		await client.mutation(api.comparisons.remove, {
-			ids: [comparison._id],
-			sessionToken: session.current?.session.token ?? ''
+	async function deleteChat() {
+		await client.mutation(api.chat.remove, {
+			ids: [chat._id]
 		});
 
-		if (page.params.comparisonId === comparison._id) await goto('/');
+		if (page.params.chatId === chat._id) await goto('/');
 	}
 
-	async function renameComparison(title: string) {
+	async function renameChat(title: string) {
 		if (title.trim().length === 0) {
-			return comparison.title;
+			return chat.title;
 		}
 
-		client.mutation(api.comparisons.rename, {
-			id: comparison._id,
-			title,
-			sessionToken: session.current?.session.token ?? ''
+		client.mutation(api.chat.updateTitle, {
+			chatId: chat._id,
+			title
 		});
 
 		return title;
@@ -61,19 +53,16 @@
 
 	async function togglePinned() {
 		pinned = !pinned;
-		await client.mutation(api.comparisons.updatePinned, {
-			id: comparison._id,
-			pinned: !comparison.pinned,
-			sessionToken: session.current?.session.token ?? ''
+		await client.mutation(api.chat.updatePinned, {
+			chatId: chat._id,
+			pinned: !chat.pinned
 		});
 	}
 
 	const backgroundClass =
 		'bg-accent group-data-[active=true]/menu-button:bg-accent group-hover/menu-button:bg-accent';
 
-	let pinned = $derived(comparison.pinned);
-
-	const generating = $derived(comparison.hasGenerating || comparison.product_urls.length === 0);
+	let pinned = $derived(chat.pinned);
 
 	let renamingMode = $state<'view' | 'edit'>('view');
 
@@ -89,7 +78,7 @@
 <Rename.Provider>
 	<Sidebar.MenuItem>
 		<Sidebar.MenuButton
-			isActive={page.params.comparisonId === comparison._id}
+			isActive={page.params.chatId === chat._id}
 			onkeydown={(e: KeyboardEvent) => {
 				if (e.key === 'F2') {
 					renamingMode = 'edit';
@@ -99,34 +88,23 @@
 			{#snippet child({ props })}
 				<a
 					{...props}
-					href={comparison.last_conversation_id
-						? `/comparisons/${comparison._id}/conversations/${comparison.last_conversation_id}`
-						: `/comparisons/${comparison._id}`}
-					class="group/menu-button hover:bg-accent data-[active=true]:bg-accent relative flex h-auto flex-col !place-items-start !gap-1 truncate rounded-md px-2 py-2"
-					onpointerover={() => {
-						warm(client, api.comparisons.get, {
-							comparison_id: comparison._id,
-							sessionToken: session.current?.session.token ?? ''
-						});
-					}}
+					href="/chat/{chat._id}"
+					class="group/menu-button hover:bg-accent data-[active=true]:bg-accent relative flex h-auto flex-col place-items-start! gap-1! truncate rounded-md px-2 py-2"
 				>
 					<Rename.Root
 						this="span"
-						value={comparison.title}
-						class="max-w-full rounded-none border-none outline-none focus:!ring-0 data-[mode=view]:truncate"
+						value={chat.title}
+						class="max-w-full rounded-none border-none outline-none focus:ring-0! data-[mode=view]:truncate"
 						fallbackSelectionBehavior="all"
-						onSave={renameComparison}
+						onSave={renameChat}
 						bind:mode={renamingMode}
 					/>
-					<span class="text-muted-foreground text-start text-xs">
-						{comparison.product_urls.length} products
-					</span>
 					<div
 						class={cn(
 							'border-border absolute right-0 top-0 rounded-bl-md rounded-tr-md border-b border-l',
 							'opacity-0 transition-opacity duration-75',
 							{
-								'opacity-100': generating && renamingMode === 'view',
+								'opacity-100': chat.generating && renamingMode === 'view',
 								'group-hover/menu-button:opacity-100': renamingMode === 'view'
 							},
 							backgroundClass
@@ -152,10 +130,10 @@
 										togglePinned();
 									}}
 								>
-									{#if !comparison.pinned}
-										<PinIcon class="!size-3.5" />
+									{#if !chat.pinned}
+										<PinIcon class="size-3.5!" />
 									{:else}
-										<PinOffIcon class="!size-3.5" />
+										<PinOffIcon class="size-3.5!" />
 									{/if}
 								</Button>
 								<Button
@@ -166,16 +144,16 @@
 									onclick={(e: MouseEvent) => {
 										e.preventDefault();
 										e.stopPropagation();
-										startDeleteComparison(e.shiftKey);
+										startDeleteChat(e.shiftKey);
 									}}
 								>
-									<TrashIcon class="!size-3.5" />
+									<TrashIcon class="size-3.5!" />
 								</Button>
 							</div>
-							{#if generating}
+							{#if chat.generating}
 								<div class={cn('z-20 size-8 rounded-bl-md rounded-tr-md', backgroundClass)}>
 									<div class="flex h-full w-full animate-spin place-items-center justify-center">
-										<LoaderCircle class="!size-3.5" />
+										<LoaderCircle class="size-3.5!" />
 									</div>
 								</div>
 							{/if}
@@ -184,5 +162,5 @@
 				</a>
 			{/snippet}
 		</Sidebar.MenuButton>
-	</Sidebar.MenuItem> 
+	</Sidebar.MenuItem>
 </Rename.Provider>

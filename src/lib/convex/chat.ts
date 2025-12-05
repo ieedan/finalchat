@@ -78,16 +78,18 @@ export const updateTitle = mutation({
 
 export const remove = mutation({
 	args: {
-		chatId: v.id('chat')
+		ids: v.array(v.id('chat'))
 	},
 	handler: async (ctx, args): Promise<void> => {
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) throw new Error('Unauthorized');
 
-		const chat = await ctx.db.get(args.chatId);
-		if (!chat || chat.userId !== user.subject)
-			throw new Error('Chat not found or you are not authorized to access it');
+		for (const id of args.ids) {
+			const chat = await ctx.db.get(id);
+			if (!chat || chat.userId !== user.subject)
+				throw new Error('Chat not found or you are not authorized to access it');
 
-		await ctx.db.delete(args.chatId);
+			await ctx.db.delete(id);
+		}
 	}
 });
