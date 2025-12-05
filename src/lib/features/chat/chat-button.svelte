@@ -12,6 +12,7 @@
 	import * as Rename from '$lib/components/ui/rename';
 	import { useSidebar } from '$lib/components/ui/sidebar';
 	import { navigating } from '$app/state';
+	import { warm } from '$lib/cache/cached-query.svelte';
 
 	type Props = {
 		chat: Doc<'chat'>;
@@ -90,6 +91,11 @@
 					{...props}
 					href="/chat/{chat._id}"
 					class="group/menu-button hover:bg-accent data-[active=true]:bg-accent relative flex h-auto flex-col place-items-start! gap-1! truncate rounded-md px-2 py-2"
+					onpointerover={() => {
+						warm(client, api.chat.get, {
+							chatId: chat._id,
+						});
+					}}
 				>
 					<Rename.Root
 						this="span"

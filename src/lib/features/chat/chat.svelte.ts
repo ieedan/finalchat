@@ -12,6 +12,7 @@ import type { ConvexClient } from 'convex/browser';
 import type { RemoteQuery } from '@sveltejs/kit';
 import { getApiKey } from '../api-keys/api-keys.remote.js';
 import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
+import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
 
 type ChatLayoutOptions = {
 	user: User;
@@ -64,7 +65,9 @@ class ChatLayoutState {
 	}
 
 	get apiKey(): string | null {
-		return this.opts.apiKey?.key ?? this.localApiKey.current ?? this.apiKeysQuery.current?.key ?? null;
+		return (
+			this.opts.apiKey?.key ?? this.localApiKey.current ?? this.apiKeysQuery.current?.key ?? null
+		);
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId }) => {
@@ -95,21 +98,15 @@ export function useChatLayout() {
 }
 
 type ChatViewOptions = {
-	chat: Doc<'chat'> & { messages: Doc<'messages'>[] };
+	chatId: Id<'chat'>;
 };
 
 class ChatViewState {
-	chatQuery: Query<typeof api.chat.get>;
+	chatQuery: QueryResult<Doc<'chat'> & { messages: Doc<'messages'>[] }>;
 	constructor(readonly opts: ChatViewOptions) {
-		this.chatQuery = useQueryWithFallback(
-			api.chat.get,
-			{
-				chatId: this.opts.chat._id
-			},
-			{
-				fallback: this.opts.chat
-			}
-		);
+		this.chatQuery = useCachedQuery(api.chat.get, {
+			chatId: this.opts.chatId
+		});
 	}
 }
 
@@ -122,4 +119,3 @@ export function setupChatView(opts: ChatViewOptions) {
 export function useChatView() {
 	return ChatViewCtx.get();
 }
-

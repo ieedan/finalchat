@@ -1,14 +1,12 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import type { Id } from '$lib/convex/_generated/dataModel';
 	import { setupChatView } from '$lib/features/chat/chat.svelte';
 
-	let { data, children } = $props();
+	let { children } = $props();
 
 	// svelte-ignore state_referenced_locally
-	setupChatView({ chat: data.chat });
+	setupChatView({ chatId: page.params.chatId as Id<'chat'> });
 </script>
-
-<svelte:head>
-	<title>{data.chat.title}</title>
-</svelte:head>
 
 {@render children()}
