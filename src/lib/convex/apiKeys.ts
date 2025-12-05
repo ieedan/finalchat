@@ -1,15 +1,16 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import { Doc } from './_generated/dataModel';
 
-export const getAll = query({
-	handler: async (ctx) => {
+export const get = query({
+	handler: async (ctx): Promise<Doc<'apiKeys'> | null> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) return [];
+		if (!user) return null;
 
 		return await ctx.db
 			.query('apiKeys')
 			.withIndex('by_user', (q) => q.eq('userId', user.subject))
-			.collect();
+			.first();
 	}
 });
 

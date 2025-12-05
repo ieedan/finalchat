@@ -3,13 +3,13 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { sidebarMenuButtonVariants } from '$lib/components/ui/sidebar/sidebar-menu-button.svelte';
-	import { ChatCtx } from './chat.svelte';
+	import { useChatLayout } from './chat.svelte';
 	import { CircleThemeSelector } from '$lib/components/ui/circle-theme-selector';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import { goto } from '$app/navigation';
 
-	const chatContext = ChatCtx.get();
+	const chatContext = useChatLayout();
 </script>
 
 <Sidebar.Root>

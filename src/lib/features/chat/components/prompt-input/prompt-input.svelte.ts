@@ -4,8 +4,10 @@ import type { ReadableBoxedValues, WritableBoxedValues } from 'svelte-toolbelt';
 import type { KeyboardEventHandler } from 'svelte/elements';
 import type { Model, ModelId } from '../../types';
 
+export type OnSubmit = (opts: { input: string; modelId: ModelId }) => Promise<void>;
+
 type PromptInputRootStateOptions = ReadableBoxedValues<{
-	onSubmit: (opts: { input: string; modelId: ModelId }) => Promise<void>;
+	onSubmit: OnSubmit;
 	submitOnEnter?: boolean;
 	optimisticClear?: boolean;
 }> &

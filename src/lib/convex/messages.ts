@@ -1,11 +1,5 @@
 import { v } from 'convex/values';
-import {
-	httpAction,
-	internalMutation,
-	internalQuery,
-	mutation,
-	query
-} from './_generated/server';
+import { httpAction, internalMutation, internalQuery, mutation, query } from './_generated/server';
 import { components, internal } from './_generated/api';
 import {
 	PersistentTextStreaming,
@@ -13,7 +7,7 @@ import {
 	StreamIdValidator
 } from '@convex-dev/persistent-text-streaming';
 import { Id } from './_generated/dataModel';
-import { openrouter } from '../ai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { ModelMessage, streamText } from 'ai';
 import { getChatMessages, getLastUserAndAssistantMessages } from './chat.utils';
 
@@ -29,9 +23,9 @@ export const create = mutation({
 		chatId: v.optional(v.id('chat')),
 		prompt: Prompt
 	},
-	handler: async (ctx, args) => {
+	handler: async (ctx, args): Promise<{ chatId: Id<'chat'>; messageId: Id<'messages'> }> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) return;
+		if (!user) throw new Error('Unauthorized');
 
 		let chatId: Id<'chat'>;
 		if (!args.chatId) {
@@ -81,7 +75,7 @@ export const getChatBody = query({
 });
 
 export const streamMessage = httpAction(async (ctx, request) => {
-	const { streamId, chatId } = (await request.json()) as { streamId: StreamId; chatId: Id<'chat'> };
+	const { streamId, chatId, apiKey } = (await request.json()) as { streamId: StreamId; chatId: Id<'chat'>; apiKey: string | undefined };
 
 	const messages = await ctx.runQuery(internal.messages.getMessagesForChat, { chatId });
 
@@ -99,32 +93,47 @@ export const streamMessage = httpAction(async (ctx, request) => {
 		request,
 		streamId,
 		async (ctx, _request, _streamId, append) => {
-			const { fullStream } = streamText({
-				model: openrouter.chat(last.userMessage.chatSettings.modelId),
-				messages: messages.map(
-					(message) =>
-						({
-							role: message.role,
-							content: message.content ?? ''
-						}) satisfies ModelMessage
-				)
-			});
+			try {
+				const openrouter = createOpenRouter({
+					apiKey
+				});
 
-			let content = '';
+				const { fullStream } = streamText({
+					model: openrouter.chat(last.userMessage.chatSettings.modelId),
+					messages: messages.map(
+						(message) =>
+							({
+								role: message.role,
+								content: message.content ?? ''
+							}) satisfies ModelMessage
+					),
+				});
 
-			for await (const chunk of fullStream) {
-				if (chunk.type === 'text-delta') {
-					content += chunk.text;
-					await append(chunk.text);
+				let content = '';
+
+				for await (const chunk of fullStream) {
+					if (chunk.type === 'text-delta') {
+						content += chunk.text;
+						await append(chunk.text);
+					}
 				}
-			}
 
-			await ctx.runMutation(internal.messages.updateMessageContent, {
-				messageId: last.assistantMessage._id,
-				content
-			});
+				await ctx.runMutation(internal.messages.updateMessageContent, {
+					messageId: last.assistantMessage._id,
+					content
+				});
+			} catch (error) {
+				await ctx.runMutation(internal.messages.updateMessageError, {
+					messageId: last.assistantMessage._id,
+					error:
+						error instanceof Error ? error.message : 'There was an error generating the response'
+				});
+			}
 		}
 	);
+
+	response.headers.set('Access-Control-Allow-Origin', '*');
+	response.headers.set('Vary', 'Origin');
 
 	return response;
 });
@@ -156,6 +165,26 @@ export const updateMessageContent = internalMutation({
 		await ctx.db.patch(args.messageId, {
 			role: 'assistant',
 			content: args.content,
+			meta: {
+				...message.meta,
+				stoppedGenerating: Date.now()
+			}
+		});
+	}
+});
+
+export const updateMessageError = internalMutation({
+	args: {
+		messageId: v.id('messages'),
+		error: v.string()
+	},
+	handler: async (ctx, args) => {
+		const message = await ctx.db.get(args.messageId);
+		if (!message) throw new Error('Message not found');
+		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
+		await ctx.db.patch(args.messageId, {
+			role: 'assistant',
+			error: args.error,
 			meta: {
 				...message.meta,
 				stoppedGenerating: Date.now()

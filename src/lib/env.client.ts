@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const env = createEnv({
 	client: {
 		PUBLIC_CONVEX_URL: z.url(),
+		PUBLIC_CONVEX_SITE_URL: z.string(),
 		PUBLIC_WORKOS_CLIENT_ID: z.string(),
 		PUBLIC_WORKOS_REDIRECT_URI: z.url()
 	},
