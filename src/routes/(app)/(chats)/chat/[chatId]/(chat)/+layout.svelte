@@ -7,4 +7,8 @@
 	setupChatView({ chat: data.chat });
 </script>
 
+<svelte:head>
+	<title>{data.chat.title}</title>
+</svelte:head>
+
 {@render children()}

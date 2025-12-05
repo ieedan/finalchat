@@ -10,6 +10,8 @@
 	import { goto } from '$app/navigation';
 	import { DEFAULT_AGE_GROUPS, getAgedGroups } from '$lib/utils/aged-groups';
 	import ChatButton from './chat-button.svelte';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import PlusIcon from '@lucide/svelte/icons/plus';
 
 	const chatContext = useChatLayout();
 
@@ -22,7 +24,16 @@
 </script>
 
 <Sidebar.Root>
-	<Sidebar.Header></Sidebar.Header>
+	<Sidebar.Header>
+		<Sidebar.MenuButton>
+			{#snippet child({ props: { class: _, ...props } })}
+				<a href="/chat" class={buttonVariants({ variant: 'default' })} {...props}>
+					<PlusIcon class="size-4!" />
+					New Chat
+				</a>
+			{/snippet}
+		</Sidebar.MenuButton>
+	</Sidebar.Header>
 	<Sidebar.Content>
 		{#each Object.entries(groups) as [name, chats] (name)}
 			{#if chats.length > 0}

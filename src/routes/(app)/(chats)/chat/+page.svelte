@@ -9,6 +9,10 @@
 	const modelId = ModelIdCtx.get();
 </script>
 
+<svelte:head>
+	<title>New Chat</title>
+</svelte:head>
+
 <div class="w-full min-h-svh items-center justify-center flex">
 	<PromptInput.Root
 		bind:modelId={modelId.current}
