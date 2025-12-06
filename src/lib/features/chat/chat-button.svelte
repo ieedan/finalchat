@@ -4,7 +4,14 @@
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
-	import { Ellipsis, LoaderCircle, PencilIcon, PinIcon, PinOffIcon, TrashIcon } from '@lucide/svelte';
+	import {
+		Ellipsis,
+		LoaderCircle,
+		PencilIcon,
+		PinIcon,
+		PinOffIcon,
+		TrashIcon
+	} from '@lucide/svelte';
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -64,7 +71,7 @@
 		'bg-accent group-data-[active=true]/menu-button:bg-accent group-hover/menu-button:bg-accent';
 
 	let pinned = $derived(chat.pinned);
-
+	let dropdownOpen = $state(false);
 	let renamingMode = $state<'view' | 'edit'>('view');
 
 	const sidebar = useSidebar();
@@ -90,7 +97,7 @@
 				<a
 					{...props}
 					href="/chat/{chat._id}"
-					class="group/menu-button hover:bg-accent transition-none data-[active=true]:bg-accent flex h-auto items-center gap-1 rounded-md px-2 py-2"
+					class="group/menu-button hover:bg-accent h-auto transition-none data-[active=true]:bg-accent flex items-center gap-1 rounded-md px-3"
 					onpointerover={() => {
 						warm(client, api.chat.get, {
 							chatId: chat._id
@@ -98,6 +105,11 @@
 					}}
 				>
 					<div class="flex min-w-0 flex-1 items-center gap-1">
+						{#if chat.generating}
+							<div class="flex shrink-0 items-center justify-center">
+								<LoaderCircle class="size-3.5! animate-spin" />
+							</div>
+						{/if}
 						<Rename.Root
 							this="span"
 							value={chat.title}
@@ -109,73 +121,67 @@
 						{#if renamingMode === 'view'}
 							<div
 								class={cn('flex shrink-0 items-center', 'opacity-0', {
-									'opacity-100': chat.generating,
 									'group-hover/menu-button:opacity-100': true
 								})}
 							>
-								{#if chat.generating}
-									<div class={cn('flex size-8 items-center justify-center', backgroundClass)}>
-										<LoaderCircle class="size-3.5! animate-spin" />
-									</div>
-								{:else}
-									<DropdownMenu.Root>
-										<DropdownMenu.Trigger
-											tabindex={-1}
-											class={cn(
-												'inline-flex size-8 items-center justify-center rounded-md bg-transparent hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-												backgroundClass
-											)}
-											onclick={(e: MouseEvent) => {
+								<DropdownMenu.Root bind:open={dropdownOpen}>
+									<DropdownMenu.Trigger
+										tabindex={-1}
+										data-open={dropdownOpen}
+										class={cn(
+											'inline-flex group-hover/menu-button:w-auto data-[open=true]:w-auto! w-0 size-9 items-center justify-center rounded-md bg-transparent hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+											backgroundClass
+										)}
+										onclick={(e: MouseEvent) => {
+											e.preventDefault();
+											e.stopPropagation();
+										}}
+									>
+										<Ellipsis class="size-4" />
+									</DropdownMenu.Trigger>
+									<DropdownMenu.Content
+										align="end"
+										side="bottom"
+										onclick={(e: MouseEvent) => {
+											e.stopPropagation();
+										}}
+									>
+										<DropdownMenu.Item
+											onSelect={(e) => {
 												e.preventDefault();
-												e.stopPropagation();
+												togglePinned();
 											}}
 										>
-											<Ellipsis class="size-3.5!" />
-										</DropdownMenu.Trigger>
-										<DropdownMenu.Content
-											align="end"
-											side="bottom"
-											onclick={(e: MouseEvent) => {
-												e.stopPropagation();
+											{#if !chat.pinned}
+												<PinIcon class="size-4!" />
+												Pin
+											{:else}
+												<PinOffIcon class="size-4!" />
+												Unpin
+											{/if}
+										</DropdownMenu.Item>
+										<DropdownMenu.Item
+											onSelect={(e) => {
+												e.preventDefault();
+												renamingMode = 'edit';
 											}}
 										>
-											<DropdownMenu.Item
-												onSelect={(e) => {
-													e.preventDefault();
-													togglePinned();
-												}}
-											>
-												{#if !chat.pinned}
-													<PinIcon class="size-4!" />
-													Pin
-												{:else}
-													<PinOffIcon class="size-4!" />
-													Unpin
-												{/if}
-											</DropdownMenu.Item>
-											<DropdownMenu.Item
-												onSelect={(e) => {
-													e.preventDefault();
-													renamingMode = 'edit'
-												}}
-											>
-												<PencilIcon class="size-4!" />
-												Edit
-											</DropdownMenu.Item>
-											<DropdownMenu.Separator />
-											<DropdownMenu.Item
-												variant="destructive"
-												onSelect={(e) => {
-													e.preventDefault();
-													startDeleteChat();
-												}}
-											>
-												<TrashIcon class="size-4!" />
-												Delete
-											</DropdownMenu.Item>
-										</DropdownMenu.Content>
-									</DropdownMenu.Root>
-								{/if}
+											<PencilIcon class="size-4!" />
+											Edit
+										</DropdownMenu.Item>
+										<DropdownMenu.Separator />
+										<DropdownMenu.Item
+											variant="destructive"
+											onSelect={(e) => {
+												e.preventDefault();
+												startDeleteChat();
+											}}
+										>
+											<TrashIcon class="size-4!" />
+											Delete
+										</DropdownMenu.Item>
+									</DropdownMenu.Content>
+								</DropdownMenu.Root>
 							</div>
 						{/if}
 					</div>
