@@ -10,6 +10,9 @@
 
 import type * as apiKeys from "../apiKeys.js";
 import type * as chat from "../chat.js";
+import type * as functions from "../functions.js";
+import type * as http from "../http.js";
+import type * as messages from "../messages.js";
 import type * as userSettings from "../userSettings.js";
 
 import type {
@@ -21,6 +24,9 @@ import type {
 declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
   chat: typeof chat;
+  functions: typeof functions;
+  http: typeof http;
+  messages: typeof messages;
   userSettings: typeof userSettings;
 }>;
 
@@ -50,4 +56,40 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  persistentTextStreaming: {
+    lib: {
+      addChunk: FunctionReference<
+        "mutation",
+        "internal",
+        { final: boolean; streamId: string; text: string },
+        any
+      >;
+      createStream: FunctionReference<"mutation", "internal", {}, any>;
+      getStreamStatus: FunctionReference<
+        "query",
+        "internal",
+        { streamId: string },
+        "pending" | "streaming" | "done" | "error" | "timeout"
+      >;
+      getStreamText: FunctionReference<
+        "query",
+        "internal",
+        { streamId: string },
+        {
+          status: "pending" | "streaming" | "done" | "error" | "timeout";
+          text: string;
+        }
+      >;
+      setStreamStatus: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          status: "pending" | "streaming" | "done" | "error" | "timeout";
+          streamId: string;
+        },
+        any
+      >;
+    };
+  };
+};

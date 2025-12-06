@@ -1,12 +1,12 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import ChatSidebar from '$lib/features/chat/chat-sidebar.svelte';
-	import { setupChat } from '$lib/features/chat/chat.svelte';
+	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import OnboardingDialog from '$lib/features/onboarding/onboarding-dialog.svelte';
 
-	let { children, data } = $props();
+	let { children } = $props();
 
-	const chatState = setupChat({ user: data.user, userSettings: data.userSettings });
+    const chatState = useChatLayout();
 </script>
 
 <Sidebar.Provider>
@@ -16,6 +16,4 @@
 	</Sidebar.Inset>
 </Sidebar.Provider>
 
-<OnboardingDialog
-	userSettings={chatState.userSettingsQuery.data}
-/>
+<OnboardingDialog userSettings={chatState.userSettingsQuery.data} />

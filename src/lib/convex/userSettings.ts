@@ -1,4 +1,5 @@
-import { mutation, query } from './_generated/server';
+import { query } from './_generated/server';
+import { mutation } from './functions';
 import { Doc } from './_generated/dataModel';
 import { getUserSettings } from './userSettings.utils';
 import merge from 'deepmerge';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { usePromptInput } from './prompt-input.svelte.js';
+	import { usePromptInput, type OnSubmit } from './prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
 	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
 	import PromptInputBannerContent from './prompt-input-banner-content.svelte';
@@ -17,9 +17,11 @@
 		optimisticClear = true,
 		value = $bindable(''),
 		modelId = $bindable(null),
+		generating = false,
 		...rest
 	}: HTMLAttributes<HTMLDivElement> & {
-		onSubmit: (opts: { input: string; modelId: ModelId }) => Promise<void>;
+		onSubmit: OnSubmit;
+		generating?: boolean;
 		/**
 		 * Whether to submit the form on enter. Otherwise the form will be submitted on shift+enter.
 		 */
@@ -32,6 +34,7 @@
 	const promptInputState = usePromptInput({
 		onSubmit: box.with(() => onSubmit),
 		submitOnEnter: box.with(() => submitOnEnter),
+		generating: box.with(() => generating),
 		value: box.with(
 			() => value,
 			(v) => (value = v)
@@ -51,9 +54,9 @@
 		onDismiss={() => (promptInputState.error = null)}
 	>
 		<PromptInputBannerContent>
-			<div class="flex items-center gap-1.5">
-				<AlertCircleIcon class="size-4 text-destructive" />
-				<span class="text-sm text-destructive">{promptInputState.error}</span>
+			<div class="flex items-center gap-1.5 relative min-w-0">
+				<AlertCircleIcon class="size-4 text-destructive shrink-0" />
+				<span class="text-sm text-destructive truncate min-w-0">{promptInputState.error}</span>
 			</div>
 			<PromptInputBannerDismiss />
 		</PromptInputBannerContent>

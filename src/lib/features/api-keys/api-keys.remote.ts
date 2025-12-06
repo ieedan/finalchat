@@ -6,16 +6,15 @@ import z from 'zod';
 
 const key = new NodeRSA(env.API_KEY_ENCRYPTION_KEY);
 
-export const getApiKeys = query(async () => {
+export const getApiKey = query(async () => {
 	const { locals } = getRequestEvent();
 
-	const apiKeys = await locals.convex.query(api.apiKeys.getAll, {});
+	const apiKey = await locals.convex.query(api.apiKeys.get, {});
+	if (!apiKey) return null;
 
-	for (const apiKey of apiKeys) {
-		apiKey.key = key.decrypt(apiKey.key, 'utf8');
-	}
+	apiKey.key = key.decrypt(apiKey.key, 'utf8');
 
-	return apiKeys;
+	return apiKey;
 });
 
 export const createApiKey = command(
@@ -25,7 +24,7 @@ export const createApiKey = command(
 	async (args) => {
 		const { locals } = getRequestEvent();
 
-        args.key = key.encrypt(args.key, 'utf8');
+        args.key = key.encrypt(args.key, 'base64');
 
 		await locals.convex.mutation(api.apiKeys.createOrUpdate, { key: args.key });
 	}

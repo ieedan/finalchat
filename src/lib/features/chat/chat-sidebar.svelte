@@ -3,18 +3,53 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { sidebarMenuButtonVariants } from '$lib/components/ui/sidebar/sidebar-menu-button.svelte';
-	import { ChatCtx } from './chat.svelte';
+	import { useChatLayout } from './chat.svelte';
 	import { CircleThemeSelector } from '$lib/components/ui/circle-theme-selector';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import { goto } from '$app/navigation';
+	import { DEFAULT_AGE_GROUPS, getAgedGroups } from '$lib/utils/aged-groups';
+	import ChatButton from './chat-button.svelte';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import PlusIcon from '@lucide/svelte/icons/plus';
 
-	const chatContext = ChatCtx.get();
+	const chatContext = useChatLayout();
+
+	const groups = $derived(
+		getAgedGroups(chatContext.chatsQuery.data ?? [], {
+			getAge: (item) => item.updatedAt,
+			groups: DEFAULT_AGE_GROUPS
+		})
+	);
 </script>
 
 <Sidebar.Root>
-	<Sidebar.Header></Sidebar.Header>
-	<Sidebar.Content></Sidebar.Content>
+	<Sidebar.Header>
+		<Sidebar.MenuButton>
+			{#snippet child({ props: { class: _, ...props } })}
+				<a href="/chat" class={buttonVariants({ variant: 'default' })} {...props}>
+					<PlusIcon class="size-4!" />
+					New Chat
+				</a>
+			{/snippet}
+		</Sidebar.MenuButton>
+	</Sidebar.Header>
+	<Sidebar.Content>
+		{#each Object.entries(groups) as [name, chats] (name)}
+			{#if chats.length > 0}
+				<Sidebar.Group class="py-0">
+					<Sidebar.GroupLabel>{name}</Sidebar.GroupLabel>
+					<Sidebar.GroupContent>
+						<Sidebar.Menu>
+							{#each chats as chat (chat._id)}
+								<ChatButton {chat} />
+							{/each}
+						</Sidebar.Menu>
+					</Sidebar.GroupContent>
+				</Sidebar.Group>
+			{/if}
+		{/each}
+	</Sidebar.Content>
 	<Sidebar.Footer>
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger class={sidebarMenuButtonVariants({ size: 'lg' })}>

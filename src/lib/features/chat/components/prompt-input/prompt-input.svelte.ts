@@ -4,10 +4,13 @@ import type { ReadableBoxedValues, WritableBoxedValues } from 'svelte-toolbelt';
 import type { KeyboardEventHandler } from 'svelte/elements';
 import type { Model, ModelId } from '../../types';
 
+export type OnSubmit = (opts: { input: string; modelId: ModelId }) => Promise<void>;
+
 type PromptInputRootStateOptions = ReadableBoxedValues<{
-	onSubmit: (opts: { input: string; modelId: ModelId }) => Promise<void>;
+	onSubmit: OnSubmit;
 	submitOnEnter?: boolean;
 	optimisticClear?: boolean;
+	generating: boolean
 }> &
 	WritableBoxedValues<{
 		value: string;
@@ -91,8 +94,9 @@ class PromptInputSubmitState {
 
 	props = $derived.by(() => ({
 		onclick: this.onclick.bind(this),
-		disabled: this.rootState.opts.value.current.trim().length === 0 || this.opts.disabled.current,
-		loading: this.rootState.loading
+		disabled: (this.rootState.opts.value.current.trim().length === 0 && !this.rootState.opts.generating.current) || this.opts.disabled.current,
+		loading: this.rootState.loading,
+		'data-generating': this.rootState.opts.generating.current
 	}));
 }
 
