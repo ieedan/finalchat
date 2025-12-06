@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/utils/types';
+import type { Brand } from '../../utils/types';
 
 export type ModelId = Brand<string, 'ModelId'>;
 

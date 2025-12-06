@@ -7,6 +7,7 @@
 	import type { StreamId } from '@convex-dev/persistent-text-streaming';
 	import { useChatLayout } from './chat.svelte';
 	import Streamdown from '$lib/features/chat/components/streamdown.svelte';
+	import ShinyText from '$lib/components/animations/shiny-text.svelte';
 
 	type Props = {
 		message: ChatMessageAssistant;
@@ -35,4 +36,7 @@
 	});
 </script>
 
+{#if streamBody.body.text === ''}
+	<ShinyText>Thinking...</ShinyText>
+{/if}
 <Streamdown content={streamBody.body.text} />

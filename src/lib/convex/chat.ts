@@ -1,8 +1,8 @@
 import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
-import { mutation } from './functions';
+import { internalMutation, mutation } from './functions';
 import { getChatMessages } from './chat.utils';
-import { query } from './_generated/server';
+import { internalQuery, query } from './_generated/server';
 
 export const getAll = query({
 	args: {},
@@ -11,10 +11,12 @@ export const getAll = query({
 
 		if (!user) return [];
 
-		return await ctx.db
+		const chats = await ctx.db
 			.query('chat')
 			.withIndex('by_user', (q) => q.eq('userId', user.subject))
 			.collect();
+
+		return chats.sort((a, b) => b.updatedAt - a.updatedAt);
 	}
 });
 
@@ -28,6 +30,23 @@ export const get = query({
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat || chat.userId !== user?.subject)
 			throw new Error('Chat not found or you are not authorized to access it');
+
+		const messages = await getChatMessages(ctx, args.chatId);
+
+		return {
+			...chat,
+			messages
+		};
+	}
+});
+
+export const internalGet = internalQuery({
+	args: {
+		chatId: v.id('chat')
+	},
+	handler: async (ctx, args): Promise<Doc<'chat'> & { messages: Doc<'messages'>[] }> => {
+		const chat = await ctx.db.get(args.chatId);
+		if (!chat) throw new Error('Chat not found');
 
 		const messages = await getChatMessages(ctx, args.chatId);
 
@@ -91,5 +110,30 @@ export const remove = mutation({
 
 			await ctx.db.delete(id);
 		}
+	}
+});
+
+export const updateGenerating = internalMutation({
+	args: {
+		chatId: v.id('chat'),
+		generating: v.boolean()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		await ctx.db.patch(args.chatId, {
+			generating: args.generating
+		});
+	}
+});
+
+export const updateGeneratedTitle = internalMutation({
+	args: {
+		chatId: v.id('chat'),
+		title: v.string()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		await ctx.db.patch(args.chatId, {
+			title: args.title,
+			generatingTitle: false
+		});
 	}
 });

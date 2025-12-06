@@ -59,6 +59,7 @@ export default defineSchema({
 	}).index('by_user', ['userId']),
 	chat: defineTable({
 		generating: v.boolean(),
+		generatingTitle: v.optional(v.boolean()),
 		userId: v.string(),
 		title: v.string(),
 		updatedAt: v.number(),

@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { httpAction, internalQuery, query } from './_generated/server';
+import { httpAction, internalAction, internalQuery, query } from './_generated/server';
 import { mutation, internalMutation } from './functions';
 import { components, internal } from './_generated/api';
 import {
@@ -9,8 +9,9 @@ import {
 } from '@convex-dev/persistent-text-streaming';
 import { Doc, Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { ModelMessage, streamText } from 'ai';
+import { generateText, ModelMessage, streamText } from 'ai';
 import { getChatMessages, getLastUserAndAssistantMessages } from './chat.utils';
+import { TITLE_GENERATION_MODEL } from '../ai.js';
 
 const persistentTextStreaming = new PersistentTextStreaming(components.persistentTextStreaming);
 
@@ -22,9 +23,17 @@ export const Prompt = v.object({
 export const create = mutation({
 	args: {
 		chatId: v.optional(v.id('chat')),
-		prompt: Prompt
+		prompt: Prompt,
+		apiKey: v.string()
 	},
-	handler: async (ctx, args): Promise<{ chatId: Id<'chat'>; userMessageId: Id<'messages'>; assistantMessageId: Id<'messages'> }> => {
+	handler: async (
+		ctx,
+		args
+	): Promise<{
+		chatId: Id<'chat'>;
+		userMessageId: Id<'messages'>;
+		assistantMessageId: Id<'messages'>;
+	}> => {
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) throw new Error('Unauthorized');
 
@@ -36,6 +45,11 @@ export const create = mutation({
 				generating: false,
 				updatedAt: Date.now(),
 				pinned: false
+			});
+
+			ctx.scheduler.runAfter(0, internal.messages.generateChatTitle, {
+				chatId,
+				apiKey: args.apiKey
 			});
 		} else {
 			chatId = args.chatId;
@@ -77,6 +91,58 @@ export const getChatBody = query({
 	},
 	handler: async (ctx, args) => {
 		return await persistentTextStreaming.getStreamBody(ctx, args.streamId as StreamId);
+	}
+});
+
+export const generateChatTitle = internalAction({
+	args: {
+		chatId: v.id('chat'),
+		apiKey: v.string()
+	},
+	handler: async (ctx, args) => {
+		const chat = await ctx.runQuery(internal.chat.internalGet, { chatId: args.chatId });
+		if (!chat) throw new Error('Chat not found');
+
+		if (chat.generatingTitle) return;
+
+		await ctx.runMutation(internal.chat.updateGenerating, {
+			chatId: args.chatId,
+			generating: true
+		});
+
+		try {
+			const openrouter = createOpenRouter({
+				apiKey: args.apiKey
+			});
+
+			const { text } = await generateText({
+				model: openrouter.chat(TITLE_GENERATION_MODEL),
+				prompt: `Generate a title for the following chat. The title should be a short summary, no more than 7 words, ideally as few as possible as the title will be displayed in cramped spaces.
+
+			Simple conversations can easily be summarized in one word. For instance if the user was to say: "Hello", "greeting" would be a sufficient title.
+
+			<chat>
+			${chat.messages
+				.map(
+					(message) => `<message role="${message.role}">
+				${message.content}
+			</message>`
+				)
+				.join('\n')}
+			</chat>`
+			});
+
+			await ctx.runMutation(internal.chat.updateGeneratedTitle, {
+				chatId: args.chatId,
+				title: text
+			});
+		} catch (error) {
+			console.error(error);
+			await ctx.runMutation(internal.chat.updateGenerating, {
+				chatId: args.chatId,
+				generating: false
+			});
+		}
 	}
 });
 

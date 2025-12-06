@@ -5,6 +5,8 @@
 	import ChatStreamedContent from './chat-streamed-content.svelte';
 	import { cn } from '$lib/utils';
 	import { CopyButton } from '$lib/components/ui/copy-button';
+	import { useChatLayout } from './chat.svelte.js';
+	import { formatDuration, type Milliseconds } from '$lib/utils/time.js';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -21,10 +23,12 @@
 	};
 
 	let { message }: Props = $props();
+
+	const chatLayoutState = useChatLayout();
 </script>
 
 <div
-	class={cn('flex flex-col gap-2 max-w-full', {
+	class={cn('flex flex-col gap-1 max-w-full w-full group/message-container', {
 		'self-end': message.role === 'user',
 		'self-start': message.role === 'assistant'
 	})}
@@ -36,12 +40,25 @@
 			{#if message.error}
 				<span class="text-destructive">{message.error}</span>
 			{:else}
-				<ChatStreamedContent {message} />
+				{#key chatLayoutState.createdMessages.has(message._id)}
+					<ChatStreamedContent {message} />
+				{/key}
 			{/if}
 		{/if}
 	</div>
 	{#if message.content}
-		<div class="self-end">
+		<div
+			class="self-end group-hover/message-container:opacity-100 opacity-0 flex items-center gap-1 transition-opacity duration-200"
+		>
+			{#if message.role === 'assistant'}
+				{#if message.meta.startedGenerating && message.meta.stoppedGenerating}
+					<span class="text-xs text-muted-foreground">
+						{formatDuration(
+							(message.meta.stoppedGenerating - message.meta.startedGenerating) as Milliseconds
+						)}
+					</span>
+				{/if}
+			{/if}
 			<CopyButton text={message.content} />
 		</div>
 	{/if}
