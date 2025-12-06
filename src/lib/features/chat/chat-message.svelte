@@ -48,27 +48,26 @@
 	</div>
 	{#if message.content}
 		<div
-			class="self-end group-hover/message-container:opacity-100 opacity-0 flex items-center gap-1 transition-opacity duration-200"
+			class="justify-between w-full group-hover/message-container:opacity-100 opacity-0 flex items-center gap-1 transition-opacity duration-200"
 		>
-			{#if message.role === 'assistant'}
-				{#if message.meta.startedGenerating && message.meta.stoppedGenerating}
-					<span class="text-xs text-muted-foreground">
-						{formatDuration(
-							(message.meta.stoppedGenerating - message.meta.startedGenerating) as Milliseconds
-						)} ・
-					</span>
+			<div>
+				{#if message.role === 'assistant'}
+					{@const metadata = [
+						message.meta.startedGenerating && message.meta.stoppedGenerating
+							? formatDuration(
+									(message.meta.stoppedGenerating - message.meta.startedGenerating) as Milliseconds
+								)
+							: null,
+						message.meta.cost ? `$${message.meta.cost}` : null,
+						message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null
+					]
+						.filter(Boolean)
+						.join(' ・')}
+					{#if metadata}
+						<span class="text-xs text-muted-foreground">{metadata}</span>
+					{/if}
 				{/if}
-				{#if message.meta.cost}
-					<span class="text-xs text-muted-foreground">
-						${message.meta.cost} ・
-					</span>
-				{/if}
-				{#if message.meta.tokenUsage}
-					<span class="text-xs text-muted-foreground">
-						{message.meta.tokenUsage} tokens
-					</span>
-				{/if}
-			{/if}
+			</div>
 			<CopyButton text={message.content} />
 		</div>
 	{/if}
