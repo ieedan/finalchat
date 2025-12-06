@@ -44,7 +44,7 @@
 			<Sidebar.Group class="py-0">
 				<Sidebar.GroupLabel>Pinned</Sidebar.GroupLabel>
 				<Sidebar.GroupContent>
-					<Sidebar.Menu>
+					<Sidebar.Menu class="gap-0">
 						{#each pinnedChats as chat (chat._id)}
 							<ChatButton {chat} />
 						{/each}
@@ -57,7 +57,7 @@
 				<Sidebar.Group class="py-0">
 					<Sidebar.GroupLabel>{name}</Sidebar.GroupLabel>
 					<Sidebar.GroupContent>
-						<Sidebar.Menu>
+						<Sidebar.Menu class="gap-0">
 							{#each chats as chat (chat._id)}
 								<ChatButton {chat} />
 							{/each}

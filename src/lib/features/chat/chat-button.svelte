@@ -20,6 +20,7 @@
 	import { useSidebar } from '$lib/components/ui/sidebar';
 	import { navigating } from '$app/state';
 	import { warm } from '$lib/cache/cached-query.svelte';
+	import type { inspect } from 'util';
 
 	type Props = {
 		chat: Doc<'chat'>;
@@ -67,9 +68,6 @@
 		});
 	}
 
-	const backgroundClass =
-		'bg-accent group-data-[active=true]/menu-button:bg-accent group-hover/menu-button:bg-accent';
-
 	let pinned = $derived(chat.pinned);
 	let dropdownOpen = $state(false);
 	let renamingMode = $state<'view' | 'edit'>('view');
@@ -94,20 +92,27 @@
 			}}
 		>
 			{#snippet child({ props })}
-				<a
-					{...props}
-					href="/chat/{chat._id}"
-					class="group/menu-button hover:bg-accent h-auto transition-none data-[active=true]:bg-accent flex items-center gap-1 rounded-md px-3"
+				<div
+					class="group/menu-button hover:bg-accent rounded-md flex items-center gap-2 h-9.5"
 					onpointerover={() => {
 						warm(client, api.chat.get, {
 							chatId: chat._id
 						});
 					}}
+					onfocus={() => {
+						warm(client, api.chat.get, {
+							chatId: chat._id
+						});
+					}}
 				>
-					<div class="flex min-w-0 flex-1 items-center gap-1">
+					<a
+						{...props}
+						href="/chat/{chat._id}"
+						class="flex min-w-0 flex-1 items-center gap-1 pl-3 h-full"
+					>
 						{#if chat.generating}
 							<div class="flex shrink-0 items-center justify-center">
-								<LoaderCircle class="size-3.5! animate-spin" />
+								<LoaderCircle class="size-4 animate-spin shrink-0" />
 							</div>
 						{/if}
 						<Rename.Root
@@ -115,77 +120,54 @@
 							value={chat.title}
 							class="min-w-0 flex-1 rounded-none border-none outline-none focus:ring-0! data-[mode=view]:truncate"
 							fallbackSelectionBehavior="all"
+							blurBehavior="exit"
 							onSave={renameChat}
 							bind:mode={renamingMode}
 						/>
-						{#if renamingMode === 'view'}
-							<div
-								class={cn('flex shrink-0 items-center', 'opacity-0', {
-									'group-hover/menu-button:opacity-100': true
-								})}
-							>
-								<DropdownMenu.Root bind:open={dropdownOpen}>
-									<DropdownMenu.Trigger
-										tabindex={-1}
-										data-open={dropdownOpen}
-										class={cn(
-											'inline-flex group-hover/menu-button:w-auto data-[open=true]:w-auto! w-0 size-9 items-center justify-center rounded-md bg-transparent hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-											backgroundClass
-										)}
-										onclick={(e: MouseEvent) => {
-											e.preventDefault();
-											e.stopPropagation();
-										}}
-									>
-										<Ellipsis class="size-4" />
-									</DropdownMenu.Trigger>
-									<DropdownMenu.Content
-										align="end"
-										side="bottom"
-										onclick={(e: MouseEvent) => {
-											e.stopPropagation();
-										}}
-									>
-										<DropdownMenu.Item
-											onSelect={(e) => {
-												e.preventDefault();
-												togglePinned();
-											}}
-										>
-											{#if !chat.pinned}
-												<PinIcon class="size-4!" />
-												Pin
-											{:else}
-												<PinOffIcon class="size-4!" />
-												Unpin
-											{/if}
-										</DropdownMenu.Item>
-										<DropdownMenu.Item
-											onSelect={(e) => {
-												e.preventDefault();
-												renamingMode = 'edit';
-											}}
-										>
-											<PencilIcon class="size-4!" />
-											Edit
-										</DropdownMenu.Item>
-										<DropdownMenu.Separator />
-										<DropdownMenu.Item
-											variant="destructive"
-											onSelect={(e) => {
-												e.preventDefault();
-												startDeleteChat();
-											}}
-										>
-											<TrashIcon class="size-4!" />
-											Delete
-										</DropdownMenu.Item>
-									</DropdownMenu.Content>
-								</DropdownMenu.Root>
-							</div>
-						{/if}
-					</div>
-				</a>
+					</a>
+					{#if renamingMode === 'view'}
+						<div
+							class={cn(
+								'flex shrink-0 h-full items-center opacity-0 group-hover/menu-button:opacity-100',
+								{
+									'opacity-100': dropdownOpen
+								}
+							)}
+						>
+							<DropdownMenu.Root bind:open={dropdownOpen}>
+								<DropdownMenu.Trigger
+									tabindex={-1}
+									data-open={dropdownOpen}
+									class={cn(
+										'inline-flex group-hover/menu-button:w-9 bg-accent data-[open=true]:w-9! w-0 h-full items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+									)}
+								>
+									<Ellipsis class="size-4 shrink-0" />
+								</DropdownMenu.Trigger>
+								<DropdownMenu.Content align="end" side="bottom">
+									<DropdownMenu.Item onSelect={() => togglePinned()}>
+										{#if !chat.pinned}
+											<PinIcon class="size-4!" />
+											Pin
+										{:else}
+											<PinOffIcon class="size-4!" />
+											Unpin
+										{/if}
+									</DropdownMenu.Item>
+									<DropdownMenu.Item onSelect={() => (renamingMode = 'edit')}>
+										<PencilIcon class="size-4!" />
+										Rename
+									</DropdownMenu.Item>
+									<DropdownMenu.Separator />
+									<DropdownMenu.Item variant="destructive" onSelect={() => startDeleteChat()}>
+										<TrashIcon class="size-4!" />
+										Delete
+									</DropdownMenu.Item>
+								</DropdownMenu.Content>
+							</DropdownMenu.Root>
+						</div>
+					{/if}
+				</div>
 			{/snippet}
 		</Sidebar.MenuButton>
 	</Sidebar.MenuItem>
