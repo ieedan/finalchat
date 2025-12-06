@@ -15,11 +15,16 @@
 
 	const chatContext = useChatLayout();
 
+	const pinnedChats = $derived(chatContext.chatsQuery.data?.filter((chat) => chat.pinned) ?? []);
+
 	const groups = $derived(
-		getAgedGroups(chatContext.chatsQuery.data ?? [], {
-			getAge: (item) => item.updatedAt,
-			groups: DEFAULT_AGE_GROUPS
-		})
+		getAgedGroups(
+			(chatContext.chatsQuery.data ?? []).filter((chat) => !chat.pinned),
+			{
+				getAge: (item) => item.updatedAt,
+				groups: DEFAULT_AGE_GROUPS
+			}
+		)
 	);
 </script>
 
@@ -35,6 +40,18 @@
 		</Sidebar.MenuButton>
 	</Sidebar.Header>
 	<Sidebar.Content>
+		{#if pinnedChats.length > 0}
+			<Sidebar.Group class="py-0">
+				<Sidebar.GroupLabel>Pinned</Sidebar.GroupLabel>
+				<Sidebar.GroupContent>
+					<Sidebar.Menu>
+						{#each pinnedChats as chat (chat._id)}
+							<ChatButton {chat} />
+						{/each}
+					</Sidebar.Menu>
+				</Sidebar.GroupContent>
+			</Sidebar.Group>
+		{/if}
 		{#each Object.entries(groups) as [name, chats] (name)}
 			{#if chats.length > 0}
 				<Sidebar.Group class="py-0">

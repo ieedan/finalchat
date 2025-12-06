@@ -107,7 +107,7 @@
 					/>
 					<div
 						class={cn(
-							'border-border absolute right-0 top-0 bottom-0 rounded-l-md border-l',
+							'absolute right-0 top-0 bottom-0',
 							'opacity-0',
 							{
 								'opacity-100': chat.generating && renamingMode === 'view',
