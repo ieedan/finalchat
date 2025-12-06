@@ -55,7 +55,17 @@
 					<span class="text-xs text-muted-foreground">
 						{formatDuration(
 							(message.meta.stoppedGenerating - message.meta.startedGenerating) as Milliseconds
-						)}
+						)} ・
+					</span>
+				{/if}
+				{#if message.meta.cost}
+					<span class="text-xs text-muted-foreground">
+						${message.meta.cost} ・
+					</span>
+				{/if}
+				{#if message.meta.tokenUsage}
+					<span class="text-xs text-muted-foreground">
+						{message.meta.tokenUsage} tokens
 					</span>
 				{/if}
 			{/if}

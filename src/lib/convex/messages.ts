@@ -154,8 +154,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 	};
 
 	const response = await persistentTextStreaming.stream(
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		ctx as any,
+		ctx,
 		request,
 		streamId,
 		async (ctx, _request, _streamId, append) => {
@@ -179,10 +178,9 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					apiKey
 				});
 
-				const { fullStream } = streamText({
+				const { fullStream, totalUsage } = streamText({
 					model: openrouter.chat(last.userMessage.chatSettings.modelId),
 					messages: messages.map(
-						// @ts-expect-error wrong
 						(message) =>
 							({
 								role: message.role,
@@ -191,19 +189,36 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					)
 				});
 
+				let openRouterGenId: string | undefined = undefined;
 				let content = '';
 
 				for await (const chunk of fullStream) {
 					if (chunk.type === 'text-delta') {
+						openRouterGenId = chunk.id;
 						content += chunk.text;
 						await append(chunk.text);
 					}
 				}
 
+				const usage = await totalUsage;
+
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
-					content
+					content,
+					meta: {
+						generationId: openRouterGenId,
+						tokenUsage: usage.totalTokens
+					}
 				});
+
+				if (openRouterGenId) {
+					// we wait long enough for the gen to propagate to openrouter
+					ctx.scheduler.runAfter(1000, internal.messages.getGenerationCost, {
+						genId: openRouterGenId,
+						messageId: last.assistantMessage._id,
+						apiKey: apiKey ?? ''
+					});
+				}
 			} catch (error) {
 				if (!last) return;
 				await ctx.runMutation(internal.messages.updateMessageError, {
@@ -218,6 +233,56 @@ export const streamMessage = httpAction(async (ctx, request) => {
 	response.headers.set('Access-Control-Allow-Origin', '*');
 	response.headers.set('Vary', 'Origin');
 	return response;
+});
+
+export const getGenerationCost = internalAction({
+	args: {
+		genId: v.string(),
+		messageId: v.id('messages'),
+		apiKey: v.string()
+	},
+	handler: async (ctx, args) => {
+		try {
+			const response = await fetch(`https://openrouter.ai/api/v1/generation?id=${args.genId}`, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${args.apiKey}`
+				}
+			});
+
+			const data = await response.json();
+
+			console.log('data', data);
+
+			const totalCost = data.data.total_cost;
+
+			await ctx.runMutation(internal.messages.updateGenerationCost, {
+				messageId: args.messageId,
+				cost: totalCost
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	}
+});
+
+export const updateGenerationCost = internalMutation({
+	args: {
+		messageId: v.id('messages'),
+		cost: v.number()
+	},
+	handler: async (ctx, args) => {
+		const message = await ctx.db.get(args.messageId);
+		if (!message) throw new Error('Message not found');
+		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
+
+		await ctx.db.patch(args.messageId, {
+			meta: {
+				...message.meta,
+				cost: args.cost
+			}
+		});
+	}
 });
 
 export const startGenerating = internalMutation({
@@ -249,10 +314,7 @@ export const getMessagesForChat = internalQuery({
 	},
 	handler: async (ctx, args): Promise<Doc<'messages'>[]> => {
 		const chat = await ctx.db.get(args.chatId);
-		const user = await ctx.auth.getUserIdentity();
-
-		if (!chat || !user || chat.userId !== user.subject)
-			throw new Error('Chat not found or you are not authorized to access it');
+		if (!chat) throw new Error('Chat not found');
 
 		return await getChatMessages(ctx, args.chatId);
 	}
@@ -261,7 +323,11 @@ export const getMessagesForChat = internalQuery({
 export const updateMessageContent = internalMutation({
 	args: {
 		messageId: v.id('messages'),
-		content: v.string()
+		content: v.string(),
+		meta: v.object({
+			generationId: v.optional(v.string()),
+			tokenUsage: v.optional(v.number())
+		})
 	},
 	handler: async (ctx, args) => {
 		const message = await ctx.db.get(args.messageId);
@@ -272,7 +338,8 @@ export const updateMessageContent = internalMutation({
 				content: args.content,
 				meta: {
 					...message.meta,
-					stoppedGenerating: Date.now()
+					stoppedGenerating: Date.now(),
+					...args.meta
 				}
 			}),
 			ctx.db.patch(message.chatId, {

@@ -27,7 +27,9 @@ export const ChatMessageAssistant = v.object({
 		modelId: v.string(),
 		cost: v.optional(v.number()),
 		startedGenerating: v.optional(v.number()),
-		stoppedGenerating: v.optional(v.number())
+		stoppedGenerating: v.optional(v.number()),
+		generationId: v.optional(v.string()),
+		tokenUsage: v.optional(v.number())
 	})
 });
 
