@@ -20,7 +20,7 @@
 		"@eslint/js": "^9.39.1",
 		"@internationalized/date": "^3.10.0",
 		"@jsrepo/transform-prettier": "^0.0.9",
-		"@lucide/svelte": "^0.556.0",
+		"@lucide/svelte": "^0.544.0",
 		"@openrouter/ai-sdk-provider": "^1.2.8",
 		"@sveltejs/adapter-vercel": "^6.2.0",
 		"@sveltejs/kit": "^2.49.1",
@@ -65,5 +65,8 @@
 		"vite": "^7.2.6",
 		"vite-plugin-devtools-json": "^1.0.0",
 		"zod": "^4.1.13"
+	},
+	"dependencies": {
+		"animated-svelte": "link:../../../Library/pnpm/global/5/node_modules/animated-svelte"
 	}
 }

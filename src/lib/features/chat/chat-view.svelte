@@ -6,8 +6,6 @@
 	import { ModelIdCtx } from '$lib/context.svelte';
 	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
 	import { onMount } from 'svelte';
-	import { Button } from '$lib/components/ui/button';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { IsMounted } from 'runed';
 	import { cn } from '$lib/utils';
 
@@ -44,24 +42,16 @@
 		</div>
 
 		<div class="sticky bottom-0 pb-4 bg-background rounded-t-lg">
-			{#if !autoScroll.isNearBottom}
-				<div class="absolute -top-9 left-1/2 -translate-x-1/2">
-					<Button
-						variant="secondary"
-						size="sm"
-						onclick={() => autoScroll.scrollToBottom()}
-						class="hover:bg-secondary"
-					>
-						Scroll to bottom
-						<ChevronDownIcon class="size-4" />
-					</Button>
-				</div>
-			{/if}
 			<PromptInput.Root
 				bind:modelId={modelId.current}
 				generating={chatViewState.chatQuery.data?.generating}
 				onSubmit={chatLayoutState.handleSubmit}
+				class="group/prompt-input"
 			>
+				<PromptInput.ScrollToBottom
+					isNearBottom={autoScroll.isNearBottom}
+					scrollToBottom={autoScroll.scrollToBottom}
+				/>
 				<PromptInput.Content>
 					<PromptInput.Textarea placeholder="Ask me anything..." />
 					<PromptInput.Footer class="justify-between">

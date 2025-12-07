@@ -11,9 +11,10 @@
 
 	type Props = {
 		message: ChatMessageAssistant;
+		driven: boolean;
 	};
 
-	let { message }: Props = $props();
+	let { message, driven }: Props = $props();
 
 	const accessToken = AccessTokenCtx.get();
 	const chatState = useChatLayout();
@@ -22,9 +23,7 @@
 		getPersistentBody: api.messages.getChatBody,
 		streamUrl: new URL('/messages/stream', env.PUBLIC_CONVEX_SITE_URL),
 		// svelte-ignore state_referenced_locally
-		get driven() {
-			return chatState.createdMessages.has(message._id);
-		},
+		driven,
 		// svelte-ignore state_referenced_locally
 		chatId: message.chatId,
 		// svelte-ignore state_referenced_locally

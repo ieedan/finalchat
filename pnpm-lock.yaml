@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  animated-svelte: link:../../../Library/pnpm/global/5/node_modules/animated-svelte
+
 patchedDependencies:
   convex-svelte:
     hash: 0cbda42873f10880d19ab3a5d6e778eb090ee338fd17ef8cfabb25aebedefee8
@@ -12,6 +15,10 @@ patchedDependencies:
 importers:
 
   .:
+    dependencies:
+      animated-svelte:
+        specifier: link:../../../Library/pnpm/global/5/node_modules/animated-svelte
+        version: link:../../../Library/pnpm/global/5/node_modules/animated-svelte
     devDependencies:
       '@convex-dev/persistent-text-streaming':
         specifier: ^0.3.0
@@ -32,8 +39,8 @@ importers:
         specifier: ^0.0.9
         version: 0.0.9(jsrepo@3.0.8(svelte@5.45.5))(prettier@3.7.4)
       '@lucide/svelte':
-        specifier: ^0.556.0
-        version: 0.556.0(svelte@5.45.5)
+        specifier: ^0.544.0
+        version: 0.544.0(svelte@5.45.5)
       '@openrouter/ai-sdk-provider':
         specifier: ^1.2.8
         version: 1.4.0(ai@5.0.107(zod@4.1.13))(zod@4.1.13)
@@ -657,8 +664,8 @@ packages:
       jsrepo: 3.0.8
       prettier: 3.x
 
-  '@lucide/svelte@0.556.0':
-    resolution: {integrity: sha512-jsJhyyd2xrJ4WtflO5TrTtyCBacF4OLBNCzotvwh4zfbbuE6aqdblx+OB0zg6zOno06ib1GJGdDcfR/2TUcb7g==}
+  '@lucide/svelte@0.544.0':
+    resolution: {integrity: sha512-9f9O6uxng2pLB01sxNySHduJN3HTl5p0HDu4H26VR51vhZfiMzyOMe9Mhof3XAk4l813eTtl+/DYRvGyoRR+yw==}
     peerDependencies:
       svelte: ^5
 
@@ -3423,7 +3430,7 @@ snapshots:
       jsrepo: 3.0.8(svelte@5.45.5)
       prettier: 3.7.4
 
-  '@lucide/svelte@0.556.0(svelte@5.45.5)':
+  '@lucide/svelte@0.544.0(svelte@5.45.5)':
     dependencies:
       svelte: 5.45.5
 

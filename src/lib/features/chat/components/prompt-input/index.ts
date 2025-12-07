@@ -6,6 +6,7 @@ import Submit from './prompt-input-submit.svelte';
 import Banner from './prompt-input-banner.svelte';
 import BannerContent from './prompt-input-banner-content.svelte';
 import BannerDismiss from './prompt-input-banner-dismiss.svelte';
+import ScrollToBottom from './prompt-input-scroll-to-bottom.svelte';
 
 export {
 	Root,
@@ -16,6 +17,7 @@ export {
 	Content,
 	BannerContent,
 	BannerDismiss,
+	ScrollToBottom,
 	//
 	Root as PromptInput,
 	Textarea as PromptInputTextarea,
@@ -24,5 +26,6 @@ export {
 	Banner as PromptInputBanner,
 	Content as PromptInputContent,
 	BannerContent as PromptInputBannerContent,
-	BannerDismiss as PromptInputBannerDismiss
+	BannerDismiss as PromptInputBannerDismiss,
+	ScrollToBottom as PromptInputScrollToBottom
 };

@@ -7,6 +7,7 @@
 	import { CopyButton } from '$lib/components/ui/copy-button';
 	import { useChatLayout } from './chat.svelte.js';
 	import { formatDuration, type Milliseconds } from '$lib/utils/time.js';
+	import { untrack } from 'svelte';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -25,6 +26,19 @@
 	let { message }: Props = $props();
 
 	const chatLayoutState = useChatLayout();
+
+	// this is weird but basically we only care if we transition to a driven state not if we transition out of it
+	let driven = $state(false);
+	$effect(() => {
+		const d = chatLayoutState.createdMessages.has(message._id);
+		untrack(() => {
+			if (d) {
+				driven = true;
+				// once we are driving remove the id so we can't drive again
+				chatLayoutState.createdMessages.delete(message._id);
+			}
+		})
+	});
 </script>
 
 <div
@@ -41,7 +55,7 @@
 				<span class="text-destructive">{message.error}</span>
 			{:else}
 				{#key chatLayoutState.createdMessages.has(message._id)}
-					<ChatStreamedContent {message} />
+					<ChatStreamedContent {message} {driven} />
 				{/key}
 			{/if}
 		{/if}
