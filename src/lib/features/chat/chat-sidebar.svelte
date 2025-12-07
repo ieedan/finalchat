@@ -30,6 +30,10 @@
 
 <Sidebar.Root>
 	<Sidebar.Header>
+		<div class="flex items-center justify-between">
+			<a href="/chat" class="text-2xl font-bold">Chat</a>
+			<Sidebar.Trigger/>
+		</div>
 		<Sidebar.MenuButton>
 			{#snippet child({ props: { class: _, ...props } })}
 				<a href="/chat" class={buttonVariants({ variant: 'default' })} {...props}>

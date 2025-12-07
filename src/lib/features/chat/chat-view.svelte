@@ -34,7 +34,7 @@
 		'scroll-smooth': isMounted.current
 	})}
 >
-	<div class="flex flex-col w-full max-w-2xl flex-1">
+	<div class="flex flex-col w-full max-w-3xl px-4 flex-1">
 		<div class="flex-1 flex flex-col gap-2 py-4">
 			{#each chatViewState.chatQuery.data?.messages ?? [] as message (message._id)}
 				<ChatMessage {message} />

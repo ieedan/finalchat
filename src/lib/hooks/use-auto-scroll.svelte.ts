@@ -72,6 +72,8 @@ export class UseAutoScroll {
 		});
 
 		observer.observe(this.#ref, { childList: true, subtree: true });
+
+		this.scrollToBottom = this.scrollToBottom.bind(this);
 	}
 
 	get ref() {

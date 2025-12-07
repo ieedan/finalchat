@@ -62,7 +62,7 @@
 	</div>
 	{#if message.content}
 		<div
-			class="justify-between w-full group-hover/message-container:opacity-100 opacity-0 flex items-center gap-1 transition-opacity duration-200"
+			class="justify-between w-full group-hover/message-container:opacity-100 md:opacity-0 flex items-center gap-1 transition-opacity duration-200"
 		>
 			<div>
 				{#if message.role === 'assistant'}

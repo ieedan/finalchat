@@ -93,7 +93,8 @@
 		>
 			{#snippet child({ props })}
 				<div
-					class="group/menu-button hover:bg-accent rounded-md flex items-center gap-2 h-9.5"
+					data-active={page.params.chatId === chat._id}
+					class="group/menu-button hover:bg-accent rounded-md flex items-center gap-2 h-9.5 data-[active=true]:bg-accent"
 					onpointerover={() => {
 						warm(client, api.chat.get, {
 							chatId: chat._id
@@ -128,7 +129,7 @@
 					{#if renamingMode === 'view'}
 						<div
 							class={cn(
-								'flex shrink-0 h-full items-center opacity-0 group-hover/menu-button:opacity-100',
+								'flex shrink-0 h-full items-center opacity-0 group-data-[active=true]/menu-button:opacity-100 group-hover/menu-button:opacity-100',
 								{
 									'opacity-100': dropdownOpen
 								}
@@ -139,7 +140,7 @@
 									tabindex={-1}
 									data-open={dropdownOpen}
 									class={cn(
-										'inline-flex group-hover/menu-button:w-9 bg-accent data-[open=true]:w-9! w-0 h-full items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+										'inline-flex group-hover/menu-button:w-9 group-data-[active=true]/menu-button:w-9 bg-accent data-[open=true]:w-9! w-0 h-full items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
 									)}
 								>
 									<Ellipsis class="size-4 shrink-0" />
