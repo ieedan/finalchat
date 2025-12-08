@@ -38,7 +38,7 @@
 	let gotoChatIndex = $state<number | null>(null);
 </script>
 
-<Sidebar.Root>
+<Sidebar.Root variant="inset">
 	<Sidebar.Header>
 		<div class="flex items-center justify-between">
 			<a href="/chat" class="text-2xl font-bold">Chat</a>

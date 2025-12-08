@@ -11,3 +11,7 @@
 - [x] ⌘ G goto functionality
 You hit ⌘ G to open a dialog instantly and then type the index of the chat you want to go to. This will also highlight the chat in the sidebar.
 - [ ] Make simple mode simple
+- [ ] Chat suggestions
+- [ ] Chat header
+- [ ] Share mode
+- [ ] Og image generation

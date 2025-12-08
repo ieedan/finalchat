@@ -19,7 +19,7 @@
 	<title>New Chat</title>
 </svelte:head>
 
-<div class="w-full min-h-svh items-center justify-center flex">
+<div class="w-full h-full items-center justify-center flex">
 	<PromptInput.Root
 		bind:modelId={modelId.current}
 		onSubmit={chatState.handleSubmit}

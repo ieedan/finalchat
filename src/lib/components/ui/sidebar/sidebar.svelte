@@ -8,7 +8,7 @@
 	let {
 		ref = $bindable(null),
 		side = 'left',
-		variant = 'inset',
+		variant = 'sidebar',
 		collapsible = 'offcanvas',
 		class: className,
 		children,
