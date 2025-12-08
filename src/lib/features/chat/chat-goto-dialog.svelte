@@ -7,7 +7,7 @@
 	type Props = {
 		open: boolean;
 		totalChats: number;
-		value: number;
+		value: number | null;
 		onClose?: () => void;
 		onSubmit?: (value: number) => void;
 	};
@@ -15,7 +15,7 @@
 	let {
 		open = $bindable(false),
 		totalChats,
-		value = $bindable(0),
+		value = $bindable(null),
 		onClose,
 		onSubmit
 	}: Props = $props();
@@ -26,6 +26,7 @@
 <Dialog.Root
 	bind:open
 	onOpenChange={() => {
+		value = null;
 		if (open === false) {
 			onClose?.();
 		}
@@ -41,16 +42,19 @@
 			class="flex flex-col gap-1"
 			onsubmit={(e) => {
 				e.preventDefault();
+				if (value === null) return;
 				onSubmit?.(value);
+				value = null;
 			}}
 		>
-			<Label class="flex items-center gap-1">
+			<Label for="goto-chat-index" class="flex items-center gap-1">
 				Chat index
 				<span class="font-bold">1-{totalChats}</span>
 			</Label>
-			<NumberField.Root min={1} max={totalChats} value={null}>
+			<NumberField.Root min={1} max={totalChats} bind:value>
 				<NumberField.Group>
 					<NumberField.Input
+						id="goto-chat-index"
 						class="w-[212px]"
 						oninput={(e) => {
 							value = Number((e.currentTarget as HTMLInputElement).value);

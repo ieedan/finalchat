@@ -24,7 +24,7 @@
 	type Props = {
 		chat: Doc<'chat'> & { index: number };
 		gotoOpen: boolean;
-		gotoIndex: number;
+		gotoIndex: number | null;
 	};
 
 	let { chat, gotoOpen, gotoIndex }: Props = $props();

@@ -35,9 +35,7 @@
 	);
 
 	let chatGotoDialogOpen = $state(false);
-	let gotoChatIndex = $derived(
-		indexedChats.findIndex((chat) => chat._id === chatContext.chatId) ?? 0
-	);
+	let gotoChatIndex = $state<number | null>(null);
 </script>
 
 <Sidebar.Root>
@@ -131,8 +129,5 @@
 			await goto(`/chat/${chat._id}`);
 		}
 		chatGotoDialogOpen = false;
-	}}
-	onClose={() => {
-		gotoChatIndex = indexedChats.findIndex((chat) => chat._id === chatContext.chatId) ?? 0;
 	}}
 />
