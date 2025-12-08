@@ -24,7 +24,9 @@
 
 <div
 	data-slot="prompt-input-banner"
-	data-state={dismissed || (dismissedByError && bannerState.rootState.error !== null) ? 'closed' : 'open'}
+	data-state={dismissed || (dismissedByError && bannerState.rootState.error !== null)
+		? 'closed'
+		: 'open'}
 	class={cn(
 		'ease-in-out border bg-sidebar -translate-y-8 rounded-lg h-full absolute z-0 w-full flex items-start justify-between gap-4 px-3 duration-150',
 		{

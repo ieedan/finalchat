@@ -7,17 +7,29 @@ import {
 	StreamId,
 	StreamIdValidator
 } from '@convex-dev/persistent-text-streaming';
-import { Doc, Id } from './_generated/dataModel';
+import { Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { generateText, ModelMessage, streamText } from 'ai';
-import { getChatMessages, getLastUserAndAssistantMessages } from './chat.utils';
+import { generateText, streamText } from 'ai';
+import {
+	getChatMessagesInternal,
+	getLastUserAndAssistantMessages,
+	MessageWithAttachments
+} from './chat.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
 
 const persistentTextStreaming = new PersistentTextStreaming(components.persistentTextStreaming);
 
 export const Prompt = v.object({
 	modelId: v.string(),
-	input: v.string()
+	input: v.string(),
+	attachments: v.optional(
+		v.array(
+			v.object({
+				url: v.string(),
+				key: v.string()
+			})
+		)
+	)
 });
 
 export const create = mutation({
@@ -66,6 +78,20 @@ export const create = mutation({
 				modelId: args.prompt.modelId
 			}
 		});
+
+		if (args.prompt.attachments && args.prompt.attachments?.length > 0) {
+			// relate the attachments to the user message
+			await Promise.all(
+				args.prompt.attachments.map(async (attachment) => {
+					await ctx.runMutation(internal.chatAttachments.create, {
+						chatId,
+						messageId: userMessageId,
+						key: attachment.key,
+						userId: user.subject
+					});
+				})
+			);
+		}
 
 		const streamId = await persistentTextStreaming.createStream(ctx);
 		const assistantMessageId = await ctx.db.insert('messages', {
@@ -180,13 +206,33 @@ export const streamMessage = httpAction(async (ctx, request) => {
 
 				const { fullStream, totalUsage } = streamText({
 					model: openrouter.chat(last.userMessage.chatSettings.modelId),
-					messages: messages.map(
-						(message) =>
-							({
+					messages: messages.map((message) => {
+						if (message.role === 'assistant') {
+							return {
 								role: message.role,
 								content: message.content ?? ''
-							}) satisfies ModelMessage
-					)
+							};
+						}
+
+						const imageParts = message.attachments?.map(
+							(attachment) =>
+								({
+									type: 'image',
+									image: attachment.url
+								}) as const
+						);
+
+						return {
+							role: message.role,
+							content: [
+								{
+									type: 'text',
+									text: message.content ?? ''
+								},
+								...(imageParts ?? [])
+							]
+						};
+					})
 				});
 
 				let openRouterGenId: string | undefined = undefined;
@@ -252,8 +298,6 @@ export const getGenerationCost = internalAction({
 
 			const data = await response.json();
 
-			console.log('data', data);
-
 			const totalCost = data.data.total_cost;
 
 			await ctx.runMutation(internal.messages.updateGenerationCost, {
@@ -312,11 +356,11 @@ export const getMessagesForChat = internalQuery({
 	args: {
 		chatId: v.id('chat')
 	},
-	handler: async (ctx, args): Promise<Doc<'messages'>[]> => {
+	handler: async (ctx, args): Promise<MessageWithAttachments[]> => {
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat) throw new Error('Chat not found');
 
-		return await getChatMessages(ctx, args.chatId);
+		return await getChatMessagesInternal(ctx, args.chatId);
 	}
 });
 

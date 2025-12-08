@@ -1,0 +1,127 @@
+import { v } from 'convex/values';
+import { internalMutation, mutation } from './functions';
+import { R2, type R2Callbacks } from '@convex-dev/r2';
+import { components, internal } from './_generated/api';
+import { internalQuery, query } from './_generated/server';
+import { env } from '../env.convex';
+import { urlAlphabet, customAlphabet } from 'nanoid';
+
+const nanoid = customAlphabet(urlAlphabet, 12);
+
+/** UserId.nanoid() */
+export type UploadKey = `${string}.${string}`;
+
+function parseUploadKey(uploadKey: UploadKey): {
+	userId: string;
+	key: string;
+} {
+	const [userId, key] = uploadKey.split('.');
+	return {
+		userId,
+		key
+	};
+}
+
+export const r2 = new R2(components.r2, {
+	R2_ACCESS_KEY_ID: env.R2_ACCESS_KEY_ID,
+	R2_SECRET_ACCESS_KEY: env.R2_SECRET_ACCESS_KEY,
+	R2_ENDPOINT: env.R2_ENDPOINT,
+	R2_BUCKET: env.R2_BUCKET
+});
+
+const callbacks: R2Callbacks = {
+	onSyncMetadata: internal.chatAttachments.onSyncMetadata
+};
+
+export const { syncMetadata, onSyncMetadata, deleteObject, getMetadata, listMetadata } =
+	r2.clientApi({
+		checkUpload: async (ctx) => {
+			const user = await ctx.auth.getUserIdentity();
+			if (!user) throw new Error('Unauthorized');
+
+			// also check subscription status here if relevant
+		},
+		callbacks,
+		checkDelete: async (ctx, _, key) => {
+			const user = await ctx.auth.getUserIdentity();
+			if (!user) throw new Error('Unauthorized');
+
+			const { userId } = parseUploadKey(key as UploadKey);
+			if (userId !== user.subject) throw new Error('Unauthorized');
+		},
+		onDelete: async (ctx, _, key) => {
+			await ctx.runMutation(internal.chatAttachments.syncRemoval, {
+				key
+			});
+		}
+	});
+
+export const generateUploadUrl = mutation({
+	handler: async (ctx): Promise<{ key: string; url: string }> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		return await r2.generateUploadUrl(`${user.subject}.${nanoid()}`);
+	}
+});
+
+export const getFileUrl = query({
+	args: {
+		key: v.string()
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		const { userId } = parseUploadKey(args.key as UploadKey);
+		if (userId !== user.subject) throw new Error('Unauthorized');
+
+		return await r2.getUrl(args.key, {
+			expiresIn: undefined // never expire, this just makes it easier
+		});
+	}
+});
+
+export const internalGetFileUrl = internalQuery({
+	args: {
+		key: v.string()
+	},
+	handler: async (_, args) => {
+		return await r2.getUrl(args.key, {
+			expiresIn: undefined // never expire, this just makes it easier
+		});
+	}
+});
+
+export const syncRemoval = internalMutation({
+	args: {
+		key: v.string()
+	},
+	handler: async (ctx, args) => {
+		const file = await ctx.db
+			.query('chatAttachments')
+			.withIndex('by_key', (q) => q.eq('key', args.key))
+			.first();
+		// it's possible the file was deleted before it was attached to a chat
+		if (!file) return;
+
+		await ctx.db.delete(file._id);
+	}
+});
+
+export const create = internalMutation({
+	args: {
+		chatId: v.id('chat'),
+		messageId: v.id('messages'),
+		key: v.string(),
+		userId: v.string()
+	},
+	handler: async (ctx, args) => {
+		await ctx.db.insert('chatAttachments', {
+			chatId: args.chatId,
+			messageId: args.messageId,
+			key: args.key,
+			userId: args.userId
+		});
+	}
+});

@@ -6,8 +6,9 @@
 	import { ModelIdCtx } from '$lib/context.svelte';
 	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
 	import { onMount } from 'svelte';
-	import { IsMounted } from 'runed';
+	import { IsMounted, PersistedState } from 'runed';
 	import { cn } from '$lib/utils';
+	import { ChatAttachmentUploader } from './chat-attachment-uploader.svelte.js';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -22,6 +23,10 @@
 	});
 
 	const isMounted = new IsMounted();
+
+	const chatAttachmentUploader = new ChatAttachmentUploader();
+
+	const attachmentsList = new PersistedState<{ url: string; key: string }[]>('chat-attachments', []);
 </script>
 
 <svelte:head>
@@ -46,6 +51,9 @@
 				bind:modelId={modelId.current}
 				generating={chatViewState.chatQuery.data?.generating}
 				onSubmit={chatLayoutState.handleSubmit}
+				onUpload={chatAttachmentUploader.uploadMany}
+				onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+				bind:attachments={attachmentsList.current}
 				class="group/prompt-input"
 			>
 				<PromptInput.ScrollToBottom

@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { internalMutation, mutation } from './functions';
-import { getChatMessages } from './chat.utils';
+import { getChatMessages, getChatMessagesInternal, MessageWithAttachments } from './chat.utils';
 import { internalQuery, query } from './_generated/server';
 
 export const getAll = query({
@@ -44,11 +44,11 @@ export const internalGet = internalQuery({
 	args: {
 		chatId: v.id('chat')
 	},
-	handler: async (ctx, args): Promise<Doc<'chat'> & { messages: Doc<'messages'>[] }> => {
+	handler: async (ctx, args): Promise<Doc<'chat'> & { messages: MessageWithAttachments[] }> => {
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat) throw new Error('Chat not found');
 
-		const messages = await getChatMessages(ctx, args.chatId);
+		const messages = await getChatMessagesInternal(ctx, args.chatId);
 
 		return {
 			...chat,

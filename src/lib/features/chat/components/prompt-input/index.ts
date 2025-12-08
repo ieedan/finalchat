@@ -1,5 +1,6 @@
 import Root from './prompt-input.svelte';
 import Content from './prompt-input-content.svelte';
+import AttachmentList from './prompt-input-attachment-list.svelte';
 import Textarea from './prompt-input-textarea.svelte';
 import Footer from './prompt-input-footer.svelte';
 import Submit from './prompt-input-submit.svelte';
@@ -10,6 +11,7 @@ import ScrollToBottom from './prompt-input-scroll-to-bottom.svelte';
 
 export {
 	Root,
+	AttachmentList,
 	Textarea,
 	Footer,
 	Submit,
@@ -20,6 +22,7 @@ export {
 	ScrollToBottom,
 	//
 	Root as PromptInput,
+	AttachmentList as PromptInputAttachmentList,
 	Textarea as PromptInputTextarea,
 	Footer as PromptInputFooter,
 	Submit as PromptInputSubmit,

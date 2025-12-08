@@ -8,6 +8,7 @@
 	import { useChatLayout } from './chat.svelte.js';
 	import { formatDuration, type Milliseconds } from '$lib/utils/time.js';
 	import { untrack } from 'svelte';
+	import type { Doc } from '$lib/convex/_generated/dataModel.js';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -20,7 +21,9 @@
 	});
 
 	type Props = {
-		message: ChatMessageUser | ChatMessageAssistant;
+		message:
+			| (ChatMessageUser & { attachments?: (Doc<'chatAttachments'> & { url: string })[] })
+			| ChatMessageAssistant;
 	};
 
 	let { message }: Props = $props();
@@ -37,7 +40,7 @@
 				// once we are driving remove the id so we can't drive again
 				chatLayoutState.createdMessages.delete(message._id);
 			}
-		})
+		});
 	});
 </script>
 
@@ -47,6 +50,22 @@
 		'self-start': message.role === 'assistant'
 	})}
 >
+	{#if message.role === 'user'}
+		{#if message.attachments}
+			<div class="w-full justify-end flex items-center gap-2">
+				{#each message.attachments as attachment}
+					<a
+						href={attachment.url}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="overflow-hidden rounded-md border border-border size-[120px]"
+					>
+						<img src={attachment.url} alt="Attachment" class="object-cover" />
+					</a>
+				{/each}
+			</div>
+		{/if}
+	{/if}
 	<div data-message-role={message.role} class={chatMessageVariants({ role: message.role })}>
 		{#if message.content}
 			<Streamdown content={message.content} animationEnabled={false} />

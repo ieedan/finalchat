@@ -1,5 +1,5 @@
-import { UserIdentity } from "convex/server";
-import { QueryCtx } from "./_generated/server";
+import { UserIdentity } from 'convex/server';
+import { QueryCtx } from './_generated/server';
 
 export function getUserSettings(ctx: QueryCtx, identity: UserIdentity) {
 	return ctx.db

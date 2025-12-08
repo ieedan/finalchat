@@ -24,7 +24,7 @@ export const createApiKey = command(
 	async (args) => {
 		const { locals } = getRequestEvent();
 
-        args.key = key.encrypt(args.key, 'base64');
+		args.key = key.encrypt(args.key, 'base64');
 
 		await locals.convex.mutation(api.apiKeys.createOrUpdate, { key: args.key });
 	}

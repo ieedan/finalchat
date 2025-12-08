@@ -71,13 +71,14 @@ class ChatLayoutState {
 		);
 	}
 
-	handleSubmit: OnSubmit = async ({ input, modelId }) => {
+	handleSubmit: OnSubmit = async ({ input, modelId, attachments }) => {
 		const { chatId, assistantMessageId } = await this.client.mutation(api.messages.create, {
 			chatId: this.chatId,
 			apiKey: this.apiKey ?? '',
 			prompt: {
 				input,
 				modelId,
+				attachments
 			}
 		});
 

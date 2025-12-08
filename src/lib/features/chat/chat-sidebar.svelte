@@ -32,7 +32,7 @@
 	<Sidebar.Header>
 		<div class="flex items-center justify-between">
 			<a href="/chat" class="text-2xl font-bold">Chat</a>
-			<Sidebar.Trigger/>
+			<Sidebar.Trigger />
 		</div>
 		<Sidebar.MenuButton>
 			{#snippet child({ props: { class: _, ...props } })}

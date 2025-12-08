@@ -6,7 +6,7 @@
 
 	let { children } = $props();
 
-    const chatState = useChatLayout();
+	const chatState = useChatLayout();
 </script>
 
 <Sidebar.Provider>

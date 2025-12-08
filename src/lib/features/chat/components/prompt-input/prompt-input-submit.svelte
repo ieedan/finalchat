@@ -22,11 +22,17 @@
 	});
 </script>
 
-<Button {variant} {size} class={cn('group relative data-[generating=true]:animate-pulse', className)} {...submitState.props} {...rest}>
+<Button
+	{variant}
+	{size}
+	class={cn('group relative data-[generating=true]:animate-pulse', className)}
+	{...submitState.props}
+	{...rest}
+>
 	{#if children}
 		{@render children()}
 	{:else if submitState.rootState.opts.generating.current}
-		<SquareIcon class="fill-current"/>
+		<SquareIcon class="fill-current" />
 	{:else}
 		<SendIcon class="group-data-[loading=true]:hidden" />
 	{/if}

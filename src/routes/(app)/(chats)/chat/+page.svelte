@@ -3,10 +3,16 @@
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import ModelPickerBasic from '$lib/features/chat/components/model-picker-basic.svelte';
 	import { ModelIdCtx } from '$lib/context.svelte';
+	import { ChatAttachmentUploader } from '$lib/features/chat/chat-attachment-uploader.svelte.js';
+	import { PersistedState } from 'runed';
 
 	const chatState = useChatLayout();
 
 	const modelId = ModelIdCtx.get();
+
+	const chatAttachmentUploader = new ChatAttachmentUploader();
+
+	const attachmentsList = new PersistedState<{ url: string; key: string }[]>('new-chat-attachments', []);
 </script>
 
 <svelte:head>
@@ -18,8 +24,12 @@
 		bind:modelId={modelId.current}
 		onSubmit={chatState.handleSubmit}
 		class="w-full max-w-2xl"
+		onUpload={chatAttachmentUploader.uploadMany}
+		onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+		bind:attachments={attachmentsList.current}
 	>
 		<PromptInput.Content>
+			<PromptInput.AttachmentList />
 			<PromptInput.Textarea placeholder="Ask me anything..." />
 			<PromptInput.Footer class="justify-between">
 				<div class="flex items-center gap-2">

@@ -11,18 +11,21 @@
 		maxHeight = 200,
 		class: className,
 		onkeydown,
+		onpaste,
 		...rest
 	}: Omit<WithElementRef<HTMLTextareaAttributes>, 'value'> & {
 		maxHeight?: number;
 	} = $props();
 
 	const textareaState = usePromptInputTextarea({
-		onkeydown: box.with(() => onkeydown)
+		onkeydown: box.with(() => onkeydown),
+		onpaste: box.with(() => onpaste)
 	});
 
 	new TextareaAutosize({
 		element: () => ref!,
 		input: () => textareaState.rootState.opts.value.current,
+		// svelte-ignore state_referenced_locally
 		maxHeight
 	});
 </script>

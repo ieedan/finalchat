@@ -24,7 +24,7 @@
 
 	// this way if the user passes text then the button will be the default size
 	// svelte-ignore state_referenced_locally
-		if (size === 'icon' && children) {
+	if (size === 'icon' && children) {
 		size = 'default';
 	}
 

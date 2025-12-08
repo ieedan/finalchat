@@ -9,7 +9,7 @@
 		scrollToBottom: () => void;
 	};
 
-let { isNearBottom, scrollToBottom }: ButtonElementProps & Props = $props();
+	let { isNearBottom, scrollToBottom }: ButtonElementProps & Props = $props();
 </script>
 
 {#if !isNearBottom}

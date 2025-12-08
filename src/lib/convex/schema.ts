@@ -67,5 +67,15 @@ export default defineSchema({
 		updatedAt: v.number(),
 		pinned: v.boolean()
 	}).index('by_user', ['userId']),
+	chatAttachments: defineTable({
+		userId: v.string(),
+		chatId: v.id('chat'),
+		messageId: v.id('messages'),
+		key: v.string()
+	})
+		.index('by_chat', ['chatId'])
+		.index('by_message', ['messageId'])
+		.index('by_key', ['key'])
+		.index('by_user', ['userId']),
 	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
 });

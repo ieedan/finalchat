@@ -11,10 +11,9 @@
 
 	let mode = $state<'basic' | 'advanced'>('advanced');
 
-    const convex = useConvexClient();
+	const convex = useConvexClient();
 
 	async function submit() {
-        
 		try {
 			await convex.mutation(api.userSettings.updateMode, {
 				mode

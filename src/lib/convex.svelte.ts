@@ -11,7 +11,7 @@ export function useQueryWithFallback<Q extends FunctionReference<'query'>>(
 		fallback: Q['_returnType'];
 	}
 ): Query<Q> {
-    let fallback = $state(opts.fallback);
+	let fallback = $state(opts.fallback);
 	const result = useQuery(func, args, {
 		initialData: fallback
 	});

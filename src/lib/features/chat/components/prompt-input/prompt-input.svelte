@@ -18,9 +18,14 @@
 		value = $bindable(''),
 		modelId = $bindable(null),
 		generating = false,
+		onUpload,
+		onDeleteAttachment,
+		attachments = $bindable([]),
 		...rest
 	}: HTMLAttributes<HTMLDivElement> & {
 		onSubmit: OnSubmit;
+		onUpload: (files: File[]) => Promise<{ url: string; key: string }[]>;
+		onDeleteAttachment: (key: string) => Promise<void>;
 		generating?: boolean;
 		/**
 		 * Whether to submit the form on enter. Otherwise the form will be submitted on shift+enter.
@@ -29,15 +34,22 @@
 		optimisticClear?: boolean;
 		value?: string;
 		modelId?: ModelId | null;
+		attachments?: { url: string; key: string }[];
 	} = $props();
 
 	const promptInputState = usePromptInput({
 		onSubmit: box.with(() => onSubmit),
+		onUpload: box.with(() => onUpload),
+		onDeleteAttachment: box.with(() => onDeleteAttachment),
 		submitOnEnter: box.with(() => submitOnEnter),
 		generating: box.with(() => generating),
 		value: box.with(
 			() => value,
 			(v) => (value = v)
+		),
+		attachments: box.with(
+			() => attachments,
+			(v) => (attachments = v)
 		),
 		optimisticClear: box.with(() => optimisticClear),
 		modelId: box.with(

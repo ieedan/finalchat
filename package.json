@@ -15,6 +15,7 @@
 	},
 	"devDependencies": {
 		"@convex-dev/persistent-text-streaming": "^0.3.0",
+		"@convex-dev/r2": "^0.8.1",
 		"@dotenvx/dotenvx": "^1.51.1",
 		"@eslint/compat": "^2.0.0",
 		"@eslint/js": "^9.39.1",
@@ -48,6 +49,7 @@
 		"jsrepo": "^3.0.8",
 		"jwt-decode": "^4.0.0",
 		"mode-watcher": "^1.1.0",
+		"nanoid": "^5.1.6",
 		"node-rsa": "^1.1.1",
 		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.0",
