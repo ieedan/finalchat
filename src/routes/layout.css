@@ -96,4 +96,5 @@
 
 html {
 	@apply overscroll-none;
+	color-scheme: dark;
 }

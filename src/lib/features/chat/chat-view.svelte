@@ -9,6 +9,8 @@
 	import { IsMounted, PersistedState } from 'runed';
 	import { cn } from '$lib/utils';
 	import { ChatAttachmentUploader } from './chat-attachment-uploader.svelte.js';
+	import * as Sidebar from '$lib/components/ui/sidebar';
+	import { Button } from '$lib/components/ui/button';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -26,13 +28,33 @@
 
 	const chatAttachmentUploader = new ChatAttachmentUploader();
 
-	const attachmentsList = new PersistedState<{ url: string; key: string }[]>('chat-attachments', []);
+	const attachmentsList = new PersistedState<{ url: string; key: string }[]>(
+		'chat-attachments',
+		[]
+	);
+
+	const sidebar = Sidebar.useSidebar();
 </script>
 
 <svelte:head>
 	<title>{chatViewState.chatQuery.data?.title}</title>
 </svelte:head>
 
+<header class="sticky top-0">
+	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20">
+		<div class="flex items-center gap-2">
+			{#if sidebar.isMobile || !sidebar.open}
+				<div class="size-9"></div>
+			{/if}
+		</div>
+		<div class="flex items-center gap-2">
+			<Button variant="outline">
+				Share
+			</Button>
+		</div>
+	</div>
+	<div class="absolute w-full h-[24px] bg-background mask-b-from-0% -bottom-[14px] z-19"></div>
+</header>
 <div
 	bind:this={scrollContainer}
 	class={cn('flex flex-col h-full max-h-full overflow-y-auto items-center', {

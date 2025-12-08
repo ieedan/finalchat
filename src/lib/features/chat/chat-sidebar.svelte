@@ -12,6 +12,7 @@
 	import { buttonVariants } from '$lib/components/ui/button';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import ChatGotoDialog from './chat-goto-dialog.svelte';
+	import { cn } from '$lib/utils';
 
 	const chatContext = useChatLayout();
 
@@ -36,13 +37,32 @@
 
 	let chatGotoDialogOpen = $state(false);
 	let gotoChatIndex = $state<number | null>(null);
+
+	const sidebar = Sidebar.useSidebar();
+
+	const headerTrigger = $derived(sidebar.isMobile || !sidebar.open);
 </script>
 
+<!-- 
+sidebar trigger
+this has to be out here because the sidebar isn't rendered all the time on mobile
+-->
+<div
+	class={cn(
+		'transition-transform left-0 top-2.5 fixed translate-x-[244px] z-21 duration-200',
+		headerTrigger && 'translate-x-[20px] translate-y-[8px]'
+	)}
+>
+	<Sidebar.Trigger />
+</div>
+
 <Sidebar.Root variant="inset">
-	<Sidebar.Header>
-		<div class="flex items-center justify-between">
+	<Sidebar.Header class="pt-0">
+		<div class="flex items-center justify-between h-9">
 			<a href="/chat" class="text-2xl font-bold">Chat</a>
-			<Sidebar.Trigger />
+			{#if sidebar.isMobile}
+				<Sidebar.Trigger />
+			{/if}
 		</div>
 		<Sidebar.MenuButton>
 			{#snippet child({ props: { class: _, ...props } })}

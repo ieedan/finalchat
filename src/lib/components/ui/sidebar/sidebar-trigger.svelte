@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Button, type ButtonElementProps } from '$lib/components/ui/button/index.js';
 	import { cn } from '$lib/utils.js';
 	import PanelLeftIcon from '@lucide/svelte/icons/panel-left';
 	import type { ComponentProps } from 'svelte';
@@ -10,7 +10,7 @@
 		class: className,
 		onclick,
 		...restProps
-	}: ComponentProps<typeof Button> & {
+	}: ButtonElementProps & {
 		onclick?: (e: MouseEvent) => void;
 	} = $props();
 
@@ -22,7 +22,7 @@
 	data-slot="sidebar-trigger"
 	variant="ghost"
 	size="icon"
-	class={cn('size-7', className)}
+	class={cn('size-9', className)}
 	type="button"
 	onclick={(e) => {
 		onclick?.(e);
