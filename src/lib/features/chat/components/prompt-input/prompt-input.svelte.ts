@@ -30,7 +30,9 @@ class PromptInputRootState {
 	error = $state<string | null>(null);
 	uploadingAttachments: Map<string, File> = new SvelteMap();
 
-	constructor(readonly opts: PromptInputRootStateOptions) {}
+	constructor(readonly opts: PromptInputRootStateOptions) {
+		this.onUpload = this.onUpload.bind(this);
+	}
 
 	async onUpload(files: File[]) {
 		try {
@@ -144,6 +146,10 @@ class PromptInputAttachmentListState {
 	constructor(readonly rootState: PromptInputRootState) {}
 }
 
+class PromptInputAttachmentButtonState {
+	constructor(readonly rootState: PromptInputRootState) {}
+}
+
 type PromptInputSubmitStateOptions = ReadableBoxedValues<{
 	disabled: boolean | null | undefined;
 	onclick: ButtonElementProps['onclick'];
@@ -230,6 +236,10 @@ export function usePromptInputTextarea(props: PromptInputTextareaStateOptions) {
 
 export function usePromptInputAttachmentList() {
 	return new PromptInputAttachmentListState(ctx.get());
+}
+
+export function usePromptInputAttachmentButton() {
+	return new PromptInputAttachmentButtonState(ctx.get());
 }
 
 export function usePromptInputSubmit(props: PromptInputSubmitStateOptions) {

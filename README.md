@@ -5,5 +5,6 @@
 ### Chat Features
 
 - [ ] Make it possible to stop the generation of a message
-- [ ] Add the ability to add attachments
-  - [ ] Users should be able to paste in images
+- [x] Add the ability to add attachments
+  - [x] Users should be able to paste in images
+  - [ ] Add more explicit button
