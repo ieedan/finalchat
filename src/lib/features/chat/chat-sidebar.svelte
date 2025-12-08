@@ -11,19 +11,32 @@
 	import ChatButton from './chat-button.svelte';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import PlusIcon from '@lucide/svelte/icons/plus';
+	import ChatGotoDialog from './chat-goto-dialog.svelte';
 
 	const chatContext = useChatLayout();
 
-	const pinnedChats = $derived(chatContext.chatsQuery.data?.filter((chat) => chat.pinned) ?? []);
+	const indexedChats = $derived(
+		chatContext.chatsQuery.data?.map((chat, i) => ({
+			...chat,
+			index: i + 1
+		})) ?? []
+	);
+
+	const pinnedChats = $derived(indexedChats.filter((chat) => chat.pinned) ?? []);
 
 	const groups = $derived(
 		getAgedGroups(
-			(chatContext.chatsQuery.data ?? []).filter((chat) => !chat.pinned),
+			indexedChats.filter((chat) => !chat.pinned),
 			{
 				getAge: (item) => item.updatedAt,
 				groups: DEFAULT_AGE_GROUPS
 			}
 		)
+	);
+
+	let chatGotoDialogOpen = $state(false);
+	let gotoChatIndex = $derived(
+		indexedChats.findIndex((chat) => chat._id === chatContext.chatId) ?? 0
 	);
 </script>
 
@@ -49,7 +62,7 @@
 				<Sidebar.GroupContent>
 					<Sidebar.Menu class="gap-0.5">
 						{#each pinnedChats as chat (chat._id)}
-							<ChatButton {chat} />
+							<ChatButton {chat} gotoOpen={chatGotoDialogOpen} gotoIndex={gotoChatIndex} />
 						{/each}
 					</Sidebar.Menu>
 				</Sidebar.GroupContent>
@@ -62,7 +75,7 @@
 					<Sidebar.GroupContent>
 						<Sidebar.Menu class="gap-0.5">
 							{#each chats as chat (chat._id)}
-								<ChatButton {chat} />
+								<ChatButton {chat} gotoOpen={chatGotoDialogOpen} gotoIndex={gotoChatIndex} />
 							{/each}
 						</Sidebar.Menu>
 					</Sidebar.GroupContent>
@@ -107,3 +120,19 @@
 		</DropdownMenu.Root>
 	</Sidebar.Footer>
 </Sidebar.Root>
+
+<ChatGotoDialog
+	bind:open={chatGotoDialogOpen}
+	totalChats={indexedChats.length}
+	bind:value={gotoChatIndex}
+	onSubmit={async (value) => {
+		const chat = indexedChats[value - 1];
+		if (chat) {
+			await goto(`/chat/${chat._id}`);
+		}
+		chatGotoDialogOpen = false;
+	}}
+	onClose={() => {
+		gotoChatIndex = indexedChats.findIndex((chat) => chat._id === chatContext.chatId) ?? 0;
+	}}
+/>

@@ -35,7 +35,7 @@
 
 <div
 	bind:this={scrollContainer}
-	class={cn('flex flex-col h-full max-h-svh overflow-y-auto items-center', {
+	class={cn('flex flex-col h-full max-h-full overflow-y-auto items-center', {
 		'scroll-smooth': isMounted.current
 	})}
 >

@@ -11,7 +11,7 @@
 
 <Sidebar.Provider>
 	<ChatSidebar />
-	<Sidebar.Inset>
+	<Sidebar.Inset class="h-svh">
 		{@render children()}
 	</Sidebar.Inset>
 </Sidebar.Provider>

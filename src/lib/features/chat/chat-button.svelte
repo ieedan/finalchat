@@ -22,10 +22,12 @@
 	import { warm } from '$lib/cache/cached-query.svelte';
 
 	type Props = {
-		chat: Doc<'chat'>;
+		chat: Doc<'chat'> & { index: number };
+		gotoOpen: boolean;
+		gotoIndex: number;
 	};
 
-	let { chat }: Props = $props();
+	let { chat, gotoOpen, gotoIndex }: Props = $props();
 
 	const client = useConvexClient();
 
@@ -118,12 +120,18 @@
 						<Rename.Root
 							this="span"
 							value={chat.title}
-							class="min-w-0 flex-1 text-sm rounded-none border-none outline-none focus:ring-0! data-[mode=view]:truncate"
+							class={cn(
+								'min-w-0 flex-1 text-sm rounded-none border-none outline-none focus:ring-0! data-[mode=view]:truncate',
+								gotoOpen && chat.index === gotoIndex ? 'bg-yellow-300 text-black' : ''
+							)}
 							fallbackSelectionBehavior="all"
 							blurBehavior="exit"
 							onSave={renameChat}
 							bind:mode={renamingMode}
 						/>
+						{#if gotoOpen}
+							<span class="text-xs text-muted-foreground font-mono pl-2">{chat.index}</span>
+						{/if}
 					</a>
 					{#if renamingMode === 'view'}
 						<div
