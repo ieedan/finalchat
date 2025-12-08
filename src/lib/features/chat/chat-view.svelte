@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { useChatLayout, useChatView } from '$lib/features/chat/chat.svelte';
 	import ModelPickerBasic from '$lib/features/chat/components/model-picker-basic.svelte';
+	import ModelPickerAdvanced from '$lib/features/chat/components/model-picker-advanced.svelte';
 	import * as PromptInput from '$lib/features/chat/components/prompt-input';
 	import ChatMessage from './chat-message.svelte';
 	import { ModelIdCtx } from '$lib/context.svelte';
@@ -87,7 +88,7 @@
 					<PromptInput.Footer class="justify-between">
 						<div class="flex items-center gap-2">
 							{#if chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
-								<ModelPickerBasic />
+								<ModelPickerAdvanced />
 							{:else}
 								<ModelPickerBasic />
 							{/if}

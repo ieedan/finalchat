@@ -5,6 +5,7 @@
 	import { ModelIdCtx } from '$lib/context.svelte';
 	import { ChatAttachmentUploader } from '$lib/features/chat/chat-attachment-uploader.svelte.js';
 	import { PersistedState } from 'runed';
+	import ModelPickerAdvanced from '$lib/features/chat/components/model-picker-advanced.svelte';
 
 	const chatState = useChatLayout();
 
@@ -12,7 +13,10 @@
 
 	const chatAttachmentUploader = new ChatAttachmentUploader();
 
-	const attachmentsList = new PersistedState<{ url: string; key: string }[]>('new-chat-attachments', []);
+	const attachmentsList = new PersistedState<{ url: string; key: string }[]>(
+		'new-chat-attachments',
+		[]
+	);
 </script>
 
 <svelte:head>
@@ -34,7 +38,7 @@
 			<PromptInput.Footer class="justify-between">
 				<div class="flex items-center gap-2">
 					{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
-						<ModelPickerBasic />
+						<ModelPickerAdvanced />
 					{:else}
 						<ModelPickerBasic />
 					{/if}
