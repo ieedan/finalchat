@@ -69,6 +69,7 @@
 							{:else}
 								<ModelPickerBasic />
 							{/if}
+							<PromptInput.AttachmentButton />
 						</div>
 						<PromptInput.Submit />
 					</PromptInput.Footer>

@@ -11,7 +11,7 @@
 	onUpload={attachmentButtonState.rootState.onUpload}
 	accept={FileDropZone.ACCEPT_IMAGE}
 >
-	<FileDropZone.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}>
+	<FileDropZone.Trigger class={buttonVariants({ variant: 'input', size: 'icon' })}>
 		<ImagePlusIcon class="size-4" />
 	</FileDropZone.Trigger>
 </FileDropZone.Root>

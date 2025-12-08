@@ -30,7 +30,7 @@
 	<Select.Trigger>
 		{selectedModel?.name}
 	</Select.Trigger>
-	<Select.Content align="start">
+	<Select.Content align="start" animated={false}>
 		{#each models as model (model.id)}
 			<Select.Item value={model.id}>
 				{model.name}

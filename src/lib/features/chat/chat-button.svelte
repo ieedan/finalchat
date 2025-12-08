@@ -20,7 +20,6 @@
 	import { useSidebar } from '$lib/components/ui/sidebar';
 	import { navigating } from '$app/state';
 	import { warm } from '$lib/cache/cached-query.svelte';
-	import type { inspect } from 'util';
 
 	type Props = {
 		chat: Doc<'chat'>;
@@ -91,10 +90,10 @@
 				}
 			}}
 		>
-			{#snippet child({ props })}
+			{#snippet child({ props: { class: _, ...props } })}
 				<div
 					data-active={page.params.chatId === chat._id}
-					class="group/menu-button hover:bg-accent rounded-md flex items-center gap-2 h-9.5 data-[active=true]:bg-accent"
+					class="group/menu-button hover:bg-sidebar-accent focus-within:bg-sidebar-accent rounded-md flex items-center gap-2 h-8.5 data-[active=true]:bg-sidebar-accent"
 					onpointerover={() => {
 						warm(client, api.chat.get, {
 							chatId: chat._id
@@ -109,7 +108,7 @@
 					<a
 						{...props}
 						href="/chat/{chat._id}"
-						class="flex min-w-0 flex-1 items-center gap-1 pl-3 h-full"
+						class="flex min-w-0 flex-1 items-center gap-1 pl-3 h-full outline-none"
 					>
 						{#if chat.generating}
 							<div class="flex shrink-0 items-center justify-center">
@@ -119,7 +118,7 @@
 						<Rename.Root
 							this="span"
 							value={chat.title}
-							class="min-w-0 flex-1 rounded-none border-none outline-none focus:ring-0! data-[mode=view]:truncate"
+							class="min-w-0 flex-1 text-sm rounded-none border-none outline-none focus:ring-0! data-[mode=view]:truncate"
 							fallbackSelectionBehavior="all"
 							blurBehavior="exit"
 							onSave={renameChat}
@@ -140,7 +139,7 @@
 									tabindex={-1}
 									data-open={dropdownOpen}
 									class={cn(
-										'inline-flex group-hover/menu-button:w-9 group-data-[active=true]/menu-button:w-9 bg-accent data-[open=true]:w-9! w-0 h-full items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+										'inline-flex group-hover/menu-button:w-9 group-data-[active=true]/menu-button:w-9 bg-sidebar-accent data-[open=true]:w-9! w-0 h-full items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
 									)}
 								>
 									<Ellipsis class="size-4 shrink-0" />

@@ -4,7 +4,6 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { sidebarMenuButtonVariants } from '$lib/components/ui/sidebar/sidebar-menu-button.svelte';
 	import { useChatLayout } from './chat.svelte';
-	import { CircleThemeSelector } from '$lib/components/ui/circle-theme-selector';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import { goto } from '$app/navigation';
@@ -48,7 +47,7 @@
 			<Sidebar.Group class="py-0">
 				<Sidebar.GroupLabel>Pinned</Sidebar.GroupLabel>
 				<Sidebar.GroupContent>
-					<Sidebar.Menu class="gap-0">
+					<Sidebar.Menu class="gap-0.5">
 						{#each pinnedChats as chat (chat._id)}
 							<ChatButton {chat} />
 						{/each}
@@ -61,7 +60,7 @@
 				<Sidebar.Group class="py-0">
 					<Sidebar.GroupLabel>{name}</Sidebar.GroupLabel>
 					<Sidebar.GroupContent>
-						<Sidebar.Menu class="gap-0">
+						<Sidebar.Menu class="gap-0.5">
 							{#each chats as chat (chat._id)}
 								<ChatButton {chat} />
 							{/each}
@@ -93,13 +92,6 @@
 				</div>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content class="w-(--bits-dropdown-menu-anchor-width)" align="center" side="top">
-				<DropdownMenu.Item
-					onSelect={(e) => e.preventDefault()}
-					class="flex items-center justify-between gap-2"
-				>
-					<span>Theme</span>
-					<CircleThemeSelector size="sm" />
-				</DropdownMenu.Item>
 				<DropdownMenu.Item class="flex items-center justify-between gap-2">
 					<span>Settings</span>
 					<SettingsIcon />

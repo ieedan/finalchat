@@ -1,7 +1,8 @@
 <script lang="ts">
 	import './layout.css';
+	import '@fontsource-variable/ibm-plex-sans';
+	import '@fontsource-variable/geist-mono';
 	import favicon from '$lib/assets/favicon.svg';
-	import { ModeWatcher } from 'mode-watcher';
 	import { env } from '$lib/env.client';
 	import { setupConvex } from 'convex-svelte';
 	import { page } from '$app/state';
@@ -50,7 +51,6 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<ModeWatcher />
 <ConfirmDeleteDialog />
 
 {@render children()}

@@ -19,6 +19,8 @@
 		"@dotenvx/dotenvx": "^1.51.1",
 		"@eslint/compat": "^2.0.0",
 		"@eslint/js": "^9.39.1",
+		"@fontsource-variable/geist-mono": "^5.2.7",
+		"@fontsource-variable/ibm-plex-sans": "^5.2.8",
 		"@internationalized/date": "^3.10.0",
 		"@jsrepo/transform-prettier": "^0.0.9",
 		"@lucide/svelte": "^0.556.0",
