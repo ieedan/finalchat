@@ -152,7 +152,7 @@
 								>
 									<Ellipsis class="size-4 shrink-0" />
 								</DropdownMenu.Trigger>
-								<DropdownMenu.Content align="end" side="bottom">
+								<DropdownMenu.Content align="end" side="bottom" animated={false}>
 									<DropdownMenu.Item onSelect={() => togglePinned()}>
 										{#if !chat.pinned}
 											<PinIcon class="size-4!" />

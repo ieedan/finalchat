@@ -15,3 +15,5 @@ You hit ⌘ G to open a dialog instantly and then type the index of the chat you
 - [ ] Chat header
 - [ ] Share mode
 - [ ] Og image generation
+- [ ] Advanced chat input
+- [ ] Settings

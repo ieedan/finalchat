@@ -10,7 +10,7 @@
 	let {
 		ref = $bindable(null),
 		class: className,
-		sideOffset = 2,
+		sideOffset = 0,
 		portalProps,
 		children,
 		preventScroll = true,
