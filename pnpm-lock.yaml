@@ -8,6 +8,9 @@ overrides:
   animated-svelte: link:../../../Library/pnpm/global/5/node_modules/animated-svelte
 
 patchedDependencies:
+  bits-ui:
+    hash: f669e4d8a3c52b59f7431a4daabb36fb90ce168473063e5ef72ce6ec2cff4cf1
+    path: patches/bits-ui.patch
   convex-svelte:
     hash: 0cbda42873f10880d19ab3a5d6e778eb090ee338fd17ef8cfabb25aebedefee8
     path: patches/convex-svelte.patch
@@ -48,8 +51,8 @@ importers:
         specifier: ^0.0.9
         version: 0.0.9(jsrepo@3.0.8(svelte@5.45.5))(prettier@3.7.4)
       '@lucide/svelte':
-        specifier: ^0.556.0
-        version: 0.556.0(svelte@5.45.5)
+        specifier: ^0.544.0
+        version: 0.544.0(svelte@5.45.5)
       '@openrouter/ai-sdk-provider':
         specifier: ^1.2.8
         version: 1.4.0(ai@5.0.107(zod@4.1.13))(zod@4.1.13)
@@ -94,7 +97,7 @@ importers:
         version: 5.0.107(zod@4.1.13)
       bits-ui:
         specifier: ^2.14.4
-        version: 2.14.4(@internationalized/date@3.10.0)(@sveltejs/kit@2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)
+        version: 2.14.4(patch_hash=f669e4d8a3c52b59f7431a4daabb36fb90ce168473063e5ef72ce6ec2cff4cf1)(@internationalized/date@3.10.0)(@sveltejs/kit@2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -900,8 +903,8 @@ packages:
       jsrepo: 3.0.8
       prettier: 3.x
 
-  '@lucide/svelte@0.556.0':
-    resolution: {integrity: sha512-jsJhyyd2xrJ4WtflO5TrTtyCBacF4OLBNCzotvwh4zfbbuE6aqdblx+OB0zg6zOno06ib1GJGdDcfR/2TUcb7g==}
+  '@lucide/svelte@0.544.0':
+    resolution: {integrity: sha512-9f9O6uxng2pLB01sxNySHduJN3HTl5p0HDu4H26VR51vhZfiMzyOMe9Mhof3XAk4l813eTtl+/DYRvGyoRR+yw==}
     peerDependencies:
       svelte: ^5
 
@@ -4556,7 +4559,7 @@ snapshots:
       jsrepo: 3.0.8(svelte@5.45.5)
       prettier: 3.7.4
 
-  '@lucide/svelte@0.556.0(svelte@5.45.5)':
+  '@lucide/svelte@0.544.0(svelte@5.45.5)':
     dependencies:
       svelte: 5.45.5
 
@@ -5720,7 +5723,7 @@ snapshots:
     dependencies:
       file-uri-to-path: 1.0.0
 
-  bits-ui@2.14.4(@internationalized/date@3.10.0)(@sveltejs/kit@2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5):
+  bits-ui@2.14.4(patch_hash=f669e4d8a3c52b59f7431a4daabb36fb90ce168473063e5ef72ce6ec2cff4cf1)(@internationalized/date@3.10.0)(@sveltejs/kit@2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5):
     dependencies:
       '@floating-ui/core': 1.7.3
       '@floating-ui/dom': 1.7.4

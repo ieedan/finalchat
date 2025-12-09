@@ -14,12 +14,12 @@
 		onFileRejected,
 		accept,
 		class: className,
-        children,
+		children,
 		...rest
 	}: FileDropZoneRootProps = $props();
 
 	const rootState = useFileDropZone({
-        id: box.with(() => id),
+		id: box.with(() => id),
 		disabled: box.with(() => disabled ?? false),
 		onUpload: box.with(() => onUpload),
 		maxFiles: box.with(() => maxFiles),
@@ -30,10 +30,6 @@
 	});
 </script>
 
-<input
-	class="hidden"
-    {...rootState.props}
-	{...rest}
-/>
+<input class="hidden" {...rootState.props} {...rest} />
 
 {@render children?.()}

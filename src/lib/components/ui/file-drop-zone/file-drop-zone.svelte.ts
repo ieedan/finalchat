@@ -22,7 +22,7 @@ class FileDropZoneState {
 				'Make sure to provide FileDropZone with `fileCount` when using the `maxFiles` prompt'
 			);
 		}
-		
+
 		this.onchange = this.onchange.bind(this);
 		this.ondrop = this.ondrop.bind(this);
 	}

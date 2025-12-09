@@ -60,7 +60,9 @@ class ChatLayoutState {
 	}
 
 	get enabledModels() {
-		return this.models.filter(model => this.userSettingsQuery.data?.favoriteModelIds?.includes(model.id));
+		return this.models.filter((model) =>
+			this.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
+		);
 	}
 
 	get user() {

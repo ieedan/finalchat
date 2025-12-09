@@ -1,6 +1,6 @@
 import { api } from '$lib/convex/_generated/api';
 import { getApiKey } from '$lib/features/api-keys/api-keys.remote.js';
-import { getModels } from '$lib/features/models/models.remote.js';;
+import { getModels } from '$lib/features/models/models.remote.js';
 import { authKit } from '@workos/authkit-sveltekit';
 
 export const load = authKit.withAuth(async ({ auth, locals }) => {

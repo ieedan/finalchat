@@ -15,7 +15,9 @@ export function formatNumberShort(num: number, digits: number = 1): string {
 
 	for (const item of lookup) {
 		if (Math.abs(num) >= item.value) {
-			return (num / item.value).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1') + item.symbol;
+			return (
+				(num / item.value).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1') + item.symbol
+			);
 		}
 	}
 	return num.toString();

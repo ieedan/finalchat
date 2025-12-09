@@ -30,5 +30,5 @@ export {
 	Input as CommandInput,
 	List as CommandList,
 	Separator as CommandSeparator,
-	Shortcut as CommandShortcut,
+	Shortcut as CommandShortcut
 };

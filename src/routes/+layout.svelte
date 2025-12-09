@@ -53,6 +53,6 @@
 </svelte:head>
 
 <ConfirmDeleteDialog />
-<Toaster position="bottom-right"/>
+<Toaster position="bottom-right" />
 
 {@render children()}

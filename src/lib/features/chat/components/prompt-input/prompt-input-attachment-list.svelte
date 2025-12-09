@@ -14,9 +14,9 @@
 			attachmentListState.rootState.uploadingAttachments.size > 0
 	);
 
-    // yeah this is weird
-    // for some reason using PersistedState to store the attachments will cause issues with the first each block
-    // this indirection seems to fix it for whatever odd reason
+	// yeah this is weird
+	// for some reason using PersistedState to store the attachments will cause issues with the first each block
+	// this indirection seems to fix it for whatever odd reason
 	const uploadedAttachments = $derived.by(() => {
 		return attachmentListState.rootState.opts.attachments.current.map((obj) => ({
 			...obj

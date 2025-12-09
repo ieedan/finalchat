@@ -1,0 +1,33 @@
+diff --git a/dist/bits/command/command.svelte.js b/dist/bits/command/command.svelte.js
+index 5cabd95e13d3bacdf2af4442b99e2826b00f8ac8..44275598c6e3d26aeeb7ffa4ba4f3a6741fb4420 100644
+--- a/dist/bits/command/command.svelte.js
++++ b/dist/bits/command/command.svelte.js
+@@ -361,12 +361,12 @@ export class CommandRootState {
+             if (this.isGrid) {
+                 const isFirstRowOfGroup = this.#itemIsFirstRowOfGroup(item);
+                 // ensure item is visible
+-                item.scrollIntoView({ block: "nearest" });
++                item.scrollIntoView({ block: "center" });
+                 if (isFirstRowOfGroup) {
+                     const closestGroupHeader = item
+                         ?.closest(COMMAND_GROUP_SELECTOR)
+                         ?.querySelector(COMMAND_GROUP_HEADING_SELECTOR);
+-                    closestGroupHeader?.scrollIntoView({ block: "nearest" });
++                    closestGroupHeader?.scrollIntoView({ block: "center" });
+                     return;
+                 }
+             }
+@@ -377,11 +377,11 @@ export class CommandRootState {
+                     const closestGroupHeader = item
+                         ?.closest(COMMAND_GROUP_SELECTOR)
+                         ?.querySelector(COMMAND_GROUP_HEADING_SELECTOR);
+-                    closestGroupHeader?.scrollIntoView({ block: "nearest" });
++                    closestGroupHeader?.scrollIntoView({ block: "center" });
+                     return;
+                 }
+             }
+-            item.scrollIntoView({ block: "nearest" });
++            item.scrollIntoView({ block: "center" });
+         });
+     }
+     #itemIsFirstRowOfGroup(item) {

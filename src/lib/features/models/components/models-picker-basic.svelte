@@ -24,7 +24,9 @@
 	let open = $state(false);
 </script>
 
-<svelte:window use:shortcut={{ key: 'm', shift: true, ctrl: true, callback: () => (open = !open) }} />
+<svelte:window
+	use:shortcut={{ key: 'm', shift: true, ctrl: true, callback: () => (open = !open) }}
+/>
 
 <Select.Root
 	type="single"

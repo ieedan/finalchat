@@ -15,15 +15,7 @@
 	const triggerState = useFileDropZoneTrigger();
 </script>
 
-<label
-	bind:this={ref}
-	class={cn(
-		'',
-		className
-	)}
-	{...triggerState.props}
-	{...rest}
->
+<label bind:this={ref} class={cn('', className)} {...triggerState.props} {...rest}>
 	{#if children}
 		{@render children()}
 	{:else}

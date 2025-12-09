@@ -5,11 +5,7 @@
 	let { class: className, ...rest }: HTMLAttributes<SVGSVGElement> = $props();
 </script>
 
-<svg
-	viewBox="0 0 24 24"
-	xmlns="http://www.w3.org/2000/svg"
-	class={cn('', className)}
-	{...rest}
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class={cn('', className)} {...rest}
 	><title>Kwaipilot</title><path
 		d="M11.765.03C5.327.03.108 5.25.108 11.686c0 3.514 1.556 6.665 4.015 8.804L9.89 8.665h6.451L9.31 23.083c.807.173 1.63.26 2.455.26 6.438 0 11.657-5.22 11.657-11.658S18.202.028 11.765.028V.03z"
 		fill="url(#lobe-icons-kwaipilot-fill-0)"

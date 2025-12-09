@@ -9,7 +9,7 @@ export function displaySize(bytes: number): string {
 	if (bytes < GIGABYTE) return `${(bytes / MEGABYTE).toFixed(0)} MB`;
 
 	return `${(bytes / GIGABYTE).toFixed(0)} GB`;
-};
+}
 
 // Utilities for working with file sizes
 export const BYTE = 1;

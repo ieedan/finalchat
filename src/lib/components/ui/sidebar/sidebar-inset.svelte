@@ -13,10 +13,7 @@
 <main
 	bind:this={ref}
 	data-slot="sidebar-inset"
-	class={cn(
-		'bg-background relative flex w-full flex-1 flex-col',
-		className
-	)}
+	class={cn('bg-background relative flex w-full flex-1 flex-col', className)}
 	style="container-type: inline-size;"
 	{...restProps}
 >

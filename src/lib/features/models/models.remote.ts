@@ -14,15 +14,14 @@ export const getModels = query(async () => {
 
 		const data = (await response.json()) as OpenRouter.ModelsResponse;
 
-		return data.data
-			.map((model) => {
-				const { lab, name } = parseModelName(model.name);
-				return {
-					...model,
-					name,
-					lab
-				};
-			});
+		return data.data.map((model) => {
+			const { lab, name } = parseModelName(model.name);
+			return {
+				...model,
+				name,
+				lab
+			};
+		});
 	} catch {
 		return [];
 	}

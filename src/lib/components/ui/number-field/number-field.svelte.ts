@@ -21,7 +21,9 @@ export class NumberFieldRootContext {
 		const min = this.opts.min?.current;
 		const max = this.opts.max?.current;
 
-		return value !== null && (min === undefined || value >= min) && (max === undefined || value <= max);
+		return (
+			value !== null && (min === undefined || value >= min) && (max === undefined || value <= max)
+		);
 	});
 }
 
