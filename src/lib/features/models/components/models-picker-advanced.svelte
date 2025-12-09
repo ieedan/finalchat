@@ -74,6 +74,7 @@
 	function handleSelect(modelId: ModelId) {
 		modelPickerState.rootState.opts.modelId.current = modelId;
 		open = false;
+		modelPickerState.onSelect();
 	}
 
 	let internalModelId = $derived<ModelId | undefined>(selectedModel?.id);
@@ -183,7 +184,7 @@
 			/>
 			<Command.List
 				class={cn(
-					'h-[136px] max-h-none md:w-[300px]',
+					'h-[124px] max-h-none md:w-[300px]',
 					animated && 'transition-[height,width]',
 					mode === 'grid' && 'h-[498px] md:w-[416px] lg:w-[688px]'
 				)}

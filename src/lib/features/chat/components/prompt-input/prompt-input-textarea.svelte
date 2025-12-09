@@ -13,13 +13,14 @@
 		onkeydown,
 		onpaste,
 		...rest
-	}: Omit<WithElementRef<HTMLTextareaAttributes>, 'value'> & {
+	}: Omit<WithElementRef<HTMLTextareaAttributes, HTMLTextAreaElement>, 'value'> & {
 		maxHeight?: number;
 	} = $props();
 
 	const textareaState = usePromptInputTextarea({
 		onkeydown: box.with(() => onkeydown),
-		onpaste: box.with(() => onpaste)
+		onpaste: box.with(() => onpaste),
+		ref: box.with(() => ref)
 	});
 
 	new TextareaAutosize({

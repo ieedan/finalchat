@@ -1,5 +1,5 @@
 import type { ButtonElementProps } from '$lib/components/ui/button';
-import { Context } from 'runed';
+import { Context, watch } from 'runed';
 import type { ReadableBoxedValues, WritableBoxedValues } from 'svelte-toolbelt';
 import type { ClipboardEventHandler, KeyboardEventHandler } from 'svelte/elements';
 import type { Model, ModelId } from '../../types';
@@ -29,6 +29,7 @@ class PromptInputRootState {
 	loading = $state(false);
 	error = $state<string | null>(null);
 	uploadingAttachments: Map<string, File> = new SvelteMap();
+	textAreaRef = $state<HTMLTextAreaElement | null>(null);
 
 	constructor(readonly opts: PromptInputRootStateOptions) {
 		this.onUpload = this.onUpload.bind(this);
@@ -100,13 +101,21 @@ class PromptInputRootState {
 type PromptInputTextareaStateOptions = ReadableBoxedValues<{
 	onkeydown: KeyboardEventHandler<HTMLTextAreaElement> | null | undefined;
 	onpaste: ClipboardEventHandler<HTMLTextAreaElement> | null | undefined;
+	ref: HTMLTextAreaElement | null;
 }>;
 
 class PromptInputTextareaState {
 	constructor(
 		readonly opts: PromptInputTextareaStateOptions,
 		readonly rootState: PromptInputRootState
-	) {}
+	) {
+		watch(
+			() => this.opts.ref.current,
+			(ref: HTMLTextAreaElement | null) => {
+				this.rootState.textAreaRef = ref;
+			}
+		);
+	}
 
 	onkeydown(e: Parameters<KeyboardEventHandler<HTMLTextAreaElement>>[0]) {
 		if (
@@ -220,6 +229,12 @@ class ModelPickerState {
 		if (this.rootState.opts.modelId.current === null) {
 			this.rootState.opts.modelId.current = this.opts.models.current[0].id;
 		}
+	}
+
+	onSelect() {
+		setTimeout(() => {
+			this.rootState.textAreaRef?.focus();
+		}, 0);
 	}
 }
 

@@ -33,6 +33,7 @@
 		() => modelPickerState.rootState.opts.modelId.current ?? models[0].id,
 		(v) => (modelPickerState.rootState.opts.modelId.current = v)
 	}
+	onValueChange={() => modelPickerState.onSelect()}
 >
 	<Select.Trigger>
 		{selectedModel?.name}
