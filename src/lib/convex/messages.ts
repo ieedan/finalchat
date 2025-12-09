@@ -278,10 +278,10 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				}
 			} catch (error) {
 				if (!last) return;
+				console.error(error);
 				await ctx.runMutation(internal.messages.updateMessageError, {
 					messageId: last.assistantMessage._id,
-					error:
-						error instanceof Error ? error.message : 'There was an error generating the response'
+					error: 'There was an error generating the response'
 				});
 			}
 		}
