@@ -8,7 +8,8 @@
 		user: data.user,
 		userSettings: data.userSettings,
 		chats: data.chats,
-		apiKey: data.apiKey
+		apiKey: data.apiKey,
+		models: data.models
 	});
 </script>
 

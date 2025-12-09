@@ -14,12 +14,14 @@ import { getApiKey } from '../api-keys/api-keys.remote.js';
 import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
 import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
 import { SvelteSet } from 'svelte/reactivity';
+import type * as OpenRouter from '../models/openrouter';
 
 type ChatLayoutOptions = {
 	user: User;
 	userSettings: Doc<'userSettings'> | null;
 	chats: Doc<'chat'>[];
 	apiKey: Doc<'apiKeys'> | null;
+	models: (OpenRouter.Model & { lab: string | null })[];
 };
 
 class ChatLayoutState {
@@ -51,6 +53,14 @@ class ChatLayoutState {
 		this.localApiKey = useLocalApiKey();
 
 		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+
+	get models() {
+		return this.opts.models;
+	}
+
+	get enabledModels() {
+		return this.models.filter(model => this.userSettingsQuery.data?.favoriteModelIds?.includes(model.id));
 	}
 
 	get user() {

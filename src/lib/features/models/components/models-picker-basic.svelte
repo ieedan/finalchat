@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as Select from '$lib/components/ui/select';
 	import { box } from 'svelte-toolbelt';
-	import type { Model } from '../types';
-	import { useModelPicker } from './prompt-input/prompt-input.svelte.js';
+	import type { Model } from '$lib/features/chat/types';
+	import { useModelPicker } from '$lib/features/chat/components/prompt-input/prompt-input.svelte.js';
 	import { BASIC_MODELS } from '$lib/ai.js';
 
 	type Props = {

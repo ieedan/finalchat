@@ -26,5 +26,5 @@
 			{heading}
 		</CommandPrimitive.GroupHeading>
 	{/if}
-	<CommandPrimitive.GroupItems {children} />
+	<CommandPrimitive.GroupItems data-slot="command-group-items" {children} />
 </CommandPrimitive.Group>

@@ -9,7 +9,8 @@ export const env = createEnv({
 		WORKOS_API_KEY: z.string(),
 		PUBLIC_WORKOS_REDIRECT_URI: z.url(),
 		WORKOS_COOKIE_PASSWORD: z.string(),
-		API_KEY_ENCRYPTION_KEY: z.string()
+		API_KEY_ENCRYPTION_KEY: z.string(),
+		OPENROUTER_API_KEY: z.string()
 	},
 	emptyStringAsUndefined: true,
 	runtimeEnv: process.env

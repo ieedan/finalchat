@@ -4,6 +4,7 @@ import { Doc } from './_generated/dataModel';
 import { getUserSettings } from './userSettings.utils';
 import merge from 'deepmerge';
 import { v } from 'convex/values';
+import { DEFAULT_ENABLED_MODEL_IDS } from '../ai.js';
 
 export const get = query({
 	args: {},
@@ -29,7 +30,8 @@ export const updateMode = mutation({
 				userId: user.subject,
 				onboarding: {
 					mode: args.mode
-				}
+				},
+				favoriteModelIds: DEFAULT_ENABLED_MODEL_IDS
 			});
 			return;
 		}
@@ -55,6 +57,46 @@ export const completeSetupApiKey = mutation({
 				setupApiKey: true,
 				completed: true
 			})
+		});
+	}
+});
+
+export const addFavoriteModel = mutation({
+	args: {
+		modelId: v.string()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return;
+
+		const userSettings = await getUserSettings(ctx, user);
+		if (!userSettings) return;
+
+		const modelIdsSet = new Set(userSettings.favoriteModelIds);
+		modelIdsSet.add(args.modelId);
+
+		await ctx.db.patch(userSettings?._id, {
+			favoriteModelIds: Array.from(modelIdsSet)
+		});
+	}
+});
+
+export const removeFavoriteModel = mutation({
+	args: {
+		modelId: v.string()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return;
+
+		const userSettings = await getUserSettings(ctx, user);
+		if (!userSettings) return;
+
+		const modelIdsSet = new Set(userSettings.favoriteModelIds);
+		modelIdsSet.delete(args.modelId);
+
+		await ctx.db.patch(userSettings?._id, {
+			favoriteModelIds: Array.from(modelIdsSet)
 		});
 	}
 });

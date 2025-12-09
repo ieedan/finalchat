@@ -1,11 +1,11 @@
 <script lang="ts">
 	import * as PromptInput from '$lib/features/chat/components/prompt-input';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
-	import ModelPickerBasic from '$lib/features/chat/components/model-picker-basic.svelte';
+	import ModelPickerBasic from '$lib/features/models/components/models-picker-basic.svelte';
 	import { ModelIdCtx } from '$lib/context.svelte';
 	import { ChatAttachmentUploader } from '$lib/features/chat/chat-attachment-uploader.svelte.js';
 	import { PersistedState } from 'runed';
-	import ModelPickerAdvanced from '$lib/features/chat/components/model-picker-advanced.svelte';
+	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 
 	const chatState = useChatLayout();
 
