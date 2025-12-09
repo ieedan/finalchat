@@ -8,6 +8,8 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { api } from '$lib/convex/_generated/api';
 	import { useConvexClient } from 'convex-svelte';
+	import ImageIcon from '@lucide/svelte/icons/image';
+	import BrainIcon from '@lucide/svelte/icons/brain';
 
 	let mode = $state<'basic' | 'advanced'>('advanced');
 
@@ -51,11 +53,16 @@
 					<p class="text-xs text-muted-foreground">Ask anything...</p>
 				</div>
 				<div class="p-2 flex items-center gap-2 justify-between">
-					<div
-						class="text-xs rounded-sm border bg-accent border-border px-1.5 py-0.5 flex items-center gap-1"
-					>
-						Fast
-						<ChevronDown class="size-3" />
+					<div class="flex items-center gap-1">
+						<div
+							class="text-xs rounded-sm border bg-accent border-border px-1.5 py-0.5 flex items-center gap-1"
+						>
+							Fast
+							<ChevronDown class="size-3" />
+						</div>
+						<div class="bg-accent size-5.5 flex items-center rounded-sm justify-center">
+							<ImageIcon class="size-3" />
+						</div>
 					</div>
 					<div class={cn(buttonVariants({ size: 'icon', variant: 'default' }), 'h-6 w-6')}>
 						<SendIcon class="size-3" />
@@ -84,11 +91,19 @@
 					<p class="text-xs text-muted-foreground">Ask anything...</p>
 				</div>
 				<div class="p-2 flex items-center gap-2 justify-between">
-					<div
-						class="text-xs rounded-sm border bg-accent border-border px-1.5 py-0.5 flex items-center gap-1"
-					>
-						GPT-5.1
-						<ChevronDown class="size-3" />
+					<div class="flex items-center gap-1">
+						<div
+							class="text-xs rounded-sm border bg-accent border-border px-1.5 py-0.5 flex items-center gap-1"
+						>
+							GPT-5.1
+							<ChevronDown class="size-3" />
+						</div>
+						<div class="bg-accent size-5.5 flex items-center rounded-sm justify-center">
+							<ImageIcon class="size-3" />
+						</div>
+						<div class="bg-accent size-5.5 flex items-center rounded-sm justify-center">
+							<BrainIcon class="size-3" />
+						</div>
 					</div>
 					<div class={cn(buttonVariants({ size: 'icon', variant: 'default' }), 'h-6 w-6')}>
 						<SendIcon class="size-3" />

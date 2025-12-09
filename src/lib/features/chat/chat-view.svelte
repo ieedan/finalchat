@@ -49,9 +49,7 @@
 			{/if}
 		</div>
 		<div class="flex items-center gap-2">
-			<Button variant="outline">
-				Share
-			</Button>
+			<Button variant="outline">Share</Button>
 		</div>
 	</div>
 	<div class="absolute w-full h-[24px] bg-background mask-b-from-0% -bottom-[14px] z-19"></div>

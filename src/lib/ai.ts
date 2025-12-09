@@ -14,7 +14,7 @@ export const DEFAULT_ENABLED_MODEL_IDS = [
 export const BASIC_MODELS: Model[] = [
 	{
 		id: 'google/gemini-2.5-flash' as ModelId,
-		name: 'Versatile',
+		name: 'Balanced',
 		description: 'Fast and reliable.'
 	},
 	{

@@ -16,9 +16,9 @@
 
 	const convex = useConvexClient();
 
-	async function skip() {
-		await convex.mutation(api.userSettings.completeSetupApiKey, {});
-	}
+	// async function skip() {
+	// 	await convex.mutation(api.userSettings.completeSetupApiKey, {});
+	// }
 
 	const canSubmit = $derived(Boolean(apiKey));
 
@@ -52,7 +52,8 @@
 	<ApiKeyInput bind:apiKey bind:storage />
 </Field.Group>
 <div class="flex items-center justify-between">
-	<Button variant="outline" onClickPromise={skip}>Skip</Button>
+	<div></div>
+	<!-- <Button variant="outline" onClickPromise={skip}>Skip</Button> -->
 	<Button class="gap-1" disabled={!canSubmit} onClickPromise={submit}>
 		Next
 		<ArrowRightIcon />

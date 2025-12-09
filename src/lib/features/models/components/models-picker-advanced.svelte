@@ -25,6 +25,12 @@
 	import ClipboardIcon from '@lucide/svelte/icons/clipboard';
 	import * as Select from '$lib/components/ui/select';
 
+	type Props = {
+		animated?: boolean;
+	};
+
+	let { animated = false }: Props = $props();
+
 	const chatLayoutState = useChatLayout();
 
 	const modelPickerState = useModelPicker({
@@ -94,12 +100,17 @@
 	use:shortcut={{ key: 'm', shift: true, ctrl: true, callback: () => (open = !open) }}
 />
 
-<Popover.Root bind:open>
+<Popover.Root
+	bind:open
+	onOpenChange={() => {
+		search = '';
+	}}
+>
 	<Popover.Trigger class={buttonVariants({ variant: 'input' })}>
 		<span>{selectedModel?.name}</span>
 		<ChevronDownIcon class="size-4" />
 	</Popover.Trigger>
-	<Popover.Content class="p-0 w-fit" align="start" animated={false} side="top">
+	<Popover.Content class="p-0 w-fit" align="start" {animated} side="top">
 		<Command.Root
 			bind:value={internalModelId}
 			columns={mode === 'list' ? undefined : 5}
@@ -120,8 +131,9 @@
 			/>
 			<Command.List
 				class={cn(
-					'h-[136px] max-h-none md:w-[300px] transition-[height,width]',
-					mode === 'grid' && 'h-[498px] md:w-[408px] lg:w-[682px]'
+					'h-[136px] max-h-none md:w-[300px]',
+					animated && 'transition-[height,width]',
+					mode === 'grid' && 'h-[498px] md:w-[416px] lg:w-[688px]'
 				)}
 			>
 				<Command.Empty>No models found.</Command.Empty>
@@ -157,6 +169,7 @@
 						<Command.Group
 							heading={lab}
 							class={cn(
+								'px-2',
 								'**:data-[slot=command-group-items]:grid **:data-[slot=command-group-items]:gap-2',
 								'md:**:data-[slot=command-group-items]:grid-cols-3',
 								'lg:**:data-[slot=command-group-items]:grid-cols-5'
@@ -222,7 +235,7 @@
 							<CopyButton
 								variant="ghost"
 								size="sm"
-								class="font-mono text-xs"
+								class="font-mono text-xs lg:flex hidden"
 								text={internalModelId}
 							>
 								{#snippet icon()}

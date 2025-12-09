@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { shortcut } from '$lib/actions/shortcut.svelte';
 	import { setupChatLayout } from '$lib/features/chat/chat.svelte';
 
 	let { children, data } = $props();
@@ -12,5 +14,9 @@
 		models: data.models
 	});
 </script>
+
+<svelte:window
+	use:shortcut={{ key: 'o', shift: true, ctrl: true, callback: () => goto('/chat') }}
+/>
 
 {@render children()}

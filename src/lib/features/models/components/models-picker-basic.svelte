@@ -8,9 +8,10 @@
 
 	type Props = {
 		models?: Model[];
+		animated?: boolean;
 	};
 
-	let { models = BASIC_MODELS }: Props = $props();
+	let { models = BASIC_MODELS, animated = false }: Props = $props();
 
 	const modelPickerState = useModelPicker({
 		models: box.with(() => models)
@@ -36,7 +37,7 @@
 	<Select.Trigger>
 		{selectedModel?.name}
 	</Select.Trigger>
-	<Select.Content align="start" animated={false}>
+	<Select.Content align="start" {animated} side="top">
 		{#each models as model (model.id)}
 			<Select.Item value={model.id}>
 				{model.name}

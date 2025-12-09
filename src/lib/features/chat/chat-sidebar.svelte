@@ -13,6 +13,8 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import ChatGotoDialog from './chat-goto-dialog.svelte';
 	import { cn } from '$lib/utils';
+	import * as Kbd from '$lib/components/ui/kbd';
+	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 
 	const chatContext = useChatLayout();
 
@@ -50,7 +52,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 <div
 	class={cn(
 		'transition-transform left-0 top-2.5 fixed translate-x-[244px] z-21 duration-200',
-		headerTrigger && 'translate-x-[20px] translate-y-[8px]'
+		headerTrigger && 'translate-x-[12px]'
 	)}
 >
 	<Sidebar.Trigger />
@@ -66,9 +68,28 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 		</div>
 		<Sidebar.MenuButton>
 			{#snippet child({ props: { class: _, ...props } })}
-				<a href="/chat" class={buttonVariants({ variant: 'default' })} {...props}>
-					<PlusIcon class="size-4!" />
-					New Chat
+				<a
+					href="/chat"
+					class={cn(
+						buttonVariants({ variant: 'default' }),
+						chatContext.userSettingsQuery.data?.onboarding?.mode === 'advanced' &&
+							'flex items-center justify-between'
+					)}
+					{...props}
+				>
+					<span class="flex items-center gap-2">
+						<PlusIcon class="size-4!" />
+						New Chat
+					</span>
+					{#if chatContext.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+						<Kbd.Group
+							class="**:data-[slot=kbd]:bg-transparent **:data-[slot=kbd]:text-foreground gap-0"
+						>
+							<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
+							<Kbd.Root>⇧</Kbd.Root>
+							<Kbd.Root>O</Kbd.Root>
+						</Kbd.Group>
+					{/if}
 				</a>
 			{/snippet}
 		</Sidebar.MenuButton>

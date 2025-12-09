@@ -44,7 +44,7 @@ export const seconds = {
  */
 export function formatDuration(
 	duration: Milliseconds,
-	transform: (num: number) => string = (num) => num.toString()
+	transform: (num: number) => string = (num) => num.toFixed(2)
 ): string {
 	if (duration < milliseconds.SECOND) return `${transform(duration)}ms`;
 
