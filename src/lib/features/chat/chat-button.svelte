@@ -4,14 +4,8 @@
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
-	import {
-		Ellipsis,
-		LoaderCircle,
-		PencilIcon,
-		PinIcon,
-		PinOffIcon,
-		TrashIcon
-	} from '@lucide/svelte';
+	import { Ellipsis, PencilIcon, PinIcon, PinOffIcon, TrashIcon } from '@lucide/svelte';
+	import { Spinner } from '$lib/components/ui/spinner';
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -113,9 +107,7 @@
 						class="flex min-w-0 flex-1 items-center gap-1 pl-3 h-full outline-none"
 					>
 						{#if chat.generating}
-							<div class="flex shrink-0 items-center justify-center">
-								<LoaderCircle class="size-4 animate-spin shrink-0" />
-							</div>
+							<Spinner />
 						{/if}
 						<Rename.Root
 							this="span"
