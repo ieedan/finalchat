@@ -124,9 +124,10 @@
 					mode === 'grid' && 'h-[498px] md:w-[408px] lg:w-[682px]'
 				)}
 			>
+				<Command.Empty>No models found.</Command.Empty>
 				{#if !gridMode}
 					<Command.Group>
-						{#each chatLayoutState.enabledModels as model (model.id)}
+						{#each sortedModels.filter( (model) => chatLayoutState.opts.userSettings?.favoriteModelIds?.includes(model.id) ) as model (model.id)}
 							<Command.Item
 								class="flex items-center justify-between gap-4"
 								value={model.id}
