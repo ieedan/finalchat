@@ -20,3 +20,7 @@ You hit ⌘ G to open a dialog instantly and then type the index of the chat you
 - [ ] Og image generation
 - [ ] Advanced chat input
 - [ ] Settings
+
+### Chat Advanced mode box
+
+- [ ] Make it possible to favorite/unfavorite models

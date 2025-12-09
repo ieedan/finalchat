@@ -23,7 +23,9 @@
 	import { Debounced } from 'runed';
 	import { CopyButton } from '$lib/components/ui/copy-button';
 	import ClipboardIcon from '@lucide/svelte/icons/clipboard';
-	import * as Select from '$lib/components/ui/select';
+	import StarOffIcon from '@lucide/svelte/icons/star-off';
+	import { useConvexClient } from 'convex-svelte';
+	import { api } from '$lib/convex/_generated/api';
 
 	type Props = {
 		animated?: boolean;
@@ -94,6 +96,30 @@
 	const isMobile = new IsMobile();
 
 	const gridMode = $derived(!isMobile.current && mode === 'grid');
+
+	const activeModel = $derived(sortedModels.find((model) => model.id === internalModelId));
+
+	const client = useConvexClient();
+
+	async function handleRemoveFromFavorites(modelId: ModelId) {
+		await client.mutation(api.userSettings.removeFavoriteModel, {
+			modelId
+		});
+	}
+
+	async function handleAddToFavorites(modelId: ModelId) {
+		await client.mutation(api.userSettings.addFavoriteModel, {
+			modelId
+		});
+	}
+
+	async function handleToggleFavorite(modelId: ModelId) {
+		if (chatLayoutState.userSettings?.favoriteModelIds?.includes(modelId)) {
+			await handleRemoveFromFavorites(modelId);
+		} else {
+			await handleAddToFavorites(modelId);
+		}
+	}
 </script>
 
 <svelte:window
@@ -104,6 +130,7 @@
 	bind:open
 	onOpenChange={() => {
 		search = '';
+		mode = 'list';
 	}}
 >
 	<Popover.Trigger class={buttonVariants({ variant: 'input' })}>
@@ -126,6 +153,11 @@
 					} else if (e.metaKey && e.key === 'ArrowLeft') {
 						e.preventDefault();
 						mode = 'list';
+					} else if (e.metaKey && e.key === 'u') {
+						e.preventDefault();
+						if (internalModelId) {
+							handleToggleFavorite(internalModelId);
+						}
 					}
 				}}
 			/>
@@ -139,7 +171,7 @@
 				<Command.Empty>No models found.</Command.Empty>
 				{#if !gridMode}
 					<Command.Group>
-						{#each sortedModels.filter( (model) => chatLayoutState.opts.userSettings?.favoriteModelIds?.includes(model.id) ) as model (model.id)}
+						{#each sortedModels.filter( (model) => chatLayoutState.userSettings?.favoriteModelIds?.includes(model.id) ) as model (model.id)}
 							<Command.Item
 								class="flex items-center justify-between gap-4"
 								value={model.id}
@@ -176,8 +208,11 @@
 							)}
 						>
 							{#each models as model (model.id)}
+								{@const isFavorite = chatLayoutState.userSettings?.favoriteModelIds?.includes(
+									model.id
+								)}
 								<Command.Item
-									class="flex items-center justify-center border border-border rounded-md gap-4 size-32"
+									class="flex items-center justify-center relative border border-border rounded-md gap-4 size-32"
 									value={model.id}
 									onSelect={() => handleSelect(model.id)}
 								>
@@ -198,6 +233,11 @@
 												<BrainIcon class="size-3.5 text-muted-foreground/50" />
 											{/if}
 										</div>
+									</div>
+									<div class="absolute top-2 right-2">
+										{#if isFavorite}
+											<StarIcon class="size-3.5 text-yellow-500 fill-yellow-500" />
+										{/if}
 									</div>
 								</Command.Item>
 							{/each}
@@ -231,18 +271,31 @@
 				</div>
 				{#if gridMode}
 					<div>
-						{#if internalModelId}
-							<CopyButton
+						{#if activeModel}
+							{@const isFavorite = chatLayoutState.userSettings?.favoriteModelIds?.includes(
+								activeModel.id
+							)}
+							<Button
 								variant="ghost"
 								size="sm"
-								class="font-mono text-xs lg:flex hidden"
-								text={internalModelId}
+								onclick={() => handleToggleFavorite(activeModel.id)}
 							>
-								{#snippet icon()}
-									<ClipboardIcon class="size-3.5" />
-								{/snippet}
-								{internalModelId}
-							</CopyButton>
+								<span
+									class={cn('text-sm flex items-center gap-1.5', isFavorite && 'text-destructive')}
+								>
+									{#if isFavorite}
+										<StarOffIcon class="size-3.5 inline shrink-0" />
+										Remove from favorites
+									{:else}
+										<StarIcon class="size-3.5 inline shrink-0" />
+										Add to favorites
+									{/if}
+								</span>
+								<Kbd.Group class="**:data-[slot=kbd]:border">
+									<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
+									<Kbd.Root>U</Kbd.Root>
+								</Kbd.Group>
+							</Button>
 						{/if}
 					</div>
 				{/if}

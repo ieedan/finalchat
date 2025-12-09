@@ -67,6 +67,10 @@ class ChatLayoutState {
 		return this.opts.user;
 	}
 
+	get userSettings() {
+		return this.userSettingsQuery.data;
+	}
+
 	get hasOnboarded() {
 		return this.userSettingsQuery.data?.onboarding?.completed;
 	}
