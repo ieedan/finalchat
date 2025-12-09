@@ -176,7 +176,7 @@
 					} else if (e.metaKey && e.key === 'k') {
 						e.preventDefault();
 						actionsMenuOpen = !actionsMenuOpen;
-					} else if (e.key === 'Backspace' && search === '' && mode === 'grid') {
+					} else if (e.key === 'Backspace' && search === '' && mode === 'grid' && !e.repeat) {
 						e.preventDefault();
 						mode = 'list';
 					}
