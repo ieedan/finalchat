@@ -75,6 +75,7 @@
 		modelPickerState.rootState.opts.modelId.current = modelId;
 		open = false;
 		mode = 'list';
+		search = '';
 		modelPickerState.onSelect();
 	}
 
