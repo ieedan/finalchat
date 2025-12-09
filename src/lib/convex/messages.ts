@@ -16,6 +16,7 @@ import {
 	MessageWithAttachments
 } from './chat.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
+import { appendChunk } from '../utils/reasoning-custom-protocol';
 
 const persistentTextStreaming = new PersistentTextStreaming(components.persistentTextStreaming);
 
@@ -145,6 +146,8 @@ export const generateChatTitle = internalAction({
 				model: openrouter.chat(TITLE_GENERATION_MODEL),
 				prompt: `Generate a title for the following chat. The title should be a short summary, no more than 7 words, ideally as few as possible as the title will be displayed in cramped spaces.
 
+			DO NOT USE MARKDOWN FOR THE TITLE.
+
 			Simple conversations can easily be summarized in one word. For instance if the user was to say: "Hello", "greeting" would be a sufficient title.
 
 			<chat>
@@ -237,12 +240,19 @@ export const streamMessage = httpAction(async (ctx, request) => {
 
 				let openRouterGenId: string | undefined = undefined;
 				let content = '';
+				let reasoning: string | undefined = undefined;
 
 				for await (const chunk of fullStream) {
 					if (chunk.type === 'text-delta') {
 						openRouterGenId = chunk.id;
 						content += chunk.text;
-						await append(chunk.text);
+						appendChunk({ chunk: chunk.text, type: 'text', append });
+					} else if (chunk.type === 'reasoning-delta') {
+						if (reasoning === undefined) {
+							reasoning = '';
+						}
+						reasoning += chunk.text;
+						appendChunk({ chunk: chunk.text, type: 'reasoning', append });
 					}
 				}
 
@@ -251,6 +261,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
 					content,
+					reasoning,
 					meta: {
 						generationId: openRouterGenId,
 						tokenUsage: usage.totalTokens
@@ -267,10 +278,10 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				}
 			} catch (error) {
 				if (!last) return;
+				console.error(error);
 				await ctx.runMutation(internal.messages.updateMessageError, {
 					messageId: last.assistantMessage._id,
-					error:
-						error instanceof Error ? error.message : 'There was an error generating the response'
+					error: 'There was an error generating the response'
 				});
 			}
 		}
@@ -368,6 +379,7 @@ export const updateMessageContent = internalMutation({
 	args: {
 		messageId: v.id('messages'),
 		content: v.string(),
+		reasoning: v.optional(v.string()),
 		meta: v.object({
 			generationId: v.optional(v.string()),
 			tokenUsage: v.optional(v.number())
@@ -380,6 +392,7 @@ export const updateMessageContent = internalMutation({
 		await Promise.all([
 			ctx.db.patch(args.messageId, {
 				content: args.content,
+				reasoning: args.reasoning,
 				meta: {
 					...message.meta,
 					stoppedGenerating: Date.now(),
