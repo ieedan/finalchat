@@ -11,7 +11,9 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint ."
+		"lint": "prettier --check . && eslint .",
+		"test:unit": "vitest",
+		"test": "npm run test:unit -- --run"
 	},
 	"devDependencies": {
 		"@convex-dev/persistent-text-streaming": "^0.3.0",
@@ -70,6 +72,7 @@
 		"typescript-eslint": "^8.48.1",
 		"vite": "^7.2.6",
 		"vite-plugin-devtools-json": "^1.0.0",
+		"vitest": "^4.0.10",
 		"zod": "^4.1.13"
 	},
 	"dependencies": {

@@ -9,6 +9,10 @@
 	import { formatDuration, type Milliseconds } from '$lib/utils/time.js';
 	import { untrack } from 'svelte';
 	import type { Doc } from '$lib/convex/_generated/dataModel.js';
+	import * as Collapsible from '$lib/components/ui/collapsible';
+	import BrainIcon from '@lucide/svelte/icons/brain';
+	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -42,6 +46,8 @@
 			}
 		});
 	});
+
+	let showReasoning = $state(false);
 </script>
 
 <div
@@ -67,6 +73,26 @@
 		{/if}
 	{/if}
 	<div data-message-role={message.role} class={chatMessageVariants({ role: message.role })}>
+		{#if message.role === 'assistant'}
+			{#if message.reasoning}
+				<div class="pb-2">
+					<Collapsible.Root bind:open={showReasoning} class="flex flex-col gap-2">
+						<Collapsible.Trigger class="flex items-center gap-2">
+							<BrainIcon class="size-4" />
+							Reasoning
+							{#if showReasoning}
+								<ChevronUpIcon class="size-4" />
+							{:else}
+								<ChevronDownIcon class="size-4" />
+							{/if}
+						</Collapsible.Trigger>
+						<Collapsible.Content class="bg-card rounded-lg p-4">
+							<Streamdown content={message.reasoning} animationEnabled={false} />
+						</Collapsible.Content>
+					</Collapsible.Root>
+				</div>
+			{/if}
+		{/if}
 		{#if message.content}
 			<Streamdown content={message.content} animationEnabled={false} />
 		{:else if message.role === 'assistant'}

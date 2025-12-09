@@ -8,6 +8,12 @@
 	import { useChatLayout } from './chat.svelte';
 	import Streamdown from '$lib/features/chat/components/streamdown.svelte';
 	import ShinyText from '$lib/components/animations/shiny-text.svelte';
+	import { deserializeStreamBody } from '$lib/utils/reasoning-custom-protocol';
+	import * as Collapsible from '$lib/components/ui/collapsible';
+	import BrainIcon from '@lucide/svelte/icons/brain';
+	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import { Spinner } from '$lib/components/ui/spinner';
 
 	type Props = {
 		message: ChatMessageAssistant;
@@ -33,9 +39,35 @@
 		},
 		authToken: accessToken?.current
 	});
+
+	const { text, reasoning } = $derived(deserializeStreamBody(streamBody.body.text));
+
+	let showReasoning = $state(false);
 </script>
 
-{#if streamBody.body.text === ''}
+{#if text === '' && reasoning === ''}
 	<ShinyText>Thinking...</ShinyText>
+{:else if reasoning !== ''}
+	{#if reasoning !== ''}
+		<div class="pb-2">
+			<Collapsible.Root bind:open={showReasoning} class="flex flex-col gap-2">
+				<Collapsible.Trigger class="flex items-center gap-2">
+					<BrainIcon class="size-4" />
+					Reasoning
+					{#if text === ''}
+						<Spinner />
+					{/if}
+					{#if showReasoning}
+						<ChevronUpIcon class="size-4" />
+					{:else}
+						<ChevronDownIcon class="size-4" />
+					{/if}
+				</Collapsible.Trigger>
+				<Collapsible.Content class="bg-card rounded-lg p-4">
+					<Streamdown content={reasoning} animationEnabled={false} />
+				</Collapsible.Content>
+			</Collapsible.Root>
+		</div>
+	{/if}
 {/if}
-<Streamdown content={streamBody.body.text} />
+<Streamdown content={text} />

@@ -21,6 +21,3 @@
 - [ ] Advanced chat input
 - [ ] Settings
 
-### Chat Advanced mode box
-
-- [ ] Make it possible to favorite/unfavorite models
