@@ -17,6 +17,13 @@
 	import GridIcon from '@lucide/svelte/icons/grid';
 	import StarIcon from '@lucide/svelte/icons/star';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
+	import { LABS, type Lab } from '../labs';
+	import { shortcut } from '$lib/actions/shortcut.svelte';
+	import fuzzysort from 'fuzzysort';
+	import { Debounced } from 'runed';
+	import { CopyButton } from '$lib/components/ui/copy-button';
+	import ClipboardIcon from '@lucide/svelte/icons/clipboard';
+	import * as Select from '$lib/components/ui/select';
 
 	const chatLayoutState = useChatLayout();
 
@@ -24,10 +31,23 @@
 		models: box.with(() => chatLayoutState.models)
 	});
 
+	let search = $state('');
+
+	const searchDebounced = new Debounced(() => search, 0);
+
+	const sortedModels = $derived(
+		searchDebounced.current.trim()
+			? fuzzysort
+					.go(searchDebounced.current, chatLayoutState.models, {
+						keys: ['name', 'lab.name', 'description', 'id'],
+						threshold: 0.5
+					})
+					.map((result) => result.obj)
+			: chatLayoutState.models
+	);
+
 	const selectedModel = $derived(
-		chatLayoutState.models.find(
-			(model) => model.id === modelPickerState.rootState.opts.modelId.current
-		)
+		sortedModels.find((model) => model.id === modelPickerState.rootState.opts.modelId.current)
 	);
 
 	let mode = $state<'list' | 'grid'>('list');
@@ -41,18 +61,28 @@
 
 	let internalModelId = $derived<ModelId | undefined>(selectedModel?.id);
 
-	const modelsByLab = $derived(groupModelsByLab(chatLayoutState.models));
+	const modelsByLab = $derived(groupModelsByLab(sortedModels));
 
 	function groupModelsByLab(models: (Model & { lab: string | null })[]) {
-		return models.reduce(
+		const grouped = models.reduce(
 			(acc, model) => {
-				const lab = model.lab ?? 'Unknown';
-				acc[lab] = acc[lab] || [];
-				acc[lab].push(model);
+				if (!model.lab) return acc;
+
+				const lab = LABS.find((lab) => lab.name.toLowerCase() === model.lab?.toLowerCase());
+
+				if (!lab) return acc;
+
+				acc[lab.name] = acc[lab.name] || [];
+				acc[lab.name].push({ ...model, lab });
 				return acc;
 			},
-			{} as Record<string, (Model & { lab: string | null })[]>
+			{} as Record<string, (Model & { lab: Lab })[]>
 		);
+
+		if (searchDebounced.current.trim() === '')
+			return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
+
+		return Object.entries(grouped);
 	}
 
 	const isMobile = new IsMobile();
@@ -60,15 +90,24 @@
 	const gridMode = $derived(!isMobile.current && mode === 'grid');
 </script>
 
+<svelte:window
+	use:shortcut={{ key: 'm', shift: true, ctrl: true, callback: () => (open = !open) }}
+/>
+
 <Popover.Root bind:open>
 	<Popover.Trigger class={buttonVariants({ variant: 'input' })}>
 		<span>{selectedModel?.name}</span>
 		<ChevronDownIcon class="size-4" />
 	</Popover.Trigger>
 	<Popover.Content class="p-0 w-fit" align="start" animated={false} side="top">
-		<Command.Root bind:value={internalModelId} columns={mode === 'list' ? undefined : 5}>
+		<Command.Root
+			bind:value={internalModelId}
+			columns={mode === 'list' ? undefined : 5}
+			shouldFilter={false}
+		>
 			<Command.Input
 				placeholder="Search models..."
+				bind:value={search}
 				onkeydown={(e) => {
 					if (e.metaKey && e.key === 'ArrowRight') {
 						e.preventDefault();
@@ -81,8 +120,8 @@
 			/>
 			<Command.List
 				class={cn(
-					'h-[136px] md:w-[300px] transition-[height,width]',
-					mode === 'grid' && 'h-[350px] md:w-[408px] lg:w-[682px]'
+					'h-[136px] max-h-none md:w-[300px] transition-[height,width]',
+					mode === 'grid' && 'h-[498px] md:w-[408px] lg:w-[682px]'
 				)}
 			>
 				{#if !gridMode}
@@ -113,7 +152,7 @@
 						{/each}
 					</Command.Group>
 				{:else}
-					{#each Object.entries(modelsByLab).sort( (a, b) => a[0].localeCompare(b[0]) ) as [lab, models]}
+					{#each modelsByLab as [lab, models]}
 						<Command.Group
 							heading={lab}
 							class={cn(
@@ -129,8 +168,15 @@
 									onSelect={() => handleSelect(model.id)}
 								>
 									<div class="flex flex-col gap-2 items-center">
-										<span class="text-center">{model.name}</span>
-										<div class="flex items-center gap-1.5">
+										{#if lab}
+											<model.lab.logo class="size-8" />
+										{/if}
+										<div class="h-10 flex items-center justify-center">
+											<span class="text-center line-clamp-2">
+												{model.name}
+											</span>
+										</div>
+										<div class="flex items-center gap-1.5 h-3.5">
 											{#if supportsImages(model)}
 												<ImageIcon class="size-3.5 text-muted-foreground/50" />
 											{/if}
@@ -147,26 +193,45 @@
 			</Command.List>
 		</Command.Root>
 		{#if !isMobile.current}
-			<div class="flex items-center gap-2 border-t p-1">
-				<Button
-					variant="ghost"
-					size="sm"
-					onclick={() => (mode = mode === 'list' ? 'grid' : 'list')}
-				>
-					<span class="text-sm flex items-center gap-1.5">
-						{#if gridMode}
-							<StarIcon class="size-3.5 inline shrink-0" />
-							Favorites
-						{:else}
-							<GridIcon class="size-3.5 inline shrink-0" />
-							All models
+			<div class="flex items-center justify-between gap-2 border-t p-1">
+				<div>
+					<Button
+						variant="ghost"
+						size="sm"
+						onclick={() => (mode = mode === 'list' ? 'grid' : 'list')}
+					>
+						<span class="text-sm flex items-center gap-1.5">
+							{#if gridMode}
+								<StarIcon class="size-3.5 inline shrink-0" />
+								Favorites
+							{:else}
+								<GridIcon class="size-3.5 inline shrink-0" />
+								All models
+							{/if}
+						</span>
+						<Kbd.Group class="**:data-[slot=kbd]:border">
+							<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
+							<Kbd.Root>{gridMode ? '←' : '→'}</Kbd.Root>
+						</Kbd.Group>
+					</Button>
+				</div>
+				{#if gridMode}
+					<div>
+						{#if internalModelId}
+							<CopyButton
+								variant="ghost"
+								size="sm"
+								class="font-mono text-xs"
+								text={internalModelId}
+							>
+								{#snippet icon()}
+									<ClipboardIcon class="size-3.5" />
+								{/snippet}
+								{internalModelId}
+							</CopyButton>
 						{/if}
-					</span>
-					<Kbd.Group class="**:data-[slot=kbd]:border">
-						<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
-						<Kbd.Root>{gridMode ? '←' : '→'}</Kbd.Root>
-					</Kbd.Group>
-				</Button>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</Popover.Content>

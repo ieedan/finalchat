@@ -1,0 +1,16 @@
+<script lang="ts">
+	import { cn } from '$lib/utils';
+	import type { HTMLAttributes } from 'svelte/elements';
+
+	let { class: className, ...rest }: HTMLAttributes<SVGSVGElement> = $props();
+</script>
+
+<svg
+	viewBox="0 0 24 24"
+	xmlns="http://www.w3.org/2000/svg"
+	class={cn('text-foreground fill-current', className)}
+	{...rest}
+	><title>Z.ai</title><path
+		d="M12.105 2L9.927 4.953H.653L2.83 2h9.276zM23.254 19.048L21.078 22h-9.242l2.174-2.952h9.244zM24 2L9.264 22H0L14.736 2H24z"
+	></path></svg
+>

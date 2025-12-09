@@ -6,12 +6,15 @@
 	let {
 		ref = $bindable(null),
 		class: className,
+		wrapperClass,
 		value = $bindable(''),
 		...restProps
-	}: CommandPrimitive.InputProps = $props();
+	}: CommandPrimitive.InputProps & {
+		wrapperClass?: string;
+	} = $props();
 </script>
 
-<div class="flex h-9 items-center gap-2 border-b px-3" data-slot="command-input-wrapper">
+<div class={cn("flex h-9 items-center gap-2 border-b px-3", wrapperClass)} data-slot="command-input-wrapper">
 	<SearchIcon class="size-4 shrink-0 opacity-50" />
 	<CommandPrimitive.Input
 		data-slot="command-input"

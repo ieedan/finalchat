@@ -4,6 +4,7 @@
 	import type { Model } from '$lib/features/chat/types';
 	import { useModelPicker } from '$lib/features/chat/components/prompt-input/prompt-input.svelte.js';
 	import { BASIC_MODELS } from '$lib/ai.js';
+	import { shortcut } from '$lib/actions/shortcut.svelte';
 
 	type Props = {
 		models?: Model[];
@@ -18,10 +19,15 @@
 	const selectedModel = $derived(
 		models.find((model) => model.id === modelPickerState.rootState.opts.modelId.current)
 	);
+
+	let open = $state(false);
 </script>
+
+<svelte:window use:shortcut={{ key: 'm', shift: true, ctrl: true, callback: () => (open = !open) }} />
 
 <Select.Root
 	type="single"
+	bind:open
 	bind:value={
 		() => modelPickerState.rootState.opts.modelId.current ?? models[0].id,
 		(v) => (modelPickerState.rootState.opts.modelId.current = v)
