@@ -74,6 +74,7 @@
 	function handleSelect(modelId: ModelId) {
 		modelPickerState.rootState.opts.modelId.current = modelId;
 		open = false;
+		mode = 'list';
 		modelPickerState.onSelect();
 	}
 
