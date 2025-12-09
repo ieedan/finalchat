@@ -69,3 +69,16 @@ export function supportsReasoning(model: Model): boolean {
 	return model.supported_parameters.includes('reasoning');
 }
 
+/**
+ * Converts a cost string (USD per token) to cost per million tokens
+ * @param costPerToken - The cost per token as a string (e.g., "0.0000007")
+ * @returns The cost per million tokens as a number (e.g., 0.7)
+ */
+export function costPerMillionTokens(costPerToken: string): string {
+	const cost = parseFloat(costPerToken);
+	if (isNaN(cost) || cost === 0) {
+		return '0';
+	}
+	return (cost * 1_000_000).toFixed(2);
+}
+

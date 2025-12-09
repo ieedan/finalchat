@@ -1,5 +1,3 @@
-import { Command as CommandPrimitive } from 'bits-ui';
-
 import Root from './command.svelte';
 import Dialog from './command-dialog.svelte';
 import Empty from './command-empty.svelte';
@@ -10,8 +8,6 @@ import List from './command-list.svelte';
 import Separator from './command-separator.svelte';
 import Shortcut from './command-shortcut.svelte';
 import LinkItem from './command-link-item.svelte';
-
-const Loading = CommandPrimitive.Loading;
 
 export {
 	Root,
@@ -24,7 +20,6 @@ export {
 	List,
 	Separator,
 	Shortcut,
-	Loading,
 	//
 	Root as Command,
 	Dialog as CommandDialog,
@@ -36,5 +31,4 @@ export {
 	List as CommandList,
 	Separator as CommandSeparator,
 	Shortcut as CommandShortcut,
-	Loading as CommandLoading
 };

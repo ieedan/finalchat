@@ -10,7 +10,12 @@
 	import { useChatLayout } from '$lib/features/chat/chat.svelte.js';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
-	import { supportsImages, supportsReasoning, type Model } from '../openrouter';
+	import {
+		costPerMillionTokens,
+		supportsImages,
+		supportsReasoning,
+		type Model
+	} from '../openrouter';
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import BrainIcon from '@lucide/svelte/icons/brain';
 	import { cn } from '$lib/utils';
@@ -21,11 +26,15 @@
 	import { shortcut } from '$lib/actions/shortcut.svelte';
 	import fuzzysort from 'fuzzysort';
 	import { Debounced } from 'runed';
-	import { CopyButton } from '$lib/components/ui/copy-button';
 	import ClipboardIcon from '@lucide/svelte/icons/clipboard';
 	import StarOffIcon from '@lucide/svelte/icons/star-off';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
+	import { Separator } from '$lib/components/ui/separator';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
+	import { toast } from 'svelte-sonner';
+	import { formatNumberShort } from '$lib/utils/number-format';
 
 	type Props = {
 		animated?: boolean;
@@ -120,6 +129,10 @@
 			await handleAddToFavorites(modelId);
 		}
 	}
+
+	let actionsMenuOpen = $state(false);
+
+	const modelIdClipboard = new UseClipboard();
 </script>
 
 <svelte:window
@@ -131,6 +144,7 @@
 	onOpenChange={() => {
 		search = '';
 		mode = 'list';
+		actionsMenuOpen = false;
 	}}
 >
 	<Popover.Trigger class={buttonVariants({ variant: 'input' })}>
@@ -158,6 +172,12 @@
 						if (internalModelId) {
 							handleToggleFavorite(internalModelId);
 						}
+					} else if (e.metaKey && e.key === 'k') {
+						e.preventDefault();
+						actionsMenuOpen = !actionsMenuOpen;
+					} else if (e.key === 'Backspace' && search === '' && mode === 'grid') {
+						e.preventDefault();
+						mode = 'list';
 					}
 				}}
 			/>
@@ -270,7 +290,7 @@
 					</Button>
 				</div>
 				{#if gridMode}
-					<div>
+					<div class="flex items-center gap-2">
 						{#if activeModel}
 							{@const isFavorite = chatLayoutState.userSettings?.favoriteModelIds?.includes(
 								activeModel.id
@@ -296,6 +316,67 @@
 									<Kbd.Root>U</Kbd.Root>
 								</Kbd.Group>
 							</Button>
+							<Separator orientation="vertical" class="h-4!" />
+							<DropdownMenu.Root bind:open={actionsMenuOpen}>
+								<DropdownMenu.Trigger
+									tabindex={-1}
+									class={buttonVariants({ variant: 'ghost', size: 'sm' })}
+								>
+									<span> Actions </span>
+									<Kbd.Group class="**:data-[slot=kbd]:border">
+										<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
+										<Kbd.Root>K</Kbd.Root>
+									</Kbd.Group>
+								</DropdownMenu.Trigger>
+								<DropdownMenu.Content align="end" side="top" {animated}>
+									<DropdownMenu.Group>
+										<DropdownMenu.Item onSelect={() => handleToggleFavorite(activeModel.id)}>
+											<span
+												class={cn(
+													'text-sm flex items-center gap-1.5',
+													isFavorite && 'text-destructive'
+												)}
+											>
+												{#if isFavorite}
+													<StarOffIcon class="size-3.5 inline shrink-0" />
+													Remove from favorites
+												{:else}
+													<StarIcon class="size-3.5 inline shrink-0" />
+													Add to favorites
+												{/if}
+											</span>
+											<Kbd.Group class="**:data-[slot=kbd]:border">
+												<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
+												<Kbd.Root>U</Kbd.Root>
+											</Kbd.Group>
+										</DropdownMenu.Item>
+									</DropdownMenu.Group>
+									<DropdownMenu.Separator />
+									<DropdownMenu.Group>
+										<DropdownMenu.Item
+											onSelect={() => {
+												modelIdClipboard.copy(activeModel.id);
+												toast.success(`Copied ${activeModel.id} to your clipboard!`);
+											}}
+										>
+											<ClipboardIcon class="size-3.5 inline shrink-0" />
+											Copy model ID
+										</DropdownMenu.Item>
+									</DropdownMenu.Group>
+									<DropdownMenu.Separator />
+									<DropdownMenu.Group>
+										<DropdownMenu.Item>
+											${costPerMillionTokens(activeModel.pricing.prompt)}/M input tokens
+										</DropdownMenu.Item>
+										<DropdownMenu.Item>
+											${costPerMillionTokens(activeModel.pricing.completion)}/M output tokens
+										</DropdownMenu.Item>
+										<DropdownMenu.Item>
+											{formatNumberShort(activeModel.context_length)} context
+										</DropdownMenu.Item>
+									</DropdownMenu.Group>
+								</DropdownMenu.Content>
+							</DropdownMenu.Root>
 						{/if}
 					</div>
 				{/if}

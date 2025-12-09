@@ -11,6 +11,7 @@
 	import { box } from 'svelte-toolbelt';
 	import { PersistedState } from 'runed';
 	import { ConfirmDeleteDialog } from '$lib/components/ui/confirm-delete-dialog';
+	import { Toaster } from '$lib/components/ui/sonner';
 
 	let { children } = $props();
 
@@ -52,5 +53,6 @@
 </svelte:head>
 
 <ConfirmDeleteDialog />
+<Toaster position="bottom-right"/>
 
 {@render children()}
