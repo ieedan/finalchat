@@ -61,6 +61,7 @@
 		"runed": "^0.37.0",
 		"svelte": "^5.45.5",
 		"svelte-check": "^4.3.4",
+		"svelte-meta-tags": "^4.5.0",
 		"svelte-sonner": "^1.0.7",
 		"svelte-streamdown": "^3.0.0",
 		"svelte-toolbelt": "^0.10.6",

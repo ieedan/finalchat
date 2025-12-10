@@ -12,6 +12,7 @@
 	import { PersistedState } from 'runed';
 	import { ConfirmDeleteDialog } from '$lib/components/ui/confirm-delete-dialog';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { MetaTags } from '$lib/components/meta-tags';
 
 	let { children } = $props();
 
@@ -55,4 +56,11 @@
 <ConfirmDeleteDialog />
 <Toaster position="bottom-right" />
 
-{@render children()}
+<MetaTags
+	title="Finalchat"
+	titleTemplate="%s ~ Finalchat"
+	description="Chat with any model available on OpenRouter with your own API key."
+	canonical={new URL(page.url.pathname, page.url.origin).href}
+>
+	{@render children()}
+</MetaTags>

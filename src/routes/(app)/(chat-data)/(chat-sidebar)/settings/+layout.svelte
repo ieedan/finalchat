@@ -2,15 +2,14 @@
 	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import { useSidebar } from '$lib/components/ui/sidebar';
 	import { Button } from '$lib/components/ui/button';
+	import { MetaTags } from '$lib/components/meta-tags';
 
 	let { children } = $props();
 
 	const sidebar = useSidebar();
 </script>
 
-<svelte:head>
-	<title>Settings</title>
-</svelte:head>
+<MetaTags title="Settings" titleTemplate="%s ~ Settings ~ Finalchat" />
 
 <header class="sticky top-0 border-b">
 	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20">
@@ -20,17 +19,15 @@
 			{/if}
 		</div>
 		<div class="flex items-center gap-2">
-			<Button href="/auth/logout" variant="outline">Logout</Button>
+			<Button href="/auth/signout" variant="outline">Logout</Button>
 		</div>
 	</div>
 </header>
 <AccountSettings.Root>
 	<AccountSettings.Sidebar>
 		<AccountSettings.SidebarGroup>
-			<AccountSettings.SidebarButton href="/settings">
-				Account
-			</AccountSettings.SidebarButton>
-            <AccountSettings.SidebarButton href="/settings/customization">
+			<AccountSettings.SidebarButton href="/settings">Account</AccountSettings.SidebarButton>
+			<AccountSettings.SidebarButton href="/settings/customization">
 				Customization
 			</AccountSettings.SidebarButton>
 			<AccountSettings.SidebarButton href="/settings/history">

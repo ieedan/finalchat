@@ -12,6 +12,7 @@
 	import { ChatAttachmentUploader } from './chat-attachment-uploader.svelte.js';
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import { Button } from '$lib/components/ui/button';
+	import { MetaTags } from '$lib/components/meta-tags';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -45,9 +46,10 @@
 	});
 </script>
 
-<svelte:head>
-	<title>{chatViewState.chatQuery.data?.title}</title>
-</svelte:head>
+<MetaTags
+	title={chatViewState.chatQuery.data?.title}
+	description={chatViewState.chatQuery.data?.title}
+/>
 
 <header class="sticky top-0">
 	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20">

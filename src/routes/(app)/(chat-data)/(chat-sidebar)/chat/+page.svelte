@@ -8,6 +8,7 @@
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
+	import { MetaTags } from '$lib/components/meta-tags';
 
 	const chatState = useChatLayout();
 
@@ -55,9 +56,7 @@
 	});
 </script>
 
-<svelte:head>
-	<title>New Chat</title>
-</svelte:head>
+<MetaTags title="New Chat" />
 
 <div class="w-full h-full flex-col items-center justify-center flex px-4 gap-8">
 	{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}

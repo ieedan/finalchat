@@ -11,6 +11,7 @@
 	import { cn } from '$lib/utils';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
+	import { FinalChat } from '$lib/components/logos';
 
 	const chatContext = useChatLayout();
 
@@ -47,8 +48,9 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 -->
 <div
 	class={cn(
-		'transition-transform left-0 top-2.5 fixed translate-x-[244px] z-21 duration-200',
-		headerTrigger && 'translate-x-[12px]'
+		'transition-transform left-0 top-2.5 fixed translate-x-[16px] -translate-y-[2px] z-21 duration-200',
+		// just in case
+		headerTrigger && ''
 	)}
 >
 	<Sidebar.Trigger />
@@ -56,10 +58,12 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 
 <Sidebar.Root variant="inset">
 	<Sidebar.Header class="pt-0">
-		<div class="flex items-center justify-between h-9">
-			<a href="/chat" class="text-2xl font-bold">Chat</a>
+		<div class="flex items-center justify-center h-9">
+			<a href="/chat" class="text-2xl font-bold">
+				<FinalChat class="size-6" />
+			</a>
 			{#if sidebar.isMobile}
-				<Sidebar.Trigger />
+				<Sidebar.Trigger class="absolute left-2" />
 			{/if}
 		</div>
 		<Sidebar.MenuButton>
@@ -121,7 +125,11 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 	<Sidebar.Footer>
 		<Sidebar.MenuButton>
 			{#snippet child({ props })}
-				<a href="/settings" {...props} class={cn(props.class ?? '', 'flex items-center gap-2 h-12')}>
+				<a
+					href="/settings"
+					{...props}
+					class={cn(props.class ?? '', 'flex items-center gap-2 h-12')}
+				>
 					<Avatar.Root>
 						<Avatar.Image src={chatContext.user.profilePictureUrl} />
 						<Avatar.Fallback>
