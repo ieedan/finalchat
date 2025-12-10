@@ -287,7 +287,10 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				if (!last) return;
 				await ctx.runMutation(internal.messages.updateMessageError, {
 					messageId: last.assistantMessage._id,
-					error: error instanceof AISDKError ? error.message : 'There was an error generating the response'
+					error:
+						error instanceof AISDKError
+							? error.message
+							: 'There was an error generating the response'
 				});
 			}
 		}

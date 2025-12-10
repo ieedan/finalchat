@@ -2,187 +2,187 @@ import { describe, it, expect, vi } from 'vitest';
 import { appendChunk, deserializeStreamBody } from './reasoning-custom-protocol';
 
 describe('custom reasoning protocol', () => {
-    it('should serialize chunks correctly', () => {
-        let serializedContent = '';
+	it('should serialize chunks correctly', () => {
+		let serializedContent = '';
 
-        const textChunks = ['Hello',', world!'];
-        const reasoningChunks = ['How should I', ' greet the user?'];
-    
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        })
+		const textChunks = ['Hello', ', world!'];
+		const reasoningChunks = ['How should I', ' greet the user?'];
 
-        for (let i = 0; i < textChunks.length; i++) {
-            appendChunk({ chunk: textChunks[i], type: 'text', append: customAppend });
-            appendChunk({ chunk: reasoningChunks[i], type: 'reasoning', append: customAppend });
-        }
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: textChunks.join(''),
-            reasoning: reasoningChunks.join('')
-        });
-    });
+		for (let i = 0; i < textChunks.length; i++) {
+			appendChunk({ chunk: textChunks[i], type: 'text', append: customAppend });
+			appendChunk({ chunk: reasoningChunks[i], type: 'reasoning', append: customAppend });
+		}
 
-    it('should handle empty chunks', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: textChunks.join(''),
+			reasoning: reasoningChunks.join('')
+		});
+	});
 
-        appendChunk({ chunk: '', type: 'text', append: customAppend });
-        appendChunk({ chunk: '', type: 'reasoning', append: customAppend });
+	it('should handle empty chunks', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: '',
-            reasoning: ''
-        });
-    });
+		appendChunk({ chunk: '', type: 'text', append: customAppend });
+		appendChunk({ chunk: '', type: 'reasoning', append: customAppend });
 
-    it('should handle chunks containing colons', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: '',
+			reasoning: ''
+		});
+	});
 
-        appendChunk({ chunk: 'Hello:world', type: 'text', append: customAppend });
-        appendChunk({ chunk: 'Reason:thinking', type: 'reasoning', append: customAppend });
+	it('should handle chunks containing colons', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: 'Hello:world',
-            reasoning: 'Reason:thinking'
-        });
-    });
+		appendChunk({ chunk: 'Hello:world', type: 'text', append: customAppend });
+		appendChunk({ chunk: 'Reason:thinking', type: 'reasoning', append: customAppend });
 
-    it('should handle chunks containing newlines and special characters', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: 'Hello:world',
+			reasoning: 'Reason:thinking'
+		});
+	});
 
-        const textWithSpecialChars = 'Hello\nWorld\tTab\r\n';
-        const reasoningWithSpecialChars = 'Think\nAbout\tThis\r\n';
+	it('should handle chunks containing newlines and special characters', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        appendChunk({ chunk: textWithSpecialChars, type: 'text', append: customAppend });
-        appendChunk({ chunk: reasoningWithSpecialChars, type: 'reasoning', append: customAppend });
+		const textWithSpecialChars = 'Hello\nWorld\tTab\r\n';
+		const reasoningWithSpecialChars = 'Think\nAbout\tThis\r\n';
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: textWithSpecialChars,
-            reasoning: reasoningWithSpecialChars
-        });
-    });
+		appendChunk({ chunk: textWithSpecialChars, type: 'text', append: customAppend });
+		appendChunk({ chunk: reasoningWithSpecialChars, type: 'reasoning', append: customAppend });
 
-    it('should handle unicode and multibyte characters', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: textWithSpecialChars,
+			reasoning: reasoningWithSpecialChars
+		});
+	});
 
-        const unicodeText = 'Hello 🌍 世界 🚀';
-        const unicodeReasoning = '思考 💭 について';
+	it('should handle unicode and multibyte characters', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        appendChunk({ chunk: unicodeText, type: 'text', append: customAppend });
-        appendChunk({ chunk: unicodeReasoning, type: 'reasoning', append: customAppend });
+		const unicodeText = 'Hello 🌍 世界 🚀';
+		const unicodeReasoning = '思考 💭 について';
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: unicodeText,
-            reasoning: unicodeReasoning
-        });
-    });
+		appendChunk({ chunk: unicodeText, type: 'text', append: customAppend });
+		appendChunk({ chunk: unicodeReasoning, type: 'reasoning', append: customAppend });
 
-    it('should handle only text chunks with no reasoning', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: unicodeText,
+			reasoning: unicodeReasoning
+		});
+	});
 
-        appendChunk({ chunk: 'Hello', type: 'text', append: customAppend });
-        appendChunk({ chunk: ' World', type: 'text', append: customAppend });
+	it('should handle only text chunks with no reasoning', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: 'Hello World',
-            reasoning: ''
-        });
-    });
+		appendChunk({ chunk: 'Hello', type: 'text', append: customAppend });
+		appendChunk({ chunk: ' World', type: 'text', append: customAppend });
 
-    it('should handle only reasoning chunks with no text', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: 'Hello World',
+			reasoning: ''
+		});
+	});
 
-        appendChunk({ chunk: 'Think', type: 'reasoning', append: customAppend });
-        appendChunk({ chunk: ' about this', type: 'reasoning', append: customAppend });
+	it('should handle only reasoning chunks with no text', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: '',
-            reasoning: 'Think about this'
-        });
-    });
+		appendChunk({ chunk: 'Think', type: 'reasoning', append: customAppend });
+		appendChunk({ chunk: ' about this', type: 'reasoning', append: customAppend });
 
-    it('should handle very long chunks', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: '',
+			reasoning: 'Think about this'
+		});
+	});
 
-        const longText = 'a'.repeat(10000);
-        const longReasoning = 'b'.repeat(5000);
+	it('should handle very long chunks', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        appendChunk({ chunk: longText, type: 'text', append: customAppend });
-        appendChunk({ chunk: longReasoning, type: 'reasoning', append: customAppend });
+		const longText = 'a'.repeat(10000);
+		const longReasoning = 'b'.repeat(5000);
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: longText,
-            reasoning: longReasoning
-        });
-    });
+		appendChunk({ chunk: longText, type: 'text', append: customAppend });
+		appendChunk({ chunk: longReasoning, type: 'reasoning', append: customAppend });
 
-    it('should handle multiple chunks of the same type in sequence', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: longText,
+			reasoning: longReasoning
+		});
+	});
 
-        appendChunk({ chunk: 'First', type: 'text', append: customAppend });
-        appendChunk({ chunk: 'Second', type: 'text', append: customAppend });
-        appendChunk({ chunk: 'Third', type: 'text', append: customAppend });
-        appendChunk({ chunk: 'Reason1', type: 'reasoning', append: customAppend });
-        appendChunk({ chunk: 'Reason2', type: 'reasoning', append: customAppend });
+	it('should handle multiple chunks of the same type in sequence', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: 'FirstSecondThird',
-            reasoning: 'Reason1Reason2'
-        });
-    });
+		appendChunk({ chunk: 'First', type: 'text', append: customAppend });
+		appendChunk({ chunk: 'Second', type: 'text', append: customAppend });
+		appendChunk({ chunk: 'Third', type: 'text', append: customAppend });
+		appendChunk({ chunk: 'Reason1', type: 'reasoning', append: customAppend });
+		appendChunk({ chunk: 'Reason2', type: 'reasoning', append: customAppend });
 
-    it('should handle chunks with numbers in content', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: 'FirstSecondThird',
+			reasoning: 'Reason1Reason2'
+		});
+	});
 
-        appendChunk({ chunk: 'Count: 12345', type: 'text', append: customAppend });
-        appendChunk({ chunk: 'Calculate: 67890', type: 'reasoning', append: customAppend });
+	it('should handle chunks with numbers in content', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: 'Count: 12345',
-            reasoning: 'Calculate: 67890'
-        });
-    });
+		appendChunk({ chunk: 'Count: 12345', type: 'text', append: customAppend });
+		appendChunk({ chunk: 'Calculate: 67890', type: 'reasoning', append: customAppend });
 
-    it('should handle single character chunks', () => {
-        let serializedContent = '';
-        const customAppend = vi.fn((serializedChunk: string) => {
-            serializedContent += serializedChunk;
-        });
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: 'Count: 12345',
+			reasoning: 'Calculate: 67890'
+		});
+	});
 
-        appendChunk({ chunk: 'a', type: 'text', append: customAppend });
-        appendChunk({ chunk: 'b', type: 'text', append: customAppend });
-        appendChunk({ chunk: 'c', type: 'reasoning', append: customAppend });
+	it('should handle single character chunks', () => {
+		let serializedContent = '';
+		const customAppend = vi.fn((serializedChunk: string) => {
+			serializedContent += serializedChunk;
+		});
 
-        expect(deserializeStreamBody(serializedContent)).toEqual({
-            text: 'ab',
-            reasoning: 'c'
-        });
-    });
-})
+		appendChunk({ chunk: 'a', type: 'text', append: customAppend });
+		appendChunk({ chunk: 'b', type: 'text', append: customAppend });
+		appendChunk({ chunk: 'c', type: 'reasoning', append: customAppend });
+
+		expect(deserializeStreamBody(serializedContent)).toEqual({
+			text: 'ab',
+			reasoning: 'c'
+		});
+	});
+});

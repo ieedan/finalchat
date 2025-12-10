@@ -62,9 +62,7 @@
 					/>
 				</NumberField.Group>
 			</NumberField.Root>
-			<span class="text-end w-full text-xs text-muted-foreground">
-				Go to chat with ⏎
-			</span>
+			<span class="text-end w-full text-xs text-muted-foreground"> Go to chat with ⏎ </span>
 		</form>
 	</Dialog.Content>
 </Dialog.Root>

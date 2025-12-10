@@ -13,17 +13,15 @@
 	const usedPercent = $derived((tokensUsed / contextLength) * 100);
 </script>
 
-{#if usedPercent >= 25}
-	<Tooltip.Provider>
-		<Tooltip.Root delayDuration={250}>
-			<Tooltip.Trigger>
-				<Gauge value={usedPercent} max={100} class="size-5" />
-			</Tooltip.Trigger>
-			<Tooltip.Content>
-				{usedPercent.toFixed(0)}% ・{formatNumberShort(tokensUsed)} / {formatNumberShort(
-					contextLength
-				)} context used
-			</Tooltip.Content>
-		</Tooltip.Root>
-	</Tooltip.Provider>
-{/if}
+<Tooltip.Provider>
+	<Tooltip.Root delayDuration={250}>
+		<Tooltip.Trigger>
+			<Gauge value={usedPercent} max={100} class="size-5" />
+		</Tooltip.Trigger>
+		<Tooltip.Content>
+			{usedPercent.toFixed(0)}% ・{formatNumberShort(tokensUsed)} / {formatNumberShort(
+				contextLength
+			)} context used
+		</Tooltip.Content>
+	</Tooltip.Root>
+</Tooltip.Provider>

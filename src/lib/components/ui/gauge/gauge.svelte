@@ -9,12 +9,12 @@
 
 	let { value, class: className, max }: Props = $props();
 
-    const RADIUS = 50;
-    const STROKE_WIDTH = 12;
+	const RADIUS = 50;
+	const STROKE_WIDTH = 12;
 
-    const VIEW_BOX_DIAMETER = RADIUS * 2 + STROKE_WIDTH;
+	const VIEW_BOX_DIAMETER = RADIUS * 2 + STROKE_WIDTH;
 
-    const circumference = $derived(2 * Math.PI * RADIUS);
+	const circumference = $derived(2 * Math.PI * RADIUS);
 </script>
 
 <svg
@@ -26,7 +26,7 @@
 	viewBox="0 0 {VIEW_BOX_DIAMETER} {VIEW_BOX_DIAMETER}"
 	class={cn('text-foreground', className)}
 >
-    <!-- background -->
+	<!-- background -->
 	<circle
 		cx="55"
 		cy="55"
@@ -34,20 +34,20 @@
 		fill="none"
 		class="stroke-accent"
 		stroke-width={STROKE_WIDTH}
-        stroke-linecap="round"
+		stroke-linecap="round"
 	/>
 
-    <!-- progress -->
-    <circle
+	<!-- progress -->
+	<circle
 		cx="55"
 		cy="55"
 		r={RADIUS}
 		fill="none"
-		class="stroke-current"
+		class="stroke-current transition-[stroke-dashoffset] duration-500 ease-out"
 		stroke-width={STROKE_WIDTH}
-        stroke-dasharray="{circumference}"
-        stroke-dashoffset="{circumference * (1 - value / max)}"
-        stroke-linecap="round"
-        style="transform-origin: center; transform: rotate(-90deg); transition-property: stroke-dashoffset;"
+		stroke-dasharray={circumference}
+		stroke-dashoffset={circumference * (1 - value / max)}
+		stroke-linecap="round"
+		style="transform-origin: center; transform: rotate(-90deg);"
 	/>
 </svg>
