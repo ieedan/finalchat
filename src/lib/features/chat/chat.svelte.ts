@@ -87,7 +87,7 @@ class ChatLayoutState {
 
 	get apiKey(): string | null {
 		return (
-			this.opts.apiKey?.key ?? this.localApiKey.current ?? this.apiKeysQuery.current?.key ?? null
+			this.localApiKey.current ?? this.apiKeysQuery.current?.key ?? this.opts.apiKey?.key ?? null
 		);
 	}
 

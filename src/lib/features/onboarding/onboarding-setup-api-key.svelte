@@ -27,6 +27,7 @@
 			localApiKey.current = apiKey;
 		} else {
 			await createApiKey({ key: apiKey });
+			localApiKey.current = null;
 		}
 
 		await convex.mutation(api.userSettings.completeSetupApiKey, {});

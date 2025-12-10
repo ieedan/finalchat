@@ -144,7 +144,10 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 				</div>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content class="w-(--bits-dropdown-menu-anchor-width)" align="center" side="top">
-				<DropdownMenu.Item class="flex items-center justify-between gap-2">
+				<DropdownMenu.Item
+					class="flex items-center justify-between gap-2"
+					onSelect={() => goto('/settings')}
+				>
 					<span>Settings</span>
 					<SettingsIcon />
 				</DropdownMenu.Item>

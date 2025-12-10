@@ -20,13 +20,10 @@
 		),
 		ref: box.with(() => ref)
 	});
-
-	const mergedProps = $derived(mergeProps(rest, state.props));
 </script>
 
 <div class="relative">
 	<Input
-		{...mergedProps}
 		bind:value
 		bind:ref
 		type={state.root.opts.hidden.current ? 'password' : 'text'}
@@ -36,11 +33,13 @@
 				// either or is mounted (offset 36px)
 				'pr-9': state.root.passwordState.copyMounted || state.root.passwordState.toggleMounted,
 				// both are mounted (offset 36px * 2)
-				'pr-[4.5rem]':
+				'pr-18':
 					state.root.passwordState.copyMounted && state.root.passwordState.toggleMounted
 			},
 			className
 		)}
+		{...state.props}
+		{...rest}
 	/>
 	{@render children?.()}
 </div>

@@ -84,11 +84,17 @@ class PasswordInputState {
 		});
 	}
 
-	props = $derived.by(() => ({
-		'aria-invalid':
+	ariaInvalid = $derived.by(() => {
+		if (!this.root.passwordState.strengthMounted) return false;
+		return (
 			this.root.strength.score < this.root.opts.minScore.current &&
 			this.root.passwordState.tainted &&
 			this.root.passwordState.strengthMounted
+		);
+	});
+
+	props = $derived.by(() => ({
+		'aria-invalid': this.ariaInvalid
 	}));
 }
 
