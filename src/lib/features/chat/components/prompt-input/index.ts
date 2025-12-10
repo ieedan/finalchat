@@ -9,6 +9,7 @@ import BannerContent from './prompt-input-banner-content.svelte';
 import BannerDismiss from './prompt-input-banner-dismiss.svelte';
 import ScrollToBottom from './prompt-input-scroll-to-bottom.svelte';
 import AttachmentButton from './prompt-input-attachment-button.svelte';
+import ContextIndicator from './prompt-input-context-indicator.svelte';
 
 export {
 	Root,
@@ -22,6 +23,7 @@ export {
 	BannerDismiss,
 	ScrollToBottom,
 	AttachmentButton,
+	ContextIndicator,
 	//
 	Root as PromptInput,
 	AttachmentList as PromptInputAttachmentList,
@@ -33,5 +35,6 @@ export {
 	BannerContent as PromptInputBannerContent,
 	BannerDismiss as PromptInputBannerDismiss,
 	ScrollToBottom as PromptInputScrollToBottom,
-	AttachmentButton as PromptInputAttachmentButton
+	AttachmentButton as PromptInputAttachmentButton,
+	ContextIndicator as PromptInputContextIndicator
 };

@@ -55,6 +55,10 @@ class ChatLayoutState {
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
+	get isAdvancedMode() {
+		return this.userSettingsQuery.data?.onboarding?.mode === 'advanced';
+	}
+
 	get models() {
 		return this.opts.models;
 	}
@@ -126,6 +130,10 @@ class ChatViewState {
 		this.chatQuery = useCachedQuery(api.chat.get, {
 			chatId: this.opts.chatId
 		});
+	}
+
+	get chat() {
+		return this.chatQuery.data;
 	}
 }
 

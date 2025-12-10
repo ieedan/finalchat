@@ -104,7 +104,7 @@
 					<a
 						{...props}
 						href="/chat/{chat._id}"
-						class="flex min-w-0 flex-1 items-center gap-1 pl-3 h-full outline-none"
+						class="flex min-w-0 flex-1 items-center gap-2 pl-3 h-full outline-none"
 					>
 						{#if chat.generating}
 							<Spinner />

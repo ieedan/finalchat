@@ -35,6 +35,14 @@
 	);
 
 	const sidebar = Sidebar.useSidebar();
+
+	const selectedModel = $derived(
+		chatLayoutState.models.find((model) => model.id === modelId.current)
+	);
+
+	const lastAssistantMessage = $derived.by(() => {
+		return chatViewState.chat?.messages.findLast((message) => message.role === 'assistant');
+	});
 </script>
 
 <svelte:head>
@@ -62,7 +70,7 @@
 >
 	<div class="flex flex-col w-full max-w-3xl px-4 flex-1">
 		<div class="flex-1 flex flex-col gap-2 py-4">
-			{#each chatViewState.chatQuery.data?.messages ?? [] as message (message._id)}
+			{#each chatViewState.chat?.messages ?? [] as message (message._id)}
 				<ChatMessage {message} />
 			{/each}
 		</div>
@@ -71,7 +79,10 @@
 			<PromptInput.Root
 				bind:modelId={modelId.current}
 				generating={chatViewState.chatQuery.data?.generating}
-				onSubmit={chatLayoutState.handleSubmit}
+				onSubmit={(opts) => {
+					autoScroll.scrollToBottom(false, 'instant');
+					return chatLayoutState.handleSubmit(opts);
+				}}
 				onUpload={chatAttachmentUploader.uploadMany}
 				onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
 				bind:attachments={attachmentsList.current}
@@ -85,14 +96,24 @@
 					<PromptInput.Textarea placeholder="Ask me anything..." />
 					<PromptInput.Footer class="justify-between">
 						<div class="flex items-center gap-2">
-							{#if chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+							{#if chatLayoutState.isAdvancedMode}
 								<ModelPickerAdvanced />
 							{:else}
 								<ModelPickerBasic />
 							{/if}
 							<PromptInput.AttachmentButton />
 						</div>
-						<PromptInput.Submit />
+						<div class="flex items-center gap-2">
+							{#if chatLayoutState.isAdvancedMode}
+								{#if lastAssistantMessage?.meta.tokenUsage !== undefined && selectedModel?.context_length !== undefined}
+									<PromptInput.ContextIndicator
+										tokensUsed={lastAssistantMessage.meta.tokenUsage}
+										contextLength={selectedModel.context_length}
+									/>
+								{/if}
+							{/if}
+							<PromptInput.Submit />
+						</div>
 					</PromptInput.Footer>
 				</PromptInput.Content>
 			</PromptInput.Root>

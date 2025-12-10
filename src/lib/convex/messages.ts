@@ -9,7 +9,7 @@ import {
 } from '@convex-dev/persistent-text-streaming';
 import { Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { generateText, streamText } from 'ai';
+import { generateText, streamText, AISDKError } from 'ai';
 import {
 	getChatMessagesInternal,
 	getLastUserAndAssistantMessages,
@@ -235,7 +235,14 @@ export const streamMessage = httpAction(async (ctx, request) => {
 								...(imageParts ?? [])
 							]
 						};
-					})
+					}),
+					onError: ({ error }) => {
+						throw new AISDKError({
+							name: error instanceof Error ? error.name : 'UnknownError',
+							message: error instanceof Error ? error.message : 'Unknown error',
+							cause: error instanceof Error ? error : undefined
+						});
+					}
 				});
 
 				let openRouterGenId: string | undefined = undefined;
@@ -278,10 +285,9 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				}
 			} catch (error) {
 				if (!last) return;
-				console.error(error);
 				await ctx.runMutation(internal.messages.updateMessageError, {
 					messageId: last.assistantMessage._id,
-					error: 'There was an error generating the response'
+					error: error instanceof AISDKError ? error.message : 'There was an error generating the response'
 				});
 			}
 		}

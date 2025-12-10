@@ -2,6 +2,7 @@
 	import { cn } from '$lib/utils';
 	import { Streamdown } from 'svelte-streamdown';
 	import Code from 'svelte-streamdown/code';
+	import Math from 'svelte-streamdown/math';
 
 	type Props = {
 		content: string;
@@ -22,6 +23,7 @@
 	baseTheme="shadcn"
 	class={cn(className)}
 	components={{
-		code: Code
+		code: Code,
+		math: Math
 	}}
 />

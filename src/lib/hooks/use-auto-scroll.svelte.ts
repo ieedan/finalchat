@@ -112,11 +112,11 @@ export class UseAutoScroll {
 
 	/** Disables auto scrolling until the container is scrolled back to the bottom */
 	disableAutoScroll() {
-		this.#userHasScrolled = !this.isAtBottom;
+		this.#userHasScrolled = !this.isNearBottom;
 	}
 
 	/** Scrolls the container to the bottom */
-	scrollToBottom(auto = false) {
+	scrollToBottom(auto = false, behavior: 'smooth' | 'auto' | 'instant' = 'smooth') {
 		if (!this.#ref) return;
 
 		this.isAutoScrolling = auto;
@@ -124,6 +124,10 @@ export class UseAutoScroll {
 		// don't auto scroll if user has scrolled
 		if (auto && this.#userHasScrolled) return;
 
-		this.#ref.scrollTo(0, this.#ref.scrollHeight);
+		this.#ref.scrollTo({
+			left: 0,
+			top: this.#ref.scrollHeight,
+			behavior
+		});
 	}
 }
