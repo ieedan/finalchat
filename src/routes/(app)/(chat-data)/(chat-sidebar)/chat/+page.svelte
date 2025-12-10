@@ -9,6 +9,7 @@
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { MetaTags } from '$lib/components/meta-tags';
+	import { FinalChat } from '$lib/components/logos';
 
 	const chatState = useChatLayout();
 
@@ -59,6 +60,9 @@
 <MetaTags title="New Chat" />
 
 <div class="w-full h-full flex-col items-center justify-center flex px-4 gap-8">
+	<div class="flex w-full items-center flex-col">
+		<FinalChat class="size-20" />
+	</div>
 	{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
 		<div class="flex flex-col gap-2 w-full max-w-sm">
 			{#each shortcuts as shortcut (shortcut.name)}
