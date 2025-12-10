@@ -42,7 +42,7 @@
 
 	const { text, reasoning } = $derived(deserializeStreamBody(streamBody.body.text));
 
-	let showReasoning = $state(false);
+	let showReasoning = $state(true);
 </script>
 
 {#if text === '' && reasoning === ''}

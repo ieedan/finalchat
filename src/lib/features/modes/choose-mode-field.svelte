@@ -14,7 +14,7 @@
 	let { mode = $bindable('advanced') }: Props = $props();
 </script>
 
-<RadioGroup.Root bind:value={mode} class="grid gap-2 grid-cols-2">
+<RadioGroup.Root bind:value={mode} class="flex flex-col md:grid gap-2 md:grid-cols-2">
 	<label
 		for="basic"
 		class={cn(

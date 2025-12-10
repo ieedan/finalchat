@@ -1,11 +1,7 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Avatar from '$lib/components/ui/avatar';
-	import { sidebarMenuButtonVariants } from '$lib/components/ui/sidebar/sidebar-menu-button.svelte';
 	import { useChatLayout } from './chat.svelte';
-	import SettingsIcon from '@lucide/svelte/icons/settings';
-	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import { goto } from '$app/navigation';
 	import { DEFAULT_AGE_GROUPS, getAgedGroups } from '$lib/utils/aged-groups';
 	import ChatButton from './chat-button.svelte';
@@ -123,9 +119,9 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 		{/each}
 	</Sidebar.Content>
 	<Sidebar.Footer>
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger class={sidebarMenuButtonVariants({ size: 'lg' })}>
-				<div class="flex items-center gap-2">
+		<Sidebar.MenuButton>
+			{#snippet child({ props })}
+				<a href="/settings" {...props} class={cn(props.class ?? '', 'flex items-center gap-2 h-12')}>
 					<Avatar.Root>
 						<Avatar.Image src={chatContext.user.profilePictureUrl} />
 						<Avatar.Fallback>
@@ -141,25 +137,9 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 							{chatContext.user.email}
 						</span>
 					</div>
-				</div>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content class="w-(--bits-dropdown-menu-anchor-width)" align="center" side="top">
-				<DropdownMenu.Item
-					class="flex items-center justify-between gap-2"
-					onSelect={() => goto('/settings')}
-				>
-					<span>Settings</span>
-					<SettingsIcon />
-				</DropdownMenu.Item>
-				<DropdownMenu.Item
-					class="flex items-center justify-between gap-2"
-					onSelect={() => goto('/auth/signout')}
-				>
-					<span>Logout</span>
-					<LogOutIcon />
-				</DropdownMenu.Item>
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
+				</a>
+			{/snippet}
+		</Sidebar.MenuButton>
 	</Sidebar.Footer>
 </Sidebar.Root>
 

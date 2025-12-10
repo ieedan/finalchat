@@ -48,6 +48,22 @@
 	});
 
 	let showReasoning = $state(false);
+
+	const tokensPerSecond = $derived.by(() => {
+		if (message.role !== 'assistant') return null;
+		if (
+			!message.meta.tokenUsage ||
+			!message.meta.startedGenerating ||
+			!message.meta.stoppedGenerating
+		)
+			return null;
+		const durationSeconds =
+			(message.meta.stoppedGenerating - message.meta.startedGenerating) / 1000;
+		if (durationSeconds > 0) {
+			return (message.meta.tokenUsage / durationSeconds).toFixed(0);
+		}
+		return null;
+	});
 </script>
 
 <div
@@ -118,7 +134,12 @@
 								)
 							: null,
 						message.meta.cost ? `$${message.meta.cost}` : null,
-						message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null
+						message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null,
+						message.meta.tokenUsage &&
+						message.meta.startedGenerating &&
+						message.meta.stoppedGenerating
+							? `${tokensPerSecond} tokens/sec`
+							: null
 					]
 						.filter(Boolean)
 						.join(' ・')}
