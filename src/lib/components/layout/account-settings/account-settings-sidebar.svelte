@@ -30,7 +30,7 @@
 			</Popover.Trigger>
 			<Popover.Content
 				align="start"
-				class="p-2 pb-0"
+				class="p-2"
 				onclick={(e) => {
 					const target = e.target as HTMLElement;
 					if (target.tagName === 'A') {

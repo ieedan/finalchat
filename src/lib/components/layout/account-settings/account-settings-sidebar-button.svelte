@@ -20,7 +20,7 @@
 
 <a
 	class={cn(
-		'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-primary-foreground mb-1.5 flex w-full flex-col gap-2 rounded-md px-6 py-2 transition-colors lg:px-3',
+		'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-primary-foreground not-last:mb-1 flex w-full flex-col gap-2 rounded-md px-6 py-2 transition-colors lg:px-3',
 		className
 	)}
 	onclick={(e) => {
