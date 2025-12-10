@@ -11,7 +11,8 @@ export default defineConfig({
 		hook: '$lib/hooks',
 		action: '$lib/actions',
 		util: '$lib/utils',
-		lib: '$lib'
+		lib: '$lib',
+		layout: '$lib/components/layout'
 	},
 	transforms: [prettier()]
 });
