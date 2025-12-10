@@ -74,8 +74,8 @@
 					{#if apiKeyInfoResource.current}
 						<span class="text-muted-foreground flex h-6 place-items-center text-xs">
 							${apiKeyInfoResource.current?.usage?.toFixed(3)} / {apiKeyInfoResource.current
-								?.limit_remaining
-								? `${apiKeyInfoResource.current?.limit_remaining?.toFixed(3)}`
+								?.limit
+								? `${apiKeyInfoResource.current?.limit?.toFixed(3)}`
 								: '∞'}
 						</span>
 					{:else if apiKeyInfoResource.error}
