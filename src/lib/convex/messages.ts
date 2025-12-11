@@ -291,7 +291,9 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					content,
 					meta: {
 						generationId: openRouterGenId,
-						tokenUsage: usage.totalTokens
+						tokenUsage: usage.totalTokens,
+						outputTokens: usage.outputTokens,
+						inputTokens: usage.inputTokens,
 					}
 				});
 
@@ -410,7 +412,9 @@ export const updateMessageContent = internalMutation({
 		content: v.string(),
 		meta: v.object({
 			generationId: v.optional(v.string()),
-			tokenUsage: v.optional(v.number())
+			tokenUsage: v.optional(v.number()),
+			outputTokens: v.optional(v.number()),
+			inputTokens: v.optional(v.number())
 		})
 	},
 	handler: async (ctx, args) => {

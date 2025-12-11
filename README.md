@@ -13,3 +13,4 @@
 - [ ] Share mode
 - [ ] Og image generation
 - [ ] Enhance prompt button
+- [ ] Chat branching
