@@ -52,25 +52,25 @@ export type TopProvider = {
 };
 
 export interface ApiKey {
-    hash:                  string;
-    name:                  string;
-    label:                 string;
-    disabled:              boolean;
-    limit:                 number;
-    limit_remaining:       number;
-    limit_reset:           string;
-    include_byok_in_limit: boolean;
-    usage:                 number;
-    usage_daily:           number;
-    usage_weekly:          number;
-    usage_monthly:         number;
-    byok_usage:            number;
-    byok_usage_daily:      number;
-    byok_usage_weekly:     number;
-    byok_usage_monthly:    number;
-    created_at:            Date;
-    updated_at:            Date;
-    expires_at:            Date;
+	hash: string;
+	name: string;
+	label: string;
+	disabled: boolean;
+	limit: number;
+	limit_remaining: number;
+	limit_reset: string;
+	include_byok_in_limit: boolean;
+	usage: number;
+	usage_daily: number;
+	usage_weekly: number;
+	usage_monthly: number;
+	byok_usage: number;
+	byok_usage_daily: number;
+	byok_usage_weekly: number;
+	byok_usage_monthly: number;
+	created_at: Date;
+	updated_at: Date;
+	expires_at: Date;
 }
 
 export function parseModelName(name: string): { lab: string | null; name: string } {

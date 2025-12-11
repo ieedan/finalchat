@@ -1,18 +1,14 @@
 <script lang="ts">
 	import { tv } from 'tailwind-variants';
 	import Streamdown from '$lib/features/chat/components/streamdown.svelte';
-	import type { ChatMessageAssistant, ChatMessageUser } from '$lib/convex/schema';
 	import ChatStreamedContent from './chat-streamed-content.svelte';
 	import { cn } from '$lib/utils';
 	import { CopyButton } from '$lib/components/ui/copy-button';
 	import { useChatLayout } from './chat.svelte.js';
 	import { formatDuration, type Milliseconds } from '$lib/utils/time.js';
 	import { untrack } from 'svelte';
-	import type { Doc } from '$lib/convex/_generated/dataModel.js';
-	import * as Collapsible from '$lib/components/ui/collapsible';
-	import BrainIcon from '@lucide/svelte/icons/brain';
-	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChatAssistantMessage from './chat-assistant-message.svelte';
+	import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -25,9 +21,7 @@
 	});
 
 	type Props = {
-		message:
-			| (ChatMessageUser & { attachments?: (Doc<'chatAttachments'> & { url: string })[] })
-			| ChatMessageAssistant;
+		message: MessageWithAttachments;
 	};
 
 	let { message }: Props = $props();
@@ -46,8 +40,6 @@
 			}
 		});
 	});
-
-	let showReasoning = $state(false);
 
 	const tokensPerSecond = $derived.by(() => {
 		if (message.role !== 'assistant') return null;
@@ -90,35 +82,17 @@
 	{/if}
 	<div data-message-role={message.role} class={chatMessageVariants({ role: message.role })}>
 		{#if message.role === 'assistant'}
-			{#if message.reasoning}
-				<div class="pb-2">
-					<Collapsible.Root bind:open={showReasoning} class="flex flex-col gap-2">
-						<Collapsible.Trigger class="flex items-center gap-2">
-							<BrainIcon class="size-4" />
-							Reasoning
-							{#if showReasoning}
-								<ChevronUpIcon class="size-4" />
-							{:else}
-								<ChevronDownIcon class="size-4" />
-							{/if}
-						</Collapsible.Trigger>
-						<Collapsible.Content class="bg-card rounded-lg p-4">
-							<Streamdown content={message.reasoning} animationEnabled={false} />
-						</Collapsible.Content>
-					</Collapsible.Root>
-				</div>
-			{/if}
-		{/if}
-		{#if message.content}
-			<Streamdown content={message.content} animationEnabled={false} />
-		{:else if message.role === 'assistant'}
-			{#if message.error}
+			{#if message.content !== undefined}
+				<ChatAssistantMessage {message} animationEnabled={false} />
+			{:else if message.error}
 				<span class="text-destructive">{message.error}</span>
 			{:else}
 				{#key chatLayoutState.createdMessages.has(message._id)}
 					<ChatStreamedContent {message} {driven} />
 				{/key}
 			{/if}
+		{:else}
+			<Streamdown content={message.content} animationEnabled={false} />
 		{/if}
 	</div>
 	{#if message.content}
@@ -148,7 +122,14 @@
 					{/if}
 				{/if}
 			</div>
-			<CopyButton text={message.content} />
+			<CopyButton
+				text={message.role === 'assistant'
+					? message.parts
+							.filter((p) => p.type === 'text')
+							.map((p) => p.text)
+							.join('')
+					: message.content}
+			/>
 		</div>
 	{/if}
 </div>

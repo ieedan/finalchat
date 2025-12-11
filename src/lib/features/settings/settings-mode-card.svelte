@@ -20,12 +20,10 @@
 </script>
 
 <Card.Root>
-    <Card.Header>
-        <Card.Title>Chat Experience</Card.Title>
-        <Card.Description>
-            Customize your chat experience.
-        </Card.Description>
-    </Card.Header>
+	<Card.Header>
+		<Card.Title>Chat Experience</Card.Title>
+		<Card.Description>Customize your chat experience.</Card.Description>
+	</Card.Header>
 	<Card.Content class="flex flex-col gap-4">
 		<ChooseModeField bind:mode />
 		<div class="flex items-center justify-end">

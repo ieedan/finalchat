@@ -9,14 +9,14 @@ import {
 } from '@convex-dev/persistent-text-streaming';
 import { Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { generateText, streamText, AISDKError } from 'ai';
+import { generateText, AISDKError, Experimental_Agent as ToolLoopAgent } from 'ai';
 import {
 	getChatMessagesInternal,
 	getLastUserAndAssistantMessages,
 	MessageWithAttachments
 } from './chat.utils';
-import { TITLE_GENERATION_MODEL } from '../ai.js';
-import { appendChunk } from '../utils/reasoning-custom-protocol';
+import { TITLE_GENERATION_MODEL, fetchLinkContentTool } from '../ai.js';
+import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
 
 const persistentTextStreaming = new PersistentTextStreaming(components.persistentTextStreaming);
 
@@ -152,11 +152,20 @@ export const generateChatTitle = internalAction({
 
 			<chat>
 			${chat.messages
-				.map(
-					(message) => `<message role="${message.role}">
+				.map((message) => {
+					if (message.role === 'user') {
+						return `<message role="${message.role}">
 				${message.content}
-			</message>`
-				)
+			</message>`;
+					}
+
+					return `<message role="${message.role}">
+				${message.parts
+					.filter((part) => part.type === 'text')
+					.map((part) => part.text)
+					.join('')}
+			</message>`;
+				})
 				.join('\n')}
 			</chat>`
 			});
@@ -207,14 +216,22 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					apiKey
 				});
 
-				const { fullStream, totalUsage } = streamText({
+				const agent = new ToolLoopAgent({
 					model: openrouter.chat(last.userMessage.chatSettings.modelId),
-					messages: messages.map((message) => {
+					tools: {
+						fetchLinkContent: fetchLinkContentTool
+					},
+					stopWhen: [
+						({ steps }) => {
+							return steps.length >= 5;
+						}
+					]
+				});
+
+				const { fullStream, totalUsage } = agent.stream({
+					messages: messages.flatMap((message) => {
 						if (message.role === 'assistant') {
-							return {
-								role: message.role,
-								content: message.content ?? ''
-							};
+							return partsToModelMessage(message.parts);
 						}
 
 						const imageParts = message.attachments?.map(
@@ -235,31 +252,35 @@ export const streamMessage = httpAction(async (ctx, request) => {
 								...(imageParts ?? [])
 							]
 						};
-					}),
-					onError: ({ error }) => {
-						throw new AISDKError({
-							name: error instanceof Error ? error.name : 'UnknownError',
-							message: error instanceof Error ? error.message : 'Unknown error',
-							cause: error instanceof Error ? error : undefined
-						});
-					}
+					})
 				});
 
 				let openRouterGenId: string | undefined = undefined;
 				let content = '';
-				let reasoning: string | undefined = undefined;
+
+				const appender = createChunkAppender({
+					append: (chunk) => {
+						append(chunk);
+						content += chunk;
+					}
+				});
 
 				for await (const chunk of fullStream) {
 					if (chunk.type === 'text-delta') {
 						openRouterGenId = chunk.id;
-						content += chunk.text;
-						appendChunk({ chunk: chunk.text, type: 'text', append });
+						appender.append({ type: 'text', text: chunk.text });
 					} else if (chunk.type === 'reasoning-delta') {
-						if (reasoning === undefined) {
-							reasoning = '';
-						}
-						reasoning += chunk.text;
-						appendChunk({ chunk: chunk.text, type: 'reasoning', append });
+						appender.append({ type: 'reasoning', text: chunk.text });
+					} else if (chunk.type === 'tool-call') {
+						appender.append(chunk);
+					} else if (chunk.type === 'tool-result') {
+						appender.append({
+							type: 'tool-result',
+							toolName: chunk.toolName,
+							toolCallId: chunk.toolCallId,
+							// @ts-expect-error - TODO: for some reason the output is unknown
+							output: chunk.output
+						});
 					}
 				}
 
@@ -268,7 +289,6 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
 					content,
-					reasoning,
 					meta: {
 						generationId: openRouterGenId,
 						tokenUsage: usage.totalTokens
@@ -388,7 +408,6 @@ export const updateMessageContent = internalMutation({
 	args: {
 		messageId: v.id('messages'),
 		content: v.string(),
-		reasoning: v.optional(v.string()),
 		meta: v.object({
 			generationId: v.optional(v.string()),
 			tokenUsage: v.optional(v.number())
@@ -401,7 +420,6 @@ export const updateMessageContent = internalMutation({
 		await Promise.all([
 			ctx.db.patch(args.messageId, {
 				content: args.content,
-				reasoning: args.reasoning,
 				meta: {
 					...message.meta,
 					stoppedGenerating: Date.now(),

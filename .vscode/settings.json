@@ -2,7 +2,5 @@
 	"files.associations": {
 		"*.css": "tailwindcss"
 	},
-	"cSpell.words": [
-		"Finalchat"
-	]
+	"cSpell.words": ["appender", "Finalchat"]
 }

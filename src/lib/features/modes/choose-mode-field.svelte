@@ -60,12 +60,10 @@
 	>
 		<div class="flex flex-col gap-1">
 			<div class="flex items-center gap-2">
-				<RadioGroup.Item id="advanced" value="advanced"/>
+				<RadioGroup.Item id="advanced" value="advanced" />
 				<span>Advanced</span>
 			</div>
-			<p class="text-sm text-muted-foreground">
-				Advanced with more control and customization.
-			</p>
+			<p class="text-sm text-muted-foreground">Advanced with more control and customization.</p>
 		</div>
 		<div class="rounded-lg border flex flex-col mt-4">
 			<div class="p-2">
