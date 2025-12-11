@@ -12,4 +12,4 @@
 
 - [ ] Share mode
 - [ ] Og image generation
-- [ ] Advanced chat input
+- [ ] Enhance prompt button
