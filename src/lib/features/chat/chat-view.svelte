@@ -78,7 +78,7 @@
 		</div>
 
 		<div class="sticky bottom-0 pb-4 bg-background rounded-t-lg">
-			
+			<div class="absolute w-full h-[24px] bg-background mask-t-from-0% -top-[14px] z-19"></div>
 			<PromptInput.Root
 				bind:modelId={modelId.current}
 				generating={chatViewState.chatQuery.data?.generating}
@@ -89,7 +89,7 @@
 				onUpload={chatAttachmentUploader.uploadMany}
 				onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
 				bind:attachments={attachmentsList.current}
-				class="group/prompt-input"
+				class="group/prompt-input z-20"
 			>
 				<PromptInput.ScrollToBottom
 					isNearBottom={autoScroll.isNearBottom}
