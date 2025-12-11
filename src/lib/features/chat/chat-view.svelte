@@ -11,8 +11,8 @@
 	import { cn } from '$lib/utils';
 	import { ChatAttachmentUploader } from './chat-attachment-uploader.svelte.js';
 	import * as Sidebar from '$lib/components/ui/sidebar';
-	import { Button } from '$lib/components/ui/button';
 	import { MetaTags } from '$lib/components/meta-tags';
+	import ShareButton from './components/share-button.svelte';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -59,7 +59,9 @@
 			{/if}
 		</div>
 		<div class="flex items-center gap-2">
-			<Button variant="outline">Share</Button>
+			{#if chatViewState.chatQuery.data}
+				<ShareButton chat={chatViewState.chatQuery.data} />
+			{/if}
 		</div>
 	</div>
 	<div class="absolute w-full h-[24px] bg-background mask-b-from-0% -bottom-[14px] z-19"></div>

@@ -249,3 +249,22 @@ export const branchFromMessage = mutation({
 		return { newChatId, newAssistantMessageId };
 	}
 });
+
+export const updatePublic = mutation({
+	args: {
+		chatId: v.id('chat'),
+		public: v.boolean()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		const chat = await ctx.db.get(args.chatId);
+		if (!chat || chat.userId !== user.subject)
+			throw new Error('Chat not found or you are not authorized to access it');
+
+		await ctx.db.patch(args.chatId, {
+			public: args.public
+		});
+	}
+});

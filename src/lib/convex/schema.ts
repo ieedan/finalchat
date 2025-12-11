@@ -73,7 +73,8 @@ export default defineSchema({
 				chatId: v.id('chat'),
 				messageId: v.id('messages')
 			})
-		)
+		),
+		public: v.optional(v.boolean())
 	}).index('by_user', ['userId']),
 	chatAttachments: defineTable({
 		userId: v.string(),
