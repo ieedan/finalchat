@@ -79,7 +79,7 @@
 <Rename.Provider>
 	<Sidebar.MenuItem>
 		<Sidebar.MenuButton
-			isActive={page.params.chatId === chat._id}
+			isActive={page.url.pathname.includes(`/chat/${chat._id}`)}
 			onkeydown={(e: KeyboardEvent) => {
 				if (e.key === 'F2') {
 					renamingMode = 'edit';
@@ -88,7 +88,7 @@
 		>
 			{#snippet child({ props: { class: _, ...props } })}
 				<div
-					data-active={page.params.chatId === chat._id}
+					data-active={page.url.pathname.includes(`/chat/${chat._id}`)}
 					class="group/menu-button hover:bg-sidebar-accent focus-within:bg-sidebar-accent rounded-md flex items-center gap-2 h-8.5 data-[active=true]:bg-sidebar-accent"
 					onpointerover={() => {
 						warm(client, api.chat.get, {

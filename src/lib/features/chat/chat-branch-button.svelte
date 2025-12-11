@@ -7,17 +7,16 @@
 	import type { MessageWithAttachments } from '$lib/convex/chat.utils';
 	import SplitIcon from '@lucide/svelte/icons/split';
 	import { useConvexClient } from 'convex-svelte';
-	import { useChatLayout } from './chat.svelte';
+	import type { Id } from '$lib/convex/_generated/dataModel';
 
 	type Props = {
 		message: MessageWithAttachments;
+		createdMessages: Set<Id<'messages'>> | null;
 	};
 
-	let { message }: Props = $props();
+	let { message, createdMessages = $bindable() }: Props = $props();
 
 	const modelId = ModelIdCtx.get();
-
-	const chatLayoutState = useChatLayout();
 
 	const client = useConvexClient();
 
@@ -38,7 +37,7 @@
 		);
 
 		if (newAssistantMessageId) {
-			chatLayoutState.createdMessages.add(newAssistantMessageId);
+			createdMessages?.add(newAssistantMessageId);
 		}
 
 		await goto(resolve(`/chat/${newChatId}`));

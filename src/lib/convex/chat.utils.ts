@@ -2,7 +2,7 @@ import { DataModel, Doc, Id } from './_generated/dataModel';
 import type { GenericMutationCtx, GenericQueryCtx } from 'convex/server';
 import type { ChatMessageAssistant, ChatMessageUser } from './schema';
 import { asyncMap } from 'convex-helpers';
-import { api, internal } from './_generated/api';
+import { internal } from './_generated/api';
 import { deserializeStream, StreamResult } from '../utils/stream-transport-protocol';
 
 export type MessageWithAttachments =
@@ -47,7 +47,7 @@ export async function getChatMessages(
 			.collect();
 
 		const attachmentsWithUrl = await asyncMap(attachments, async (attachment) => {
-			const url = await ctx.runQuery(api.chatAttachments.getFileUrl, {
+			const url = await ctx.runQuery(internal.chatAttachments.internalGetFileUrl, {
 				key: attachment.key
 			});
 			return {

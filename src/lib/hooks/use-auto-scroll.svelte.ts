@@ -2,6 +2,10 @@
 	Installed from @ieedan/shadcn-svelte-extras
 */
 
+type Options = {
+	startAtBottom?: boolean;
+};
+
 /** Use this on a vertically scrollable container to ensure that it automatically scrolls to the bottom of the content.
  *
  * ## Usage
@@ -33,6 +37,8 @@ export class UseAutoScroll {
 	private lastScrollHeight = 0;
 	isAutoScrolling = $state(false);
 
+	constructor(readonly opts: Options = { startAtBottom: true }) {}
+
 	// This sets everything up once #ref is bound
 	set ref(ref: HTMLElement | undefined) {
 		this.#ref = ref;
@@ -41,8 +47,10 @@ export class UseAutoScroll {
 
 		this.lastScrollHeight = this.#ref.scrollHeight;
 
-		// start from bottom or start position
-		this.#ref.scrollTo(0, this.#scrollY ? this.#scrollY : this.#ref.scrollHeight);
+		if (this.opts.startAtBottom) {
+			// start from bottom or start position
+			this.#ref.scrollTo(0, this.#scrollY ? this.#scrollY : this.#ref.scrollHeight);
+		}
 
 		this.#ref.addEventListener('scroll', () => {
 			if (!this.#ref) return;

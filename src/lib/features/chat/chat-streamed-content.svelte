@@ -5,7 +5,6 @@
 	import { env } from '$lib/env.client';
 	import { useStream } from '$lib/utils/persistent-text-streaming.svelte.js';
 	import type { StreamId } from '@convex-dev/persistent-text-streaming';
-	import { useChatLayout } from './chat.svelte';
 	import { deserializeStream } from '$lib/utils/stream-transport-protocol';
 	import ChatAssistantMessage from './chat-assistant-message.svelte';
 	import ShinyText from '$lib/components/animations/shiny-text.svelte';
@@ -13,12 +12,12 @@
 	type Props = {
 		message: ChatMessageAssistant;
 		driven: boolean;
+		apiKey: string | null;
 	};
 
-	let { message, driven }: Props = $props();
+	let { message, driven, apiKey }: Props = $props();
 
 	const accessToken = AccessTokenCtx.get();
-	const chatState = useChatLayout();
 
 	const streamBody = useStream({
 		getPersistentBody: api.messages.getChatBody,
@@ -30,7 +29,7 @@
 		// svelte-ignore state_referenced_locally
 		streamId: message.streamId as StreamId,
 		get apiKey() {
-			return chatState.apiKey;
+			return apiKey;
 		},
 		authToken: accessToken?.current
 	});

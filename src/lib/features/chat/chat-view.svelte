@@ -64,7 +64,9 @@
 			{/if}
 		</div>
 	</div>
-	<div class="absolute w-full h-[24px] bg-background mask-b-from-0% -bottom-[14px] z-19"></div>
+	{#if !autoScroll.isAtTop}
+		<div class="absolute w-full h-[24px] bg-background mask-b-from-0% -bottom-[14px] z-19"></div>
+	{/if}
 </header>
 <div
 	bind:this={scrollContainer}
@@ -75,12 +77,18 @@
 	<div class="flex flex-col w-full max-w-3xl px-4 flex-1">
 		<div class="flex-1 flex flex-col gap-2 py-4">
 			{#each chatViewState.chat?.messages ?? [] as message (message._id)}
-				<ChatMessage {message} />
+				<ChatMessage
+					{message}
+					apiKey={chatLayoutState.apiKey}
+					bind:createdMessages={chatLayoutState.createdMessages}
+				/>
 			{/each}
 		</div>
 
 		<div class="sticky bottom-0 pb-4 bg-background rounded-t-lg">
-			<div class="absolute w-full h-[24px] bg-background mask-t-from-0% -top-[14px] z-19"></div>
+			{#if !autoScroll.isAtBottom}
+				<div class="absolute w-full h-[24px] bg-background mask-t-from-0% -top-[14px] z-19"></div>
+			{/if}
 			<PromptInput.Root
 				bind:modelId={modelId.current}
 				generating={chatViewState.chatQuery.data?.generating}

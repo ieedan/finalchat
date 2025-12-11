@@ -4,12 +4,12 @@
 	import ChatStreamedContent from './chat-streamed-content.svelte';
 	import { cn } from '$lib/utils';
 	import { CopyButton } from '$lib/components/ui/copy-button';
-	import { useChatLayout } from './chat.svelte.js';
 	import { formatDuration, type Milliseconds } from '$lib/utils/time.js';
 	import { untrack } from 'svelte';
 	import ChatAssistantMessage from './chat-assistant-message.svelte';
 	import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
 	import ChatBranchButton from './chat-branch-button.svelte';
+	import type { Id } from '$lib/convex/_generated/dataModel.js';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -23,21 +23,21 @@
 
 	type Props = {
 		message: MessageWithAttachments;
+		createdMessages: Set<Id<'messages'>> | null;
+		apiKey: string | null;
 	};
 
-	let { message }: Props = $props();
-
-	const chatLayoutState = useChatLayout();
+	let { message, createdMessages = $bindable(null), apiKey }: Props = $props();
 
 	// this is weird but basically we only care if we transition to a driven state not if we transition out of it
 	let driven = $state(false);
 	$effect(() => {
-		const d = chatLayoutState.createdMessages.has(message._id);
+		const d = createdMessages?.has(message._id);
 		untrack(() => {
 			if (d) {
 				driven = true;
 				// once we are driving remove the id so we can't drive again
-				chatLayoutState.createdMessages.delete(message._id);
+				createdMessages?.delete(message._id);
 			}
 		});
 	});
@@ -88,8 +88,8 @@
 			{:else if message.error}
 				<span class="text-destructive">{message.error}</span>
 			{:else}
-				{#key chatLayoutState.createdMessages.has(message._id)}
-					<ChatStreamedContent {message} {driven} />
+				{#key createdMessages?.has(message._id)}
+					<ChatStreamedContent {message} {driven} {apiKey} />
 				{/key}
 			{/if}
 		{:else}
@@ -120,7 +120,7 @@
 				{/if}
 			</div>
 			<div class="flex items-center gap-1">
-				<ChatBranchButton {message} />
+				<ChatBranchButton {message} bind:createdMessages />
 				<CopyButton
 					text={message.role === 'assistant'
 						? message.parts

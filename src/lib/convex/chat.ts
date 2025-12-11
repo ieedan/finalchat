@@ -42,6 +42,23 @@ export const get = query({
 	}
 });
 
+export const getPublic = query({
+	args: {
+		chatId: v.id('chat')
+	},
+	handler: async (ctx, args): Promise<(Doc<'chat'> & { messages: MessageWithAttachments[] }) | null> => {
+		const chat = await ctx.db.get(args.chatId);
+		if (!chat || !chat.public) return null
+
+		const messages = await getChatMessages(ctx, args.chatId);
+
+		return {
+			...chat,
+			messages
+		};
+	}
+});
+
 export const internalGet = internalQuery({
 	args: {
 		chatId: v.id('chat')
