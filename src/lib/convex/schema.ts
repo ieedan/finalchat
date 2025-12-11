@@ -31,7 +31,7 @@ export const ChatMessageAssistant = v.object({
 		generationId: v.optional(v.string()),
 		tokenUsage: v.optional(v.number()),
 		outputTokens: v.optional(v.number()),
-		inputTokens: v.optional(v.number()),
+		inputTokens: v.optional(v.number())
 	})
 });
 
@@ -67,7 +67,13 @@ export default defineSchema({
 		userId: v.string(),
 		title: v.string(),
 		updatedAt: v.number(),
-		pinned: v.boolean()
+		pinned: v.boolean(),
+		branchedFrom: v.optional(
+			v.object({
+				chatId: v.id('chat'),
+				messageId: v.id('messages')
+			})
+		)
 	}).index('by_user', ['userId']),
 	chatAttachments: defineTable({
 		userId: v.string(),

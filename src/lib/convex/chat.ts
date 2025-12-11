@@ -1,8 +1,10 @@
 import { v } from 'convex/values';
-import { Doc } from './_generated/dataModel';
+import { Doc, Id } from './_generated/dataModel';
 import { internalMutation, mutation } from './functions';
 import { getChatMessages, getChatMessagesInternal, MessageWithAttachments } from './chat.utils';
 import { internalQuery, query } from './_generated/server';
+import { internal } from './_generated/api';
+import { persistentTextStreaming } from './persistent-text-streaming.utils';
 
 export const getAll = query({
 	args: {},
@@ -135,5 +137,115 @@ export const updateGeneratedTitle = internalMutation({
 			title: args.title,
 			generatingTitle: false
 		});
+	}
+});
+
+export const branchFromMessage = mutation({
+	args: {
+		message: v.union(
+			v.object({
+				_id: v.id('messages'),
+				role: v.literal('user'),
+				modelId: v.string()
+			}),
+			v.object({
+				_id: v.id('messages'),
+				role: v.literal('assistant')
+			})
+		)
+	},
+	handler: async (
+		ctx,
+		args
+	): Promise<{ newChatId: Id<'chat'>; newAssistantMessageId: Id<'messages'> | null }> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		const sourceMessage = await ctx.db.get(args.message._id);
+		if (!sourceMessage || sourceMessage.role !== args.message.role) {
+			throw new Error('Source message not found');
+		}
+
+		const ogChat = await ctx.runQuery(internal.chat.internalGet, { chatId: sourceMessage.chatId });
+		if (!ogChat || ogChat.userId !== user.subject) {
+			throw new Error('Chat not found or you are not authorized to access it');
+		}
+
+		const chatIndex = ogChat.messages.findIndex((m) => m._id === args.message._id);
+		if (chatIndex === -1) {
+			throw new Error('Source message not found in chat');
+		}
+
+		const messages = ogChat.messages.slice(0, chatIndex + 1);
+
+		// copy over the chat
+		const newChatId = await ctx.db.insert('chat', {
+			userId: user.subject,
+			title: ogChat.title,
+			generating: false,
+			updatedAt: Date.now(),
+			pinned: false,
+			branchedFrom: {
+				chatId: ogChat._id,
+				messageId: args.message._id
+			}
+		});
+		// get related attachments
+		const relatedAttachments = (
+			await ctx.db
+				.query('chatAttachments')
+				.withIndex('by_chat', (q) => q.eq('chatId', ogChat._id))
+				.collect()
+		).filter((a) => messages.some((m) => m._id === a.messageId));
+		// copy over the messages with attachments
+		await Promise.all(
+			messages.map(async (m) => {
+				const ogAttachments = relatedAttachments.filter((a) => a.messageId === m._id);
+				let newMessageId: Id<'messages'>;
+				if (m.role === 'user') {
+					newMessageId = await ctx.db.insert('messages', {
+						role: 'user',
+						chatId: newChatId,
+						content: m.content,
+						chatSettings: m.chatSettings
+					});
+				} else {
+					newMessageId = await ctx.db.insert('messages', {
+						role: 'assistant',
+						chatId: newChatId,
+						streamId: m.streamId,
+						meta: m.meta,
+						content: m.content,
+						error: m.error
+					});
+				}
+				// copy over attachments
+				await Promise.all(
+					ogAttachments.map((a) =>
+						ctx.db.insert('chatAttachments', {
+							...a,
+							messageId: newMessageId,
+							chatId: newChatId
+						})
+					)
+				);
+			})
+		);
+
+		let newAssistantMessageId: Id<'messages'> | null = null;
+		// if the source message is a user message we need to generate a new assistant message
+		if (sourceMessage.role === 'user' && args.message.role === 'user') {
+			const streamId = await persistentTextStreaming.createStream(ctx);
+			newAssistantMessageId = await ctx.db.insert('messages', {
+				chatId: newChatId,
+				role: 'assistant',
+				streamId,
+				meta: {
+					modelId: args.message.modelId
+				}
+			});
+		}
+
+		return { newChatId, newAssistantMessageId };
 	}
 });

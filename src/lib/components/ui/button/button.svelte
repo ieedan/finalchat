@@ -113,9 +113,18 @@
 		}
 	}}
 >
-	{#if type !== undefined && loading}
-		<Spinner />
-		<span class="sr-only">Loading</span>
+	{#if size === 'icon'}
+		{#if type !== undefined && loading}
+			<Spinner />
+			<span class="sr-only">Loading</span>
+		{:else}
+			{@render children?.()}
+		{/if}
+	{:else}
+		{#if type !== undefined && loading}
+			<Spinner />
+			<span class="sr-only">Loading</span>
+		{/if}
+		{@render children?.()}
 	{/if}
-	{@render children?.()}
 </svelte:element>

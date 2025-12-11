@@ -9,6 +9,7 @@
 	import { untrack } from 'svelte';
 	import ChatAssistantMessage from './chat-assistant-message.svelte';
 	import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
+	import ChatBranchButton from './chat-branch-button.svelte';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -109,9 +110,7 @@
 							: null,
 						message.meta.cost ? `$${message.meta.cost}` : null,
 						message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null,
-						tokensPerSecond
-							? `${tokensPerSecond} tokens/sec`
-							: null
+						tokensPerSecond ? `${tokensPerSecond} tokens/sec` : null
 					]
 						.filter(Boolean)
 						.join(' ・')}
@@ -120,14 +119,17 @@
 					{/if}
 				{/if}
 			</div>
-			<CopyButton
-				text={message.role === 'assistant'
-					? message.parts
-							.filter((p) => p.type === 'text')
-							.map((p) => p.text)
-							.join('')
-					: message.content}
-			/>
+			<div class="flex items-center gap-1">
+				<ChatBranchButton {message} />
+				<CopyButton
+					text={message.role === 'assistant'
+						? message.parts
+								.filter((p) => p.type === 'text')
+								.map((p) => p.text)
+								.join('')
+						: message.content}
+				/>
+			</div>
 		</div>
 	{/if}
 </div>

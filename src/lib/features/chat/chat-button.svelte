@@ -4,7 +4,7 @@
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
-	import { Ellipsis, PencilIcon, PinIcon, PinOffIcon, TrashIcon } from '@lucide/svelte';
+	import { Ellipsis, PencilIcon, PinIcon, PinOffIcon, SplitIcon, TrashIcon } from '@lucide/svelte';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';
@@ -108,6 +108,18 @@
 					>
 						{#if chat.generating}
 							<Spinner />
+						{:else if chat.branchedFrom}
+							<button
+								type="button"
+								onclick={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+									goto(`/chat/${chat.branchedFrom!.chatId}`);
+								}}
+								class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+							>
+								<SplitIcon class="size-4" />
+							</button>
 						{/if}
 						<Rename.Root
 							this="span"

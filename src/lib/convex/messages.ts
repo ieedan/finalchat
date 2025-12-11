@@ -1,12 +1,8 @@
 import { v } from 'convex/values';
 import { httpAction, internalAction, internalQuery, query } from './_generated/server';
 import { mutation, internalMutation } from './functions';
-import { components, internal } from './_generated/api';
-import {
-	PersistentTextStreaming,
-	StreamId,
-	StreamIdValidator
-} from '@convex-dev/persistent-text-streaming';
+import { internal } from './_generated/api';
+import { StreamId, StreamIdValidator } from '@convex-dev/persistent-text-streaming';
 import { Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { generateText, AISDKError, Experimental_Agent as ToolLoopAgent } from 'ai';
@@ -17,8 +13,7 @@ import {
 } from './chat.utils';
 import { TITLE_GENERATION_MODEL, fetchLinkContentTool } from '../ai.js';
 import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
-
-const persistentTextStreaming = new PersistentTextStreaming(components.persistentTextStreaming);
+import { persistentTextStreaming } from './persistent-text-streaming.utils';
 
 export const Prompt = v.object({
 	modelId: v.string(),
@@ -217,7 +212,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				});
 
 				const agent = new ToolLoopAgent({
-					model: openrouter.chat(last.userMessage.chatSettings.modelId),
+					model: openrouter.chat(last.assistantMessage.meta.modelId),
 					tools: {
 						fetchLinkContent: fetchLinkContentTool
 					},
@@ -293,7 +288,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 						generationId: openRouterGenId,
 						tokenUsage: usage.totalTokens,
 						outputTokens: usage.outputTokens,
-						inputTokens: usage.inputTokens,
+						inputTokens: usage.inputTokens
 					}
 				});
 

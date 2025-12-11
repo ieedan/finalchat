@@ -15,6 +15,7 @@ import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
 import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
 import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
+import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
 
 type ChatLayoutOptions = {
 	user: User;
@@ -125,7 +126,7 @@ type ChatViewOptions = {
 };
 
 class ChatViewState {
-	chatQuery: QueryResult<Doc<'chat'> & { messages: Doc<'messages'>[] }>;
+	chatQuery: QueryResult<Doc<'chat'> & { messages: MessageWithAttachments[] }>;
 	constructor(readonly opts: ChatViewOptions) {
 		this.chatQuery = useCachedQuery(api.chat.get, {
 			chatId: this.opts.chatId
