@@ -218,7 +218,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					},
 					stopWhen: [
 						({ steps }) => {
-							return steps.length >= 5;
+							return steps.length >= 10;
 						}
 					]
 				});
