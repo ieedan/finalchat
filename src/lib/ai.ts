@@ -37,9 +37,23 @@ export const fetchLinkContentTool = tool({
 	inputSchema: z.object({
 		link: z.string()
 	}),
-	execute: async ({ link }) => {
-		const response = await fetch(link);
-		const text = await response.text();
-		return text;
+	execute: async ({ link }, { abortSignal }) => {
+		try {
+			const response = await fetch(link, {
+				method: 'GET',
+				signal: abortSignal
+			});
+			if (!response.ok) {
+				throw new Error(`${response.status} ${response.statusText}`);
+			}
+			const contentType = response.headers.get('content-type');
+			const allowedTypes = ['text/plain', 'text/markdown'];
+			if (allowedTypes.some((type) => contentType?.includes(type))) {
+				return await response.text();
+			}
+			throw new Error('Link response was not markdown. Maybe you need to add .md or .mdx to the end of the link?');
+		} catch (error) {
+			return `Error reading link content: ${error instanceof Error ? error.message : error}`;
+		}
 	}
 });

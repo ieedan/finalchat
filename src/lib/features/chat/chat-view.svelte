@@ -78,6 +78,7 @@
 		</div>
 
 		<div class="sticky bottom-0 pb-4 bg-background rounded-t-lg">
+			
 			<PromptInput.Root
 				bind:modelId={modelId.current}
 				generating={chatViewState.chatQuery.data?.generating}
