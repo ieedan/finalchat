@@ -59,7 +59,7 @@
 			class="flex flex-col w-full max-w-3xl mt-4 px-4 flex-1 border border-border rounded-md py-3 bg-accent"
 		>
 			<p class="text-sm">
-				You're viewing a shared copy of this chat. Start your own chat
+				You're viewing a shared chat. Start your own chat
 				<a href="/chat" class="underline underline-offset-2">here</a>.
 			</p>
 		</div>
