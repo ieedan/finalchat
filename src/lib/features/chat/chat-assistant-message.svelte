@@ -4,6 +4,8 @@
 	import ChatReasoningPart from './chat-reasoning-part.svelte';
 	import Streamdown from './components/streamdown.svelte';
 	import ShinyText from '$lib/components/animations/shiny-text.svelte';
+	import ChatToolPart from './chat-tool-part.svelte';
+	import type { ToolResultPart } from 'ai';
 
 	type Props = {
 		message: ChatMessageAssistant & {
@@ -27,15 +29,7 @@
 			{@const toolCallResult = message.parts.find(
 				(p) => p.type === 'tool-result' && p.toolCallId === part.toolCallId
 			)}
-			<div class="border border-border rounded-md bg-accent">
-				{part.toolCallId}:{part.toolName} was called
-				{#if toolCallResult && toolCallResult.type === 'tool-result'}
-					Got result:
-					<pre>
-                    {JSON.stringify(toolCallResult.output, null, 2)}
-                </pre>
-				{/if}
-			</div>
+			<ChatToolPart tool={{ ...part, result: toolCallResult as ToolResultPart }} />
 		{/if}
 	{/each}
 {/if}

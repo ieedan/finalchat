@@ -8,6 +8,7 @@
 	import { useChatLayout } from './chat.svelte';
 	import { deserializeStream } from '$lib/utils/stream-transport-protocol';
 	import ChatAssistantMessage from './chat-assistant-message.svelte';
+	import ShinyText from '$lib/components/animations/shiny-text.svelte';
 
 	type Props = {
 		message: ChatMessageAssistant;
@@ -34,9 +35,14 @@
 		authToken: accessToken?.current
 	});
 
-	const deserializedResult = $derived(deserializeStream({ text: streamBody.body.text, }));
+	const deserializedResult = $derived(deserializeStream({ text: streamBody.body.text }));
 </script>
 
-{#if deserializedResult.isOk()}
-	<ChatAssistantMessage message={{...message, parts: deserializedResult.value.stack}} animationEnabled={true} />
+{#if streamBody.body.text.length === 0}
+	<ShinyText>Thinking...</ShinyText>
+{:else if deserializedResult.isOk()}
+	<ChatAssistantMessage
+		message={{ ...message, parts: deserializedResult.value.stack }}
+		animationEnabled={true}
+	/>
 {/if}

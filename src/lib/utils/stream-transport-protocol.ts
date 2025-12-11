@@ -1,4 +1,4 @@
-import type { ToolCallPart, ReasoningOutput, TextPart, ToolResultPart, ModelMessage, AssistantModelMessage, FilePart } from 'ai';
+import type { ToolCallPart, ReasoningOutput, TextPart, ToolResultPart, ModelMessage } from 'ai';
 import { type Result, ok, err } from 'nevereverthrow';
 
 export const PROTOCOL_VERSION = 'v1';
@@ -95,7 +95,8 @@ export function deserializeStream({
 > {
 	if (isFirstChunk) {
 		const firstColonIndex = text.indexOf(':');
-		if (firstColonIndex === -1) return err(new DeserializeStreamError('Broken protocol: No version colon found'));
+		if (firstColonIndex === -1)
+			return err(new DeserializeStreamError('Broken protocol: No version colon found'));
 		version = text.slice(0, firstColonIndex);
 		text = text.slice(firstColonIndex + 1);
 	}
@@ -118,17 +119,31 @@ export function deserializeStream({
 	}
 
 	const chunkText = text.slice(nextColonIndex + 1, nextColonIndex + 1 + chunkLength);
-	if (chunkType === 'text' || chunkType === 'reasoning') {
+	if (chunkType === 'text') {
 		const lastChunk = stack[stack.length - 1];
 		// if the last chunk is the same type as the current chunk we just append the text to the last chunk since this isn't a separate part
-		if (lastChunk && lastChunk.type === chunkType) {
+		if (lastChunk && lastChunk.type === 'text') {
 			stack[stack.length - 1] = { ...lastChunk, text: lastChunk.text + chunkText };
 		} else {
-			stack = [...stack, { type: chunkType, text: chunkText }];
+			stack = [...stack, { type: 'text', text: chunkText }];
+		}
+	} else if (chunkType === 'reasoning') {
+		if (chunkText !== '[REDACTED]') {
+			const lastChunk = stack[stack.length - 1];
+			// if the last chunk is the same type as the current chunk we just append the text to the last chunk since this isn't a separate part
+			if (lastChunk && lastChunk.type === 'reasoning') {
+				stack[stack.length - 1] = { ...lastChunk, text: lastChunk.text + chunkText };
+			} else {
+				stack = [...stack, { type: 'reasoning', text: chunkText }];
+			}
 		}
 	} else if (chunkType === 'tool-call' || chunkType === 'tool-result') {
-		const chunkData = JSON.parse(chunkText) as ToolCallPart | ToolResultPart;
-		stack = [...stack, chunkData];
+		try {
+			const chunkData = JSON.parse(chunkText) as ToolCallPart | ToolResultPart;
+			stack = [...stack, chunkData];
+		} catch {
+			return err(new DeserializeStreamError('Broken protocol: Error parsing tool call or result'));
+		}
 	} else {
 		return err(new DeserializeStreamError('Broken protocol: Unknown chunk type'));
 	}
@@ -140,34 +155,82 @@ export function deserializeStream({
 }
 
 export function partsToModelMessage(parts: StreamResult): ModelMessage[] {
-	const assistantMessage = {
-		role: 'assistant',
-		content: [] as Array<TextPart | FilePart | ReasoningOutput | ToolCallPart | ToolResultPart>
-	} satisfies AssistantModelMessage;
+	const messages: ModelMessage[] = [];
 
-	for (const part of parts) {
-		if (part.type === 'tool-result') {
-			assistantMessage.content.push({
-				type: 'tool-result',
-				toolCallId: part.toolCallId,
-				toolName: part.toolName,
-				output: part.output,
-			})
-		} else if (part.type === 'tool-call') {
-			assistantMessage.content.push({
-				toolName: part.toolName,
-				toolCallId: part.toolCallId,
-				input: part.input,
-				type: 'tool-call',
-			} satisfies ToolCallPart)
-		} else if (part.type === 'text' || part.type === 'reasoning') {
-			assistantMessage.content.push({
-				type: part.type,
-				text: part.text,
-			} satisfies TextPart | ReasoningOutput)
+	let currentMessage:
+		| {
+				role: 'assistant';
+				content: (TextPart | ReasoningOutput)[];
+		  }
+		| undefined = undefined;
+
+	function flushMessage() {
+		if (currentMessage) {
+			messages.push(currentMessage);
+			currentMessage = undefined;
 		}
 	}
 
-	const messages: ModelMessage[] = [assistantMessage];
+	for (const part of parts) {
+		if (part.type === 'tool-result') {
+			flushMessage();
+			// Ensure output is always an object, not a string
+			// If output is a string, wrap it in the expected format
+			const output =
+				typeof part.output === 'string'
+					? { type: 'text' as const, value: part.output }
+					: part.output;
+			messages.push({
+				role: 'tool',
+				content: [
+					{
+						type: 'tool-result',
+						toolCallId: part.toolCallId,
+						toolName: part.toolName,
+						output: output
+					}
+				]
+			} as ModelMessage);
+		} else if (part.type === 'tool-call') {
+			flushMessage();
+			messages.push({
+				role: 'assistant',
+				content: [
+					{
+						type: 'tool-call',
+						toolName: part.toolName,
+						toolCallId: part.toolCallId,
+						input: part.input
+					}
+				]
+			});
+		} else if (part.type === 'text' || part.type === 'reasoning') {
+			flushMessage();
+			if (!currentMessage) {
+				currentMessage = {
+					role: 'assistant',
+					content: []
+				};
+			}
+
+			// just to satisfy the types
+			if (part.type === 'text') {
+				currentMessage.content.push({
+					type: 'text',
+					text: part.text
+				});
+			} else if (part.type === 'reasoning') {
+				currentMessage.content.push({
+					type: 'reasoning',
+					text: part.text
+				});
+			}
+		}
+	}
+
+	flushMessage();
+
+	JSON.stringify(messages, null, 2);
+
 	return messages;
 }

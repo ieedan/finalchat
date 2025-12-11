@@ -61,7 +61,7 @@
 	</Card.Header>
 	<Card.Content>
 		<form
-            method="POST"
+			method="POST"
 			onsubmit={(e) => {
 				e.preventDefault();
 				handleSave();
@@ -73,8 +73,7 @@
 				<div>
 					{#if apiKeyInfoResource.current}
 						<span class="text-muted-foreground flex h-6 place-items-center text-xs">
-							${apiKeyInfoResource.current?.usage?.toFixed(3)} / {apiKeyInfoResource.current
-								?.limit
+							${apiKeyInfoResource.current?.usage?.toFixed(3)} / {apiKeyInfoResource.current?.limit
 								? `${apiKeyInfoResource.current?.limit?.toFixed(3)}`
 								: '∞'}
 						</span>

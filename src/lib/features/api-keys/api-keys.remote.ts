@@ -29,4 +29,3 @@ export const createApiKey = command(
 		await locals.convex.mutation(api.apiKeys.createOrUpdate, { key: args.key });
 	}
 );
-

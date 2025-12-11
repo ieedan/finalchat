@@ -16,10 +16,7 @@ import {
 	MessageWithAttachments
 } from './chat.utils';
 import { TITLE_GENERATION_MODEL, fetchLinkContentTool } from '../ai.js';
-import {
-	createChunkAppender,
-	partsToModelMessage
-} from '../utils/stream-transport-protocol';
+import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
 
 const persistentTextStreaming = new PersistentTextStreaming(components.persistentTextStreaming);
 
@@ -228,8 +225,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 						({ steps }) => {
 							return steps.length >= 5;
 						}
-					],
-
+					]
 				});
 
 				const { fullStream, totalUsage } = agent.stream({
@@ -256,7 +252,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 								...(imageParts ?? [])
 							]
 						};
-					}),
+					})
 				});
 
 				let openRouterGenId: string | undefined = undefined;
