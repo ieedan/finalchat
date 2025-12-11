@@ -48,16 +48,16 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 -->
 <div
 	class={cn(
-		'transition-transform left-0 top-2.5 fixed translate-x-[16px] -translate-y-[2px] z-21 duration-200',
+		'transition-transform left-0 top-2.5 fixed translate-x-[16px] z-21 duration-200',
 		// just in case
-		headerTrigger && ''
+		headerTrigger && 'translate-x-[12px]'
 	)}
 >
 	<Sidebar.Trigger />
 </div>
 
 <Sidebar.Root variant="inset">
-	<Sidebar.Header class="pt-0">
+	<Sidebar.Header class="pt-[2px]">
 		<div class="flex items-center justify-center h-9">
 			<a href="/chat" class="text-2xl font-bold">
 				<FinalChat class="size-6" />

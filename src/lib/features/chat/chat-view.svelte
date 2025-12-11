@@ -12,7 +12,7 @@
 	import { ChatAttachmentUploader } from './chat-attachment-uploader.svelte.js';
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import { MetaTags } from '$lib/components/meta-tags';
-	import ShareButton from './components/share-button.svelte';
+	import ShareButton from './chat-share-button.svelte';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -52,11 +52,13 @@
 />
 
 <header class="sticky top-0">
-	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20">
-		<div class="flex items-center gap-2">
-			{#if sidebar.isMobile || !sidebar.open}
-				<div class="size-9"></div>
-			{/if}
+	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20 h-14">
+		<div class="flex items-center gap-4">
+			<div
+				data-visible={sidebar.isMobile || !sidebar.open}
+				class="size-9 data-[visible=false]:w-0 transition-all duration-200"
+			></div>
+			<span class="text-foreground text-sm">{chatViewState.chatQuery.data?.title}</span>
 		</div>
 		<div class="flex items-center gap-2">
 			{#if chatViewState.chatQuery.data}

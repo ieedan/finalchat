@@ -11,6 +11,7 @@
 	import { cn } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte.js';
+	import { useSidebar } from '$lib/components/ui/sidebar';
 
 	let { data } = $props();
 
@@ -35,13 +36,21 @@
 	});
 
 	const isMounted = new IsMounted();
+
+	const sidebar = useSidebar();
 </script>
 
 <MetaTags title={chatQuery.data?.title} description={chatQuery.data?.title} />
 
 <header class="sticky top-0">
-	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20">
-		<div class="flex items-center gap-2"></div>
+	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20 h-14">
+		<div class="flex items-center gap-4">
+			<div
+				data-visible={sidebar.isMobile || !sidebar.open}
+				class="size-9 data-[visible=false]:w-0 transition-all duration-200"
+			></div>
+			<span class="text-foreground text-sm">{chatQuery.data?.title}</span>
+		</div>
 		<div class="flex items-center gap-2"></div>
 	</div>
 	{#if !autoScroll.isAtTop}
