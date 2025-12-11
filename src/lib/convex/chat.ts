@@ -24,7 +24,7 @@ export const get = query({
 	args: {
 		chatId: v.id('chat')
 	},
-	handler: async (ctx, args): Promise<Doc<'chat'> & { messages: Doc<'messages'>[] }> => {
+	handler: async (ctx, args): Promise<Doc<'chat'> & { messages: MessageWithAttachments[] }> => {
 		const user = await ctx.auth.getUserIdentity();
 
 		const chat = await ctx.db.get(args.chatId);

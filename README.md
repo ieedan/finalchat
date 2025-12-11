@@ -11,9 +11,6 @@
 
 ### Chat Features
 
-- [ ] Make it possible to stop the generation of a message
-- [ ] Make simple mode simple
 - [ ] Share mode
 - [ ] Og image generation
 - [ ] Advanced chat input
-- [ ] Settings

@@ -1,4 +1,6 @@
+import z from 'zod';
 import type { Model, ModelId } from './features/chat/types';
+import { tool } from 'ai';
 
 export const TITLE_GENERATION_MODEL = 'google/gemini-2.5-flash' as ModelId;
 
@@ -28,3 +30,16 @@ export const BASIC_MODELS: Model[] = [
 		description: 'Smart and detailed.'
 	}
 ];
+
+export const fetchLinkContentTool = tool({
+	name: 'fetch-link-content',
+	description: 'Fetch the text content of a link',
+	inputSchema: z.object({
+		link: z.string()
+	}),
+	execute: async ({ link }) => {
+		const response = await fetch(link);
+		const text = await response.text();
+		return text;
+	}
+});

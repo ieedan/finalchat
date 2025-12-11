@@ -21,7 +21,6 @@ export const ChatMessageAssistant = v.object({
 	chatId: v.id('chat'),
 	role: v.literal('assistant'),
 	content: v.optional(v.string()),
-	reasoning: v.optional(v.string()),
 	error: v.optional(v.string()),
 	streamId: StreamIdValidator,
 	meta: v.object({
