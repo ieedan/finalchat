@@ -11,11 +11,16 @@
 	import { MetaTags } from '$lib/components/meta-tags';
 	import { FinalChat } from '$lib/components/logos';
 
+	let { data } = $props();
+
 	const chatState = useChatLayout();
 
 	const modelId = ModelIdCtx.get();
 
 	const chatAttachmentUploader = new ChatAttachmentUploader();
+
+	// svelte-ignore state_referenced_locally
+	let query = $state<string>(data.query ?? '');
 
 	const attachmentsList = new PersistedState<{ url: string; key: string }[]>(
 		'new-chat-attachments',
@@ -87,6 +92,7 @@
 			onUpload={chatAttachmentUploader.uploadMany}
 			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
 			bind:attachments={attachmentsList.current}
+			bind:value={query}
 		>
 			<PromptInput.Content>
 				<PromptInput.AttachmentList />
