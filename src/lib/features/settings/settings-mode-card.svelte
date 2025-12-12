@@ -5,10 +5,14 @@
 	import { Button } from '$lib/components/ui/button';
 	import { api } from '$lib/convex/_generated/api';
 	import { useConvexClient } from 'convex-svelte';
+	import { ModelIdCtx } from '$lib/context.svelte';
+	import { BASIC_MODELS } from '$lib/ai';
 
 	const client = useConvexClient();
 
 	const chatLayoutState = useChatLayout();
+
+	const modelId = ModelIdCtx.get();
 
 	let mode = $derived(chatLayoutState.userSettingsQuery.data?.onboarding?.mode ?? 'advanced');
 
@@ -16,6 +20,8 @@
 		await client.mutation(api.userSettings.updateMode, {
 			mode
 		});
+
+		modelId.current = BASIC_MODELS[0].id;
 	}
 </script>
 

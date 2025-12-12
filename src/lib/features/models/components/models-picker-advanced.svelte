@@ -136,6 +136,8 @@
 	let actionsMenuOpen = $state(false);
 
 	const modelIdClipboard = new UseClipboard();
+
+	let commandInputRef = $state<HTMLInputElement | null>(null);
 </script>
 
 <svelte:window
@@ -161,6 +163,7 @@
 			shouldFilter={false}
 		>
 			<Command.Input
+				bind:ref={commandInputRef}
 				placeholder="Search models..."
 				bind:value={search}
 				onkeydown={(e) => {
@@ -275,7 +278,14 @@
 					<Button
 						variant="ghost"
 						size="sm"
-						onclick={() => (mode = mode === 'list' ? 'grid' : 'list')}
+						onclick={() => {
+							commandInputRef?.focus();
+							if (mode === 'list') {
+								mode = 'grid';
+							} else {
+								mode = 'list';
+							}
+						}}
 					>
 						<span class="text-sm flex items-center gap-1.5">
 							{#if gridMode}
@@ -320,11 +330,17 @@
 								</Kbd.Group>
 							</Button>
 							<Separator orientation="vertical" class="h-4!" />
-							<DropdownMenu.Root bind:open={actionsMenuOpen}>
-								<DropdownMenu.Trigger
-									tabindex={-1}
-									class={buttonVariants({ variant: 'ghost', size: 'sm' })}
-								>
+							<DropdownMenu.Root
+								bind:open={actionsMenuOpen}
+								onOpenChange={(state) => {
+									if (!state) {
+										setTimeout(() => {
+											commandInputRef?.focus();
+										}, 0);
+									}
+								}}
+							>
+								<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost', size: 'sm' })}>
 									<span> Actions </span>
 									<Kbd.Group class="**:data-[slot=kbd]:border">
 										<Kbd.Root>{cmdOrCtrl}</Kbd.Root>

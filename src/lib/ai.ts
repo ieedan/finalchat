@@ -28,6 +28,11 @@ export const BASIC_MODELS: Model[] = [
 		id: 'openai/gpt-5.1' as ModelId,
 		name: 'Thoughtful',
 		description: 'Smart and detailed.'
+	},
+	{
+		id: 'google/gemini-2.5-flash-image' as ModelId,
+		name: 'Image',
+		description: 'Image generation model.'
 	}
 ];
 
