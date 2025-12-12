@@ -13,7 +13,6 @@
 		onUpload,
 		onFileRejected,
 		accept,
-		class: className,
 		children,
 		...rest
 	}: FileDropZoneRootProps = $props();

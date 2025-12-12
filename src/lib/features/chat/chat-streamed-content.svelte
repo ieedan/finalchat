@@ -1,3 +1,4 @@
+<!-- svelte-ignore state_referenced_locally -->
 <script lang="ts">
 	import { AccessTokenCtx } from '$lib/context.svelte';
 	import { api } from '$lib/convex/_generated/api';
@@ -25,11 +26,8 @@
 	const streamBody = useStream({
 		getPersistentBody: api.messages.getChatBody,
 		streamUrl: new URL('/messages/stream', env.PUBLIC_CONVEX_SITE_URL),
-		// svelte-ignore state_referenced_locally
 		driven,
-		// svelte-ignore state_referenced_locally
 		chatId: message.chatId,
-		// svelte-ignore state_referenced_locally
 		streamId: message.streamId as StreamId,
 		get apiKey() {
 			return apiKey;

@@ -45,7 +45,7 @@
 	{/each}
 	{#if message.attachments.length > 0}
 		<div class="flex flex-col gap-2 not-first:mt-2">
-			{#each message.attachments as attachment}
+			{#each message.attachments as attachment (attachment.key)}
 				<ChatImageAttachment {attachment} size="lg" />
 			{/each}
 		</div>

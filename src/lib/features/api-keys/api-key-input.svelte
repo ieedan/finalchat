@@ -45,7 +45,7 @@
 			{/if}
 		</Select.Trigger>
 		<Select.Content align="start">
-			{#each storageOptions as option}
+			{#each storageOptions as option (option.label)}
 				<Select.Item value={option.label} class="flex flex-col gap-0 items-start">
 					<div class="flex items-center gap-2">
 						<option.icon class="size-4" />

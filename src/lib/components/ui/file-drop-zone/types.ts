@@ -46,7 +46,7 @@ export type FileDropZoneRootPropsWithoutHTML = WithChildren<{
 }>;
 
 export type FileDropZoneRootProps = FileDropZoneRootPropsWithoutHTML &
-	Omit<HTMLInputAttributes, 'multiple' | 'files' | 'id'>;
+	Omit<HTMLInputAttributes, 'multiple' | 'files' | 'id' | 'class'>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type FileDropZoneTriggerPropsWithoutHTML = WithChildren<WithElementRef<{}>>;

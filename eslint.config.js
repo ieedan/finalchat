@@ -32,7 +32,8 @@ export default defineConfig(
 			],
 			'svelte/no-at-html-tags': 'warn',
 			'svelte/no-useless-mustaches': 'warn',
-			'svelte/no-navigation-without-resolve': 'off'
+			'svelte/no-navigation-without-resolve': 'off',
+			'svelte/no-unused-svelte-ignore': 'off'
 		}
 	},
 	{
