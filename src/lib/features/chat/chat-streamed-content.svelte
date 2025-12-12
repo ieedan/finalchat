@@ -8,9 +8,12 @@
 	import { deserializeStream } from '$lib/utils/stream-transport-protocol';
 	import ChatAssistantMessage from './chat-assistant-message.svelte';
 	import ShinyText from '$lib/components/animations/shiny-text.svelte';
+	import type { Doc } from '$lib/convex/_generated/dataModel';
 
 	type Props = {
-		message: ChatMessageAssistant;
+		message: ChatMessageAssistant & {
+			attachments: (Doc<'chatAttachments'> & { url: string })[];
+		};
 		driven: boolean;
 		apiKey: string | null;
 	};

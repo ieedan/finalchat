@@ -30,7 +30,7 @@
 
 	const chatAttachmentUploader = new ChatAttachmentUploader();
 
-	const attachmentsList = new PersistedState<{ url: string; key: string }[]>(
+	const attachmentsList = new PersistedState<{ url: string; key: string; mediaType: string }[]>(
 		'chat-attachments',
 		[]
 	);

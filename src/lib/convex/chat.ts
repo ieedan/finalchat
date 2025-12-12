@@ -1,7 +1,11 @@
 import { v } from 'convex/values';
-import { Doc, Id } from './_generated/dataModel';
+import type { Doc, Id } from './_generated/dataModel';
 import { internalMutation, mutation } from './functions';
-import { getChatMessages, getChatMessagesInternal, MessageWithAttachments } from './chat.utils';
+import {
+	getChatMessages,
+	getChatMessagesInternal,
+	type MessageWithAttachments
+} from './chat.utils';
 import { internalQuery, query } from './_generated/server';
 import { internal } from './_generated/api';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
@@ -230,12 +234,15 @@ export const branchFromMessage = mutation({
 						role: 'user',
 						chatId: newChatId,
 						content: m.content,
-						chatSettings: m._id === args.message._id && args.message.role === 'user' ? {
-							modelId: args.message.modelId,
-							supportedParameters: args.message.supportedParameters,
-							inputModalities: args.message.inputModalities,
-							outputModalities: args.message.outputModalities
-						} : m.chatSettings
+						chatSettings:
+							m._id === args.message._id && args.message.role === 'user'
+								? {
+										modelId: args.message.modelId,
+										supportedParameters: args.message.supportedParameters,
+										inputModalities: args.message.inputModalities,
+										outputModalities: args.message.outputModalities
+									}
+								: m.chatSettings
 					});
 				} else {
 					newMessageId = await ctx.db.insert('messages', {
@@ -254,7 +261,8 @@ export const branchFromMessage = mutation({
 							messageId: newMessageId,
 							chatId: newChatId,
 							userId: user.subject,
-							key: a.key
+							key: a.key,
+							mediaType: a.mediaType
 						})
 					)
 				);

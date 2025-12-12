@@ -37,7 +37,7 @@
 			<div class="flex items-center justify-between gap-8">
 				<span class="text-muted-foreground">{shortcut.name}</span>
 				<Kbd.Group class="gap-1">
-					{#each shortcut.keys as key}
+					{#each shortcut.keys as key (key)}
 						<Kbd.Root>{key}</Kbd.Root>
 					{/each}
 				</Kbd.Group>

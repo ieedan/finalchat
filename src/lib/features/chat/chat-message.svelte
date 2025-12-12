@@ -10,8 +10,8 @@
 	import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
 	import ChatBranchButton from './chat-branch-button.svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel.js';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 	import { useMedia } from '$lib/hooks/use-media.svelte';
+	import ChatImageAttachment from './chat-image-attachment.svelte';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -72,15 +72,8 @@
 	{#if message.role === 'user'}
 		{#if message.attachments}
 			<div class="w-full justify-end flex items-center gap-2">
-				{#each message.attachments as attachment}
-					<a
-						href={attachment.url}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="overflow-hidden rounded-md border border-border size-[120px]"
-					>
-						<img src={attachment.url} alt="Attachment" class="object-cover" />
-					</a>
+				{#each message.attachments as attachment (attachment.key)}
+					<ChatImageAttachment {attachment} size="sm" />
 				{/each}
 			</div>
 		{/if}
@@ -114,8 +107,12 @@
 								)
 							: null,
 						message.meta.cost ? `$${message.meta.cost}` : null,
-						message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null,
-						tokensPerSecond ? `${tokensPerSecond} tokens/sec` : null
+						...(message.meta.imageGen
+							? [
+									message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null,
+									tokensPerSecond ? `${tokensPerSecond} tokens/sec` : null
+								]
+							: [])
 					]
 						.filter(Boolean)
 						.join(' ・')}

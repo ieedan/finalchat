@@ -8,6 +8,7 @@
 	import type { ToolResultPart } from 'ai';
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import ChatImageAttachment from './chat-image-attachment.svelte';
 
 	type Props = {
 		message: ChatMessageAssistant & {
@@ -29,7 +30,10 @@
 {:else}
 	{#each message.parts as part, i (i)}
 		{#if part.type === 'reasoning'}
-			<ChatReasoningPart {part} isLastPart={i === message.parts.length - 1 && message.attachments.length === 0} />
+			<ChatReasoningPart
+				{part}
+				isLastPart={i === message.parts.length - 1 && message.attachments.length === 0}
+			/>
 		{:else if part.type === 'text'}
 			<Streamdown content={part.text} {animationEnabled} />
 		{:else if part.type === 'tool-call'}
@@ -42,17 +46,10 @@
 	{#if message.attachments.length > 0}
 		<div class="flex flex-col gap-2 not-first:mt-2">
 			{#each message.attachments as attachment}
-				<a
-					href={attachment.url}
-					target="_blank"
-					rel="noopener noreferrer"
-					class="rounded-md overflow-hidden max-w-sm"
-				>
-					<img src={attachment.url} alt="Attachment" class="object-cover" />
-				</a>
+				<ChatImageAttachment {attachment} size="lg" />
 			{/each}
 		</div>
 	{:else if message.meta.imageGen}
-		<Skeleton class="max-w-sm w-full aspect-square"/>
+		<Skeleton class="max-w-sm w-full aspect-square" />
 	{/if}
 {/if}

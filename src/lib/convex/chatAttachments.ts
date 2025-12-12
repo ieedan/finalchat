@@ -2,25 +2,9 @@ import { v } from 'convex/values';
 import { internalMutation, mutation } from './functions';
 import { R2, type R2Callbacks } from '@convex-dev/r2';
 import { components, internal } from './_generated/api';
-import { internalQuery, query } from './_generated/server';
+import { httpAction, internalQuery, query } from './_generated/server';
 import { env } from '../env.convex';
-import { urlAlphabet, customAlphabet } from 'nanoid';
-
-const nanoid = customAlphabet(urlAlphabet, 12);
-
-/** UserId.nanoid() */
-export type UploadKey = `${string}.${string}`;
-
-function parseUploadKey(uploadKey: UploadKey): {
-	userId: string;
-	key: string;
-} {
-	const [userId, key] = uploadKey.split('.');
-	return {
-		userId,
-		key
-	};
-}
+import { createKey, parseUploadKey, type UploadKey } from './chatAttachments.utils';
 
 export const r2 = new R2(components.r2, {
 	R2_ACCESS_KEY_ID: env.R2_ACCESS_KEY_ID,
@@ -61,7 +45,7 @@ export const generateUploadUrl = mutation({
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) throw new Error('Unauthorized');
 
-		return await r2.generateUploadUrl(`${user.subject}.${nanoid()}`);
+		return await r2.generateUploadUrl(createKey(user));
 	}
 });
 
@@ -114,14 +98,36 @@ export const create = internalMutation({
 		chatId: v.id('chat'),
 		messageId: v.id('messages'),
 		key: v.string(),
-		userId: v.string()
+		userId: v.string(),
+		mediaType: v.string()
 	},
 	handler: async (ctx, args) => {
 		await ctx.db.insert('chatAttachments', {
 			chatId: args.chatId,
 			messageId: args.messageId,
 			key: args.key,
-			userId: args.userId
+			userId: args.userId,
+			mediaType: args.mediaType
 		});
 	}
+});
+
+export const downloadFile = httpAction(async (ctx, request) => {
+	const user = await ctx.auth.getUserIdentity();
+	if (!user) throw new Error('Unauthorized not');
+
+	const { key } = await request.json();
+
+	const { userId } = parseUploadKey(key as UploadKey);
+	if (userId !== user.subject) throw new Error('Unauthorized');
+
+	const response = await fetch(
+		await ctx.runQuery(internal.chatAttachments.internalGetFileUrl, { key })
+	);
+
+	const newResponse = new Response(response.body, response);
+
+	newResponse.headers.set('Access-Control-Allow-Origin', 'http://localhost:5173');
+
+	return newResponse;
 });

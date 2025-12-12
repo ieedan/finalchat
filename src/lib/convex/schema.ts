@@ -1,7 +1,7 @@
 import { StreamIdValidator } from '@convex-dev/persistent-text-streaming';
 import { defineSchema, defineTable } from 'convex/server';
-import { Infer, v } from 'convex/values';
-import { Id } from './_generated/dataModel';
+import { type Infer, v } from 'convex/values';
+import type { Id } from './_generated/dataModel';
 
 export const ChatMessageUser = v.object({
 	chatId: v.id('chat'),
@@ -84,7 +84,8 @@ export default defineSchema({
 		userId: v.string(),
 		chatId: v.id('chat'),
 		messageId: v.id('messages'),
-		key: v.string()
+		key: v.string(),
+		mediaType: v.string()
 	})
 		.index('by_chat', ['chatId'])
 		.index('by_message', ['messageId'])

@@ -1,9 +1,9 @@
-import { DataModel, Doc, Id } from './_generated/dataModel';
+import type { DataModel, Doc, Id } from './_generated/dataModel';
 import type { GenericMutationCtx, GenericQueryCtx } from 'convex/server';
 import type { ChatMessageAssistant, ChatMessageUser } from './schema';
 import { asyncMap } from 'convex-helpers';
 import { internal } from './_generated/api';
-import { deserializeStream, StreamResult } from '../utils/stream-transport-protocol';
+import { deserializeStream, type StreamResult } from '../utils/stream-transport-protocol';
 
 export type MessageWithAttachments =
 	| (ChatMessageUser & {

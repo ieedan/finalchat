@@ -7,10 +7,9 @@
 
 	let {
 		class: className,
-		children,
 		onclick,
 		...rest
-	}: Omit<HTMLButtonAttributes, 'type'> = $props();
+	}: Omit<HTMLButtonAttributes, 'type' | 'children'> = $props();
 
 	const dismissState = usePromptInputBannerDismiss({
 		onclick: box.with(() => onclick)

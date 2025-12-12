@@ -220,7 +220,7 @@
 						{/each}
 					</Command.Group>
 				{:else}
-					{#each modelsByLab as [lab, models]}
+					{#each modelsByLab as [lab, models] (lab)}
 						<Command.Group
 							heading={lab}
 							class={cn(

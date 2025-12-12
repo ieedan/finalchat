@@ -2,26 +2,27 @@ import { v } from 'convex/values';
 import { httpAction, internalAction, internalQuery, query } from './_generated/server';
 import { mutation, internalMutation } from './functions';
 import { internal } from './_generated/api';
-import { StreamId, StreamIdValidator } from '@convex-dev/persistent-text-streaming';
-import { Doc, Id } from './_generated/dataModel';
+import { type StreamId, StreamIdValidator } from '@convex-dev/persistent-text-streaming';
+import type { Doc, Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import {
 	generateText,
 	AISDKError,
 	Experimental_Agent as ToolLoopAgent,
-	StreamTextResult,
-	ModelMessage,
+	type StreamTextResult,
+	type ModelMessage,
 	streamText
 } from 'ai';
 import {
 	getChatMessagesInternal,
 	getLastUserAndAssistantMessages,
-	MessageWithAttachments
+	type MessageWithAttachments
 } from './chat.utils';
 import { TITLE_GENERATION_MODEL, fetchLinkContentTool } from '../ai.js';
 import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './chatAttachments';
+import { createKey } from './chatAttachments.utils';
 
 export const Prompt = v.object({
 	modelId: v.string(),
@@ -30,7 +31,8 @@ export const Prompt = v.object({
 		v.array(
 			v.object({
 				url: v.string(),
-				key: v.string()
+				key: v.string(),
+				mediaType: v.string()
 			})
 		)
 	),
@@ -97,7 +99,8 @@ export const create = mutation({
 						chatId,
 						messageId: userMessageId,
 						key: attachment.key,
-						userId: user.subject
+						userId: user.subject,
+						mediaType: attachment.mediaType
 					});
 				})
 			);
@@ -198,6 +201,9 @@ export const generateChatTitle = internalAction({
 });
 
 export const streamMessage = httpAction(async (ctx, request) => {
+	const user = await ctx.auth.getUserIdentity();
+	if (!user) throw new Error('Unauthorized');
+
 	const { streamId, chatId, apiKey } = (await request.json()) as {
 		streamId: StreamId;
 		chatId: Id<'chat'>;
@@ -342,6 +348,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 									}
 
 									const key = await r2.store(ctx, bytes, {
+										key: createKey(user),
 										type: file.mediaType
 									});
 
@@ -349,7 +356,8 @@ export const streamMessage = httpAction(async (ctx, request) => {
 										chatId,
 										messageId: last.assistantMessage._id,
 										key,
-										userId: chat.userId
+										userId: chat.userId,
+										mediaType: file.mediaType
 									});
 								})()
 							);

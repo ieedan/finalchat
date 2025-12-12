@@ -2,7 +2,7 @@ import {
 	mutation as rawMutation,
 	internalMutation as rawInternalMutation
 } from './_generated/server';
-import { DataModel } from './_generated/dataModel';
+import type { DataModel } from './_generated/dataModel';
 import { Triggers } from 'convex-helpers/server/triggers';
 import { customCtx, customMutation } from 'convex-helpers/server/customFunctions';
 

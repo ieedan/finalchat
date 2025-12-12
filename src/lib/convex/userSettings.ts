@@ -1,6 +1,6 @@
 import { query } from './_generated/server';
 import { mutation } from './functions';
-import { Doc } from './_generated/dataModel';
+import type { Doc } from './_generated/dataModel';
 import { getUserSettings } from './userSettings.utils';
 import merge from 'deepmerge';
 import { v } from 'convex/values';

@@ -19,6 +19,7 @@
 	};
 </script>
 
+<!-- svelte-ignore state_referenced_locally -->
 <script lang="ts" generics="TagName extends TextElementTagNames">
 	import { cn } from '$lib/utils.js';
 	import { box } from 'svelte-toolbelt';

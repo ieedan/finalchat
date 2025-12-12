@@ -24,7 +24,7 @@
 		...rest
 	}: HTMLAttributes<HTMLDivElement> & {
 		onSubmit: OnSubmit;
-		onUpload: (files: File[]) => Promise<{ url: string; key: string }[]>;
+		onUpload: (files: File[]) => Promise<{ url: string; key: string; mediaType: string }[]>;
 		onDeleteAttachment: (key: string) => Promise<void>;
 		generating?: boolean;
 		/**
@@ -34,7 +34,7 @@
 		optimisticClear?: boolean;
 		value?: string;
 		modelId?: ModelId | null;
-		attachments?: { url: string; key: string }[];
+		attachments?: { url: string; key: string; mediaType: string }[];
 	} = $props();
 
 	const promptInputState = usePromptInput({

@@ -19,10 +19,10 @@ export class ChatAttachmentUploader {
 		await this.client.mutation(api.chatAttachments.deleteObject, { key });
 	}
 
-	async upload(file: File): Promise<{ url: string; key: string }> {
+	async upload(file: File): Promise<{ url: string; key: string; mediaType: string }> {
 		const key = await this.uploadFile(file);
 		const url = await this.client.query(api.chatAttachments.getFileUrl, { key });
-		return { url, key };
+		return { url, key, mediaType: file.type };
 	}
 
 	async uploadMany(files: File[]) {

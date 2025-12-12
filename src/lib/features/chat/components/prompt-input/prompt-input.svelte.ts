@@ -8,7 +8,7 @@ import { SvelteMap } from 'svelte/reactivity';
 export type OnSubmit = (opts: {
 	input: string;
 	modelId: ModelId;
-	attachments: { url: string; key: string }[];
+	attachments: { url: string; key: string; mediaType: string }[];
 }) => Promise<void>;
 
 type PromptInputRootStateOptions = ReadableBoxedValues<{
@@ -16,13 +16,13 @@ type PromptInputRootStateOptions = ReadableBoxedValues<{
 	submitOnEnter?: boolean;
 	optimisticClear?: boolean;
 	generating: boolean;
-	onUpload: (files: File[]) => Promise<{ url: string; key: string }[]>;
+	onUpload: (files: File[]) => Promise<{ url: string; key: string; mediaType: string }[]>;
 	onDeleteAttachment: (key: string) => Promise<void>;
 }> &
 	WritableBoxedValues<{
 		value: string;
 		modelId: ModelId | null;
-		attachments: { url: string; key: string }[];
+		attachments: { url: string; key: string; mediaType: string }[];
 	}>;
 
 class PromptInputRootState {
@@ -53,7 +53,8 @@ class PromptInputRootState {
 				...this.opts.attachments.current,
 				...uploadedImages.map((uploadedImage) => ({
 					url: uploadedImage.url,
-					key: uploadedImage.key
+					key: uploadedImage.key,
+					mediaType: uploadedImage.mediaType
 				}))
 			];
 		} catch (error) {
