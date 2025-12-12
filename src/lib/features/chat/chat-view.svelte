@@ -123,6 +123,7 @@
 							{#if chatLayoutState.isAdvancedMode}
 								{#if lastAssistantMessage?.meta.tokenUsage !== undefined && selectedModel?.context_length !== undefined}
 									<PromptInput.ContextIndicator
+										class="hidden md:block"
 										tokensUsed={lastAssistantMessage.meta.tokenUsage}
 										contextLength={selectedModel.context_length}
 									/>

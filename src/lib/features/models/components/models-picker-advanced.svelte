@@ -152,8 +152,8 @@
 		actionsMenuOpen = false;
 	}}
 >
-	<Popover.Trigger class={buttonVariants({ variant: 'input' })}>
-		<span>{selectedModel?.name}</span>
+	<Popover.Trigger class={cn(buttonVariants({ variant: 'input' }), 'max-w-[175px] md:max-w-none')}>
+		<span class="truncate">{selectedModel?.name}</span>
 		<ChevronDownIcon class="size-4" />
 	</Popover.Trigger>
 	<Popover.Content class="p-0 w-fit" align="start" {animated} side="top">

@@ -2,13 +2,15 @@
 	import { Gauge } from '$lib/components/ui/gauge';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { formatNumberShort } from '$lib/utils/number-format';
+	import { cn } from '$lib/utils';
 
 	type Props = {
 		tokensUsed: number;
 		contextLength: number;
+		class?: string;
 	};
 
-	let { tokensUsed, contextLength }: Props = $props();
+	let { tokensUsed, contextLength, class: className }: Props = $props();
 
 	const usedPercent = $derived((tokensUsed / contextLength) * 100);
 </script>
@@ -16,7 +18,7 @@
 <Tooltip.Provider>
 	<Tooltip.Root delayDuration={250}>
 		<Tooltip.Trigger>
-			<Gauge value={usedPercent} max={100} class="size-5" />
+			<Gauge value={usedPercent} max={100} class={cn('size-5', className)} />
 		</Tooltip.Trigger>
 		<Tooltip.Content>
 			{usedPercent.toFixed(0)}% ・{formatNumberShort(tokensUsed)} / {formatNumberShort(

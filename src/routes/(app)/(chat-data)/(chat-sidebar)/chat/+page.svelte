@@ -57,11 +57,11 @@
 <MetaTags title="New Chat" />
 
 <div class="w-full h-full flex-col items-center justify-center flex px-4 gap-8">
-	<div class="flex w-full items-center flex-col">
+	<div class="flex w-full items-center flex-col h-full justify-center md:h-auto">
 		<FinalChat class="size-20" />
 	</div>
 	{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
-		<div class="flex flex-col gap-0 w-full max-w-sm">
+		<div class="md:flex flex-col gap-0 w-full max-w-sm hidden">
 			{#each shortcuts as shortcut (shortcut.name)}
 				<div class="flex items-center justify-between gap-8 px-3 py-2.5 rounded-lg group">
 					<div class="flex items-center gap-3">
@@ -85,7 +85,7 @@
 	{:else}
 		<h1 class="text-3xl font-bold">{greeting()}, {chatState.user.firstName}!</h1>
 	{/if}
-	<div class="flex flex-col gap-4 w-full items-center">
+	<div class="flex flex-col gap-4 w-full items-center pb-4">
 		<PromptInput.Root
 			bind:modelId={modelId.current}
 			onSubmit={chatState.handleSubmit}
