@@ -10,6 +10,8 @@
 	import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
 	import ChatBranchButton from './chat-branch-button.svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel.js';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
+	import { useMedia } from '$lib/hooks/use-media.svelte';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -57,6 +59,8 @@
 		}
 		return null;
 	});
+
+	const media = useMedia();
 </script>
 
 <div
@@ -103,6 +107,7 @@
 			<div>
 				{#if message.role === 'assistant'}
 					{@const metadata = [
+						media.lg ? message.meta.modelId : null,
 						message.meta.startedGenerating && message.meta.stoppedGenerating
 							? formatDuration(
 									(message.meta.stoppedGenerating - message.meta.startedGenerating) as Milliseconds

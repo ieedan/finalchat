@@ -12,6 +12,7 @@
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { FinalChat } from '$lib/components/logos';
+	// import { navigating } from '$app/stores';
 
 	const chatContext = useChatLayout();
 
@@ -40,6 +41,15 @@
 	const sidebar = Sidebar.useSidebar();
 
 	const headerTrigger = $derived(sidebar.isMobile || !sidebar.open);
+
+	// auto close sidebar when navigating to settings or back to chat
+	// navigating.subscribe((nav) => {
+	// 	if (nav?.to?.url.pathname.includes('/settings') && nav.from?.url.pathname.includes('/chat')) {
+	// 		sidebar.setOpen(false);
+	// 	} else if (nav?.to?.url.pathname.includes('/chat') && nav.from?.url.pathname.includes('/settings')) {
+	// 		sidebar.setOpen(true);
+	// 	}
+	// })
 </script>
 
 <!-- 

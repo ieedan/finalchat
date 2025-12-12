@@ -32,7 +32,11 @@
 <Popover.Root>
 	<Popover.Trigger class={cn(buttonVariants({ variant: 'outline' }))}>Share</Popover.Trigger>
 	<Popover.Content align="end" {animated} class="w-sm flex flex-col gap-2">
-		<RadioGroup.Root bind:value class="border border-border rounded-lg gap-0 bg-input" onValueChange={updatePublic}>
+		<RadioGroup.Root
+			bind:value
+			class="border border-border rounded-lg gap-0 bg-input"
+			onValueChange={updatePublic}
+		>
 			{@render option({
 				icon: LockIcon,
 				label: 'Private',

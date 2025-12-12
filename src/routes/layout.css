@@ -98,3 +98,7 @@ html {
 	@apply overscroll-none;
 	color-scheme: dark;
 }
+
+.bg-popover {
+	--input: var(--background);
+}

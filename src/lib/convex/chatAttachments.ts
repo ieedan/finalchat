@@ -2,7 +2,7 @@ import { v } from 'convex/values';
 import { internalMutation, mutation } from './functions';
 import { R2, type R2Callbacks } from '@convex-dev/r2';
 import { components, internal } from './_generated/api';
-import { internalQuery } from './_generated/server';
+import { internalQuery, query } from './_generated/server';
 import { env } from '../env.convex';
 import { urlAlphabet, customAlphabet } from 'nanoid';
 
@@ -62,6 +62,23 @@ export const generateUploadUrl = mutation({
 		if (!user) throw new Error('Unauthorized');
 
 		return await r2.generateUploadUrl(`${user.subject}.${nanoid()}`);
+	}
+});
+
+export const getFileUrl = query({
+	args: {
+		key: v.string()
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		const { userId } = parseUploadKey(args.key as UploadKey);
+		if (userId !== user.subject) throw new Error('Unauthorized');
+
+		return await r2.getUrl(args.key, {
+			expiresIn: undefined // never expire, this just makes it easier
+		});
 	}
 });
 

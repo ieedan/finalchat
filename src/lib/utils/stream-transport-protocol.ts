@@ -151,7 +151,12 @@ export function deserializeStream({
 	const remainingText = text.slice(nextColonIndex + 1 + chunkLength);
 	if (remainingText.length === 0) return ok({ stack, remainingText: null, version });
 
-	const nextResult = deserializeStream({ text: remainingText, stack, isFirstChunk: false, version });
+	const nextResult = deserializeStream({
+		text: remainingText,
+		stack,
+		isFirstChunk: false,
+		version
+	});
 	if (nextResult.isOk()) return nextResult;
 	// return partial stream
 	return ok({ stack, remainingText: null, version });

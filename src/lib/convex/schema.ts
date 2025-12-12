@@ -8,7 +8,10 @@ export const ChatMessageUser = v.object({
 	role: v.literal('user'),
 	content: v.string(),
 	chatSettings: v.object({
-		modelId: v.string()
+		modelId: v.string(),
+		supportedParameters: v.optional(v.array(v.string())),
+		inputModalities: v.optional(v.array(v.string())),
+		outputModalities: v.optional(v.array(v.string()))
 	})
 });
 
@@ -25,6 +28,7 @@ export const ChatMessageAssistant = v.object({
 	streamId: StreamIdValidator,
 	meta: v.object({
 		modelId: v.string(),
+		imageGen: v.optional(v.boolean()),
 		cost: v.optional(v.number()),
 		startedGenerating: v.optional(v.number()),
 		stoppedGenerating: v.optional(v.number()),
@@ -86,5 +90,12 @@ export default defineSchema({
 		.index('by_message', ['messageId'])
 		.index('by_key', ['key'])
 		.index('by_user', ['userId']),
-	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
+	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId']),
+	agents: defineTable({
+		userId: v.string(),
+		name: v.string(),
+		modelId: v.string(),
+		systemPrompt: v.string(),
+		color: v.optional(v.string())
+	}).index('by_user', ['userId'])
 });

@@ -51,7 +51,9 @@ export const fetchLinkContentTool = tool({
 			if (allowedTypes.some((type) => contentType?.includes(type))) {
 				return await response.text();
 			}
-			throw new Error('Link response was not markdown. Maybe you need to add .md or .mdx to the end of the link?');
+			throw new Error(
+				'Link response was not markdown. Maybe you need to add .md or .mdx to the end of the link?'
+			);
 		} catch (error) {
 			return `Error reading link content: ${error instanceof Error ? error.message : error}`;
 		}

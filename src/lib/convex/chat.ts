@@ -46,9 +46,12 @@ export const getPublic = query({
 	args: {
 		chatId: v.id('chat')
 	},
-	handler: async (ctx, args): Promise<(Doc<'chat'> & { messages: MessageWithAttachments[] }) | null> => {
+	handler: async (
+		ctx,
+		args
+	): Promise<(Doc<'chat'> & { messages: MessageWithAttachments[] }) | null> => {
 		const chat = await ctx.db.get(args.chatId);
-		if (!chat || !chat.public) return null
+		if (!chat || !chat.public) return null;
 
 		const messages = await getChatMessages(ctx, args.chatId);
 
@@ -163,7 +166,10 @@ export const branchFromMessage = mutation({
 			v.object({
 				_id: v.id('messages'),
 				role: v.literal('user'),
-				modelId: v.string()
+				modelId: v.string(),
+				supportedParameters: v.array(v.string()),
+				inputModalities: v.array(v.string()),
+				outputModalities: v.array(v.string())
 			}),
 			v.object({
 				_id: v.id('messages'),
@@ -224,7 +230,12 @@ export const branchFromMessage = mutation({
 						role: 'user',
 						chatId: newChatId,
 						content: m.content,
-						chatSettings: m.chatSettings
+						chatSettings: m._id === args.message._id && args.message.role === 'user' ? {
+							modelId: args.message.modelId,
+							supportedParameters: args.message.supportedParameters,
+							inputModalities: args.message.inputModalities,
+							outputModalities: args.message.outputModalities
+						} : m.chatSettings
 					});
 				} else {
 					newMessageId = await ctx.db.insert('messages', {
@@ -240,9 +251,10 @@ export const branchFromMessage = mutation({
 				await Promise.all(
 					ogAttachments.map((a) =>
 						ctx.db.insert('chatAttachments', {
-							...a,
 							messageId: newMessageId,
-							chatId: newChatId
+							chatId: newChatId,
+							userId: user.subject,
+							key: a.key
 						})
 					)
 				);

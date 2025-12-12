@@ -3,9 +3,16 @@ import { httpAction, internalAction, internalQuery, query } from './_generated/s
 import { mutation, internalMutation } from './functions';
 import { internal } from './_generated/api';
 import { StreamId, StreamIdValidator } from '@convex-dev/persistent-text-streaming';
-import { Id } from './_generated/dataModel';
+import { Doc, Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { generateText, AISDKError, Experimental_Agent as ToolLoopAgent } from 'ai';
+import {
+	generateText,
+	AISDKError,
+	Experimental_Agent as ToolLoopAgent,
+	StreamTextResult,
+	ModelMessage,
+	streamText
+} from 'ai';
 import {
 	getChatMessagesInternal,
 	getLastUserAndAssistantMessages,
@@ -14,6 +21,7 @@ import {
 import { TITLE_GENERATION_MODEL, fetchLinkContentTool } from '../ai.js';
 import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
+import { r2 } from './chatAttachments';
 
 export const Prompt = v.object({
 	modelId: v.string(),
@@ -25,7 +33,10 @@ export const Prompt = v.object({
 				key: v.string()
 			})
 		)
-	)
+	),
+	supportedParameters: v.array(v.string()),
+	inputModalities: v.array(v.string()),
+	outputModalities: v.array(v.string())
 });
 
 export const create = mutation({
@@ -71,7 +82,10 @@ export const create = mutation({
 			role: 'user',
 			content: args.prompt.input,
 			chatSettings: {
-				modelId: args.prompt.modelId
+				modelId: args.prompt.modelId,
+				supportedParameters: args.prompt.supportedParameters,
+				inputModalities: args.prompt.inputModalities,
+				outputModalities: args.prompt.outputModalities
 			}
 		});
 
@@ -89,13 +103,17 @@ export const create = mutation({
 			);
 		}
 
+		const isImageModel =
+			args.prompt.outputModalities.length === 1 && args.prompt.outputModalities[0] === 'image';
+
 		const streamId = await persistentTextStreaming.createStream(ctx);
 		const assistantMessageId = await ctx.db.insert('messages', {
 			chatId,
 			role: 'assistant',
 			streamId,
 			meta: {
-				modelId: args.prompt.modelId
+				modelId: args.prompt.modelId,
+				imageGen: isImageModel
 			}
 		});
 
@@ -193,7 +211,9 @@ export const streamMessage = httpAction(async (ctx, request) => {
 		async (ctx, _request, _streamId, append) => {
 			let last: ReturnType<typeof getLastUserAndAssistantMessages> | null = null;
 			try {
-				const messages = await ctx.runQuery(internal.messages.getMessagesForChat, { chatId });
+				const { messages, chat } = await ctx.runQuery(internal.messages.getMessagesForChat, {
+					chatId
+				});
 
 				last = getLastUserAndAssistantMessages(messages);
 				if (!last) {
@@ -211,44 +231,76 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					apiKey
 				});
 
-				const agent = new ToolLoopAgent({
-					model: openrouter.chat(last.assistantMessage.meta.modelId),
-					tools: {
-						fetchLinkContent: fetchLinkContentTool
-					},
-					stopWhen: [
-						({ steps }) => {
-							return steps.length >= 10;
-						}
-					]
+				// convert messages into model messages
+				const modelMessages: ModelMessage[] = messages.flatMap((message) => {
+					if (message.role === 'assistant') {
+						const modelMessages = partsToModelMessage(message.parts);
+
+						return [
+							...modelMessages,
+							...(message.attachments.length > 0
+								? [
+										{
+											role: 'assistant' as const,
+											content: [
+												...message.attachments.map((attachment) => ({
+													type: 'file' as const,
+													data: attachment.url,
+													mediaType: 'image'
+												}))
+											]
+										}
+									]
+								: [])
+						];
+					}
+
+					const imageParts = message.attachments?.map(
+						(attachment) =>
+							({
+								type: 'image',
+								image: attachment.url
+							}) as const
+					);
+
+					return {
+						role: message.role,
+						content: [
+							{
+								type: 'text',
+								text: message.content ?? ''
+							},
+							...(imageParts ?? [])
+						]
+					};
 				});
 
-				const { fullStream, totalUsage } = agent.stream({
-					messages: messages.flatMap((message) => {
-						if (message.role === 'assistant') {
-							return partsToModelMessage(message.parts);
-						}
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				let streamResult: StreamTextResult<any, unknown>;
+				if (last.userMessage.chatSettings.supportedParameters?.includes('tools')) {
+					const agent = new ToolLoopAgent({
+						model: openrouter.chat(last.userMessage.chatSettings.modelId),
+						tools: {
+							fetchLinkContent: fetchLinkContentTool
+						},
+						stopWhen: [
+							({ steps }) => {
+								return steps.length >= 10;
+							}
+						]
+					});
 
-						const imageParts = message.attachments?.map(
-							(attachment) =>
-								({
-									type: 'image',
-									image: attachment.url
-								}) as const
-						);
+					streamResult = agent.stream({
+						messages: modelMessages
+					});
+				} else {
+					streamResult = streamText({
+						model: openrouter.chat(last.userMessage.chatSettings.modelId),
+						messages: modelMessages
+					});
+				}
 
-						return {
-							role: message.role,
-							content: [
-								{
-									type: 'text',
-									text: message.content ?? ''
-								},
-								...(imageParts ?? [])
-							]
-						};
-					})
-				});
+				const { fullStream, totalUsage } = streamResult;
 
 				let openRouterGenId: string | undefined = undefined;
 				let content = '';
@@ -259,6 +311,8 @@ export const streamMessage = httpAction(async (ctx, request) => {
 						content += chunk;
 					}
 				});
+
+				const uploadPromises: Promise<void>[] = [];
 
 				for await (const chunk of fullStream) {
 					if (chunk.type === 'text-delta') {
@@ -276,10 +330,39 @@ export const streamMessage = httpAction(async (ctx, request) => {
 							// @ts-expect-error - TODO: for some reason the output is unknown
 							output: chunk.output
 						});
+					} else if (chunk.type === 'file') {
+						const file = chunk.file;
+						if (file.mediaType.startsWith('image/')) {
+							uploadPromises.push(
+								(async () => {
+									const binaryString = atob(file.base64);
+									const bytes = new Uint8Array(binaryString.length);
+									for (let i = 0; i < binaryString.length; i++) {
+										bytes[i] = binaryString.charCodeAt(i);
+									}
+
+									const key = await r2.store(ctx, bytes, {
+										type: file.mediaType
+									});
+
+									await ctx.runMutation(internal.chatAttachments.create, {
+										chatId,
+										messageId: last.assistantMessage._id,
+										key,
+										userId: chat.userId
+									});
+								})()
+							);
+						}
 					}
 				}
 
 				const usage = await totalUsage;
+
+				// wait for uploads to complete
+				if (uploadPromises.length > 0) {
+					await Promise.all(uploadPromises);
+				}
 
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
@@ -393,11 +476,19 @@ export const getMessagesForChat = internalQuery({
 	args: {
 		chatId: v.id('chat')
 	},
-	handler: async (ctx, args): Promise<MessageWithAttachments[]> => {
+	handler: async (
+		ctx,
+		args
+	): Promise<{ chat: Doc<'chat'>; messages: MessageWithAttachments[] }> => {
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat) throw new Error('Chat not found');
 
-		return await getChatMessagesInternal(ctx, args.chatId);
+		const messages = await getChatMessagesInternal(ctx, args.chatId);
+
+		return {
+			chat,
+			messages
+		};
 	}
 });
 

@@ -23,10 +23,11 @@
 		</div>
 	</div>
 </header>
-<AccountSettings.Root>
+<AccountSettings.Root class="max-w-full">
 	<AccountSettings.Sidebar>
 		<AccountSettings.SidebarGroup>
 			<AccountSettings.SidebarButton href="/settings">Account</AccountSettings.SidebarButton>
+			<AccountSettings.SidebarButton href="/settings/agents">Agents</AccountSettings.SidebarButton>
 			<AccountSettings.SidebarButton href="/settings/customization">
 				Customization
 			</AccountSettings.SidebarButton>

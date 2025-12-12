@@ -8,11 +8,14 @@
 	import SplitIcon from '@lucide/svelte/icons/split';
 	import { useConvexClient } from 'convex-svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel';
+	import { useChatLayout } from './chat.svelte';
 
 	type Props = {
 		message: MessageWithAttachments;
 		createdMessages: Set<Id<'messages'>> | null;
 	};
+
+	const chatLayoutState = useChatLayout();
 
 	let { message, createdMessages = $bindable() }: Props = $props();
 
@@ -22,16 +25,25 @@
 
 	async function branchFromMessage() {
 		if (modelId.current === null) return;
+		const model = chatLayoutState.models.find((m) => m.id === modelId.current);
 
 		const { newChatId, newAssistantMessageId } = await client.mutation(
 			api.chat.branchFromMessage,
 			message.role === 'assistant'
-				? { message: { _id: message._id, role: 'assistant' } }
+				? {
+						message: {
+							_id: message._id,
+							role: 'assistant'
+						}
+					}
 				: {
 						message: {
 							_id: message._id,
 							role: 'user',
-							modelId: modelId.current
+							modelId: modelId.current,
+							supportedParameters: model?.supported_parameters ?? [],
+							inputModalities: model?.architecture.input_modalities ?? ['text'],
+							outputModalities: model?.architecture.output_modalities ?? ['text']
 						}
 					}
 		);

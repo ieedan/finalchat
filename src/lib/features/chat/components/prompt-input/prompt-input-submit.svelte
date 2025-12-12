@@ -4,7 +4,6 @@
 	import SendIcon from '@lucide/svelte/icons/send';
 	import { usePromptInputSubmit } from './prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
-	import SquareIcon from '@lucide/svelte/icons/square';
 
 	let {
 		variant = 'default',
@@ -31,9 +30,7 @@
 >
 	{#if children}
 		{@render children()}
-	{:else if submitState.rootState.opts.generating.current}
-		<SquareIcon class="fill-current" />
-	{:else}
+	{:else if !submitState.rootState.loading}
 		<SendIcon class="group-data-[loading=true]:hidden" />
 	{/if}
 </Button>

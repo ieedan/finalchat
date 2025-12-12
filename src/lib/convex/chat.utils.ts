@@ -7,10 +7,11 @@ import { deserializeStream, StreamResult } from '../utils/stream-transport-proto
 
 export type MessageWithAttachments =
 	| (ChatMessageUser & {
-			attachments?: (Doc<'chatAttachments'> & { url: string })[];
+			attachments: (Doc<'chatAttachments'> & { url: string })[];
 	  })
 	| (ChatMessageAssistant & {
 			parts: StreamResult;
+			attachments: (Doc<'chatAttachments'> & { url: string })[];
 	  });
 
 export async function getChatMessages(
@@ -23,24 +24,6 @@ export async function getChatMessages(
 		.collect();
 
 	const messagesWithAttachments = asyncMap(messages, async (message) => {
-		if (message.role === 'assistant') {
-			const deserializedContentResult = deserializeStream({
-				text: message.content ?? '',
-				stack: []
-			});
-			if (deserializedContentResult.isErr()) {
-				return {
-					...message,
-					parts: []
-				};
-			}
-
-			return {
-				...message,
-				parts: deserializedContentResult.value.stack
-			};
-		}
-
 		const attachments = await ctx.db
 			.query('chatAttachments')
 			.withIndex('by_message', (q) => q.eq('messageId', message._id))
@@ -55,6 +38,26 @@ export async function getChatMessages(
 				url
 			};
 		});
+
+		if (message.role === 'assistant') {
+			const deserializedContentResult = deserializeStream({
+				text: message.content ?? '',
+				stack: []
+			});
+			if (deserializedContentResult.isErr()) {
+				return {
+					...message,
+					attachments: attachmentsWithUrl,
+					parts: []
+				};
+			}
+
+			return {
+				...message,
+				attachments: attachmentsWithUrl,
+				parts: deserializedContentResult.value.stack
+			};
+		}
 
 		return {
 			...message,
@@ -75,24 +78,6 @@ export async function getChatMessagesInternal(
 		.collect();
 
 	const messagesWithAttachments = asyncMap(messages, async (message) => {
-		if (message.role === 'assistant') {
-			const deserializedContentResult = deserializeStream({
-				text: message.content ?? '',
-				stack: []
-			});
-			if (deserializedContentResult.isErr()) {
-				return {
-					...message,
-					parts: []
-				};
-			}
-
-			return {
-				...message,
-				parts: deserializedContentResult.value.stack
-			};
-		}
-
 		const attachments = await ctx.db
 			.query('chatAttachments')
 			.withIndex('by_message', (q) => q.eq('messageId', message._id))
@@ -107,6 +92,26 @@ export async function getChatMessagesInternal(
 				url
 			};
 		});
+
+		if (message.role === 'assistant') {
+			const deserializedContentResult = deserializeStream({
+				text: message.content ?? '',
+				stack: []
+			});
+			if (deserializedContentResult.isErr()) {
+				return {
+					...message,
+					attachments: attachmentsWithUrl,
+					parts: []
+				};
+			}
+
+			return {
+				...message,
+				parts: deserializedContentResult.value.stack,
+				attachments: attachmentsWithUrl
+			};
+		}
 
 		return {
 			...message,

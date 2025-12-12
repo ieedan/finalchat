@@ -7,7 +7,7 @@ export async function load({ params, locals }) {
 		chatId: params.chatId as Id<'chat'>
 	});
 
-    if (!chat) error(404, 'Chat not found');
+	if (!chat) error(404, 'Chat not found');
 
 	return {
 		chat

@@ -93,13 +93,18 @@ class ChatLayoutState {
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments }) => {
+		const model = this.models.find((m) => m.id === modelId);
+		if (!model) throw new Error(`Model with id: ${modelId} not found`);
 		const { chatId, assistantMessageId } = await this.client.mutation(api.messages.create, {
 			chatId: this.chatId,
 			apiKey: this.apiKey ?? '',
 			prompt: {
 				input,
 				modelId,
-				attachments
+				attachments,
+				supportedParameters: model.supported_parameters,
+				inputModalities: model.architecture.input_modalities,
+				outputModalities: model.architecture.output_modalities
 			}
 		});
 
