@@ -17,6 +17,9 @@ export function parseUploadKey(uploadKey: UploadKey): {
 	};
 }
 
-export function createKey(user: UserIdentity): UploadKey {
+export function createKey(user: string | UserIdentity): UploadKey {
+	if (typeof user === 'string') {
+		return `${user}.${nanoid()}`;
+	}
 	return `${user.subject}.${nanoid()}`;
 }

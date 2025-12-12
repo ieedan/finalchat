@@ -17,9 +17,10 @@
 		};
 		driven: boolean;
 		apiKey: string | null;
+		systemPrompt: string | null;
 	};
 
-	let { message, driven, apiKey }: Props = $props();
+	let { message, driven, apiKey, systemPrompt }: Props = $props();
 
 	const accessToken = AccessTokenCtx.get();
 
@@ -32,7 +33,8 @@
 		get apiKey() {
 			return apiKey;
 		},
-		authToken: accessToken?.current
+		authToken: accessToken?.current,
+		systemPrompt
 	});
 
 	const deserializedResult = $derived(deserializeStream({ text: streamBody.body.text }));

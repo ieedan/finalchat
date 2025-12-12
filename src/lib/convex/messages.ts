@@ -201,13 +201,11 @@ export const generateChatTitle = internalAction({
 });
 
 export const streamMessage = httpAction(async (ctx, request) => {
-	const user = await ctx.auth.getUserIdentity();
-	if (!user) throw new Error('Unauthorized');
-
-	const { streamId, chatId, apiKey } = (await request.json()) as {
+	const { streamId, chatId, apiKey, systemPrompt } = (await request.json()) as {
 		streamId: StreamId;
 		chatId: Id<'chat'>;
 		apiKey: string | undefined;
+		systemPrompt: string | undefined;
 	};
 
 	const response = await persistentTextStreaming.stream(
@@ -281,6 +279,16 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					};
 				});
 
+				if (systemPrompt) {
+					modelMessages.unshift({
+						role: 'system',
+						content: `The following prompt has been provided by the user to customize your behavior.
+<user_prompt>
+${systemPrompt}
+</user_prompt>`
+					});
+				}
+
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				let streamResult: StreamTextResult<any, unknown>;
 				if (last.userMessage.chatSettings.supportedParameters?.includes('tools')) {
@@ -348,7 +356,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 									}
 
 									const key = await r2.store(ctx, bytes, {
-										key: createKey(user),
+										key: createKey(chat.userId),
 										type: file.mediaType
 									});
 

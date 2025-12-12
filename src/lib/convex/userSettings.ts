@@ -100,3 +100,20 @@ export const removeFavoriteModel = mutation({
 		});
 	}
 });
+
+export const updateSystemPrompt = mutation({
+	args: {
+		systemPrompt: v.string()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return;
+
+		const userSettings = await getUserSettings(ctx, user);
+		if (!userSettings) return;
+
+		await ctx.db.patch(userSettings?._id, {
+			systemPrompt: args.systemPrompt
+		});
+	}
+});

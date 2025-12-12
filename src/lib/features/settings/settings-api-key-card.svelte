@@ -8,6 +8,7 @@
 	import type { ApiKey } from '../models/openrouter';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { resource } from 'runed';
+	import { toast } from 'svelte-sonner';
 
 	const chatLayoutState = useChatLayout();
 
@@ -26,6 +27,7 @@
 			await createApiKey({ key: apiKey }).updates(chatLayoutState.apiKeysQuery);
 			localApiKey.current = null;
 		}
+		toast.success('API key updated!');
 		loading = false;
 	}
 

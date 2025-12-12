@@ -56,7 +56,8 @@ export default defineSchema({
 				completed: v.optional(v.boolean())
 			})
 		),
-		favoriteModelIds: v.array(v.string())
+		favoriteModelIds: v.array(v.string()),
+		systemPrompt: v.optional(v.string())
 	}).index('by_user', ['userId']),
 	apiKeys: defineTable({
 		userId: v.string(),
@@ -91,12 +92,5 @@ export default defineSchema({
 		.index('by_message', ['messageId'])
 		.index('by_key', ['key'])
 		.index('by_user', ['userId']),
-	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId']),
-	agents: defineTable({
-		userId: v.string(),
-		name: v.string(),
-		modelId: v.string(),
-		systemPrompt: v.string(),
-		color: v.optional(v.string())
-	}).index('by_user', ['userId'])
+	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
 });

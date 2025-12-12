@@ -27,9 +27,10 @@
 		message: MessageWithAttachments;
 		createdMessages: Set<Id<'messages'>> | null;
 		apiKey: string | null;
+		systemPrompt: string | null;
 	};
 
-	let { message, createdMessages = $bindable(null), apiKey }: Props = $props();
+	let { message, createdMessages = $bindable(null), apiKey, systemPrompt }: Props = $props();
 
 	// this is weird but basically we only care if we transition to a driven state not if we transition out of it
 	let driven = $state(false);
@@ -86,7 +87,7 @@
 				<span class="text-destructive">{message.error}</span>
 			{:else}
 				{#key createdMessages?.has(message._id)}
-					<ChatStreamedContent {message} {driven} {apiKey} />
+					<ChatStreamedContent {message} {driven} {apiKey} {systemPrompt} />
 				{/key}
 			{/if}
 		{:else}

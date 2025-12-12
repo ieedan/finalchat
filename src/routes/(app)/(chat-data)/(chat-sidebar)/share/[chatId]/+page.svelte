@@ -78,6 +78,7 @@
 					{message}
 					apiKey={chatLayoutState.apiKey}
 					bind:createdMessages={chatLayoutState.createdMessages}
+					systemPrompt={chatLayoutState.userSettingsQuery.data?.systemPrompt ?? null}
 				/>
 			{/each}
 		</div>

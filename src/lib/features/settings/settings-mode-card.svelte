@@ -7,6 +7,7 @@
 	import { useConvexClient } from 'convex-svelte';
 	import { ModelIdCtx } from '$lib/context.svelte';
 	import { BASIC_MODELS } from '$lib/ai';
+	import { toast } from 'svelte-sonner';
 
 	const client = useConvexClient();
 
@@ -22,7 +23,13 @@
 		});
 
 		modelId.current = BASIC_MODELS[0].id;
+
+		toast.success('Mode updated!');
 	}
+
+	const modeHasChanged = $derived(
+		mode !== chatLayoutState.userSettingsQuery.data?.onboarding?.mode
+	);
 </script>
 
 <Card.Root>
@@ -33,7 +40,7 @@
 	<Card.Content class="flex flex-col gap-4">
 		<ChooseModeField bind:mode />
 		<div class="flex items-center justify-end">
-			<Button onClickPromise={handleChangeMode}>Save</Button>
+			<Button onClickPromise={handleChangeMode} disabled={!modeHasChanged}>Save</Button>
 		</div>
 	</Card.Content>
 </Card.Root>

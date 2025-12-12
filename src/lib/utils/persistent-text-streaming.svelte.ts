@@ -14,7 +14,8 @@ export function useStream({
 	chatId,
 	authToken,
 	apiKey,
-	headers
+	headers,
+	systemPrompt
 }: {
 	getPersistentBody: FunctionReference<'query', 'public', { streamId: string }, StreamBody>;
 	streamUrl: URL;
@@ -29,6 +30,7 @@ export function useStream({
 	apiKey: string | null;
 	// If provided, these will be passed as additional headers.
 	headers?: Record<string, string>;
+	systemPrompt?: string | null;
 }) {
 	let streamEnded = $state<boolean | null>(null);
 	let streamBody = $state<string>('');
@@ -50,7 +52,7 @@ export function useStream({
 			void (async () => {
 				const success = await startStreaming(
 					streamUrl,
-					{ streamId, chatId, apiKey },
+					{ streamId, chatId, apiKey, systemPrompt },
 					(text) => {
 						streamBody += text;
 					},
@@ -120,6 +122,7 @@ async function startStreaming(
 		streamId: StreamId;
 		chatId: Id<'chat'>;
 		apiKey: string | null;
+		systemPrompt?: string | null;
 	},
 	onUpdate: (text: string) => void,
 	headers: Record<string, string>

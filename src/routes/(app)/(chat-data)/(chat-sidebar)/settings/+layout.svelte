@@ -23,23 +23,25 @@
 		</div>
 	</div>
 </header>
-<AccountSettings.Root class="max-w-full">
-	<AccountSettings.Sidebar>
-		<AccountSettings.SidebarGroup>
-			<AccountSettings.SidebarButton href="/settings">Account</AccountSettings.SidebarButton>
-			<AccountSettings.SidebarButton href="/settings/agents">Agents</AccountSettings.SidebarButton>
-			<AccountSettings.SidebarButton href="/settings/customization">
-				Customization
-			</AccountSettings.SidebarButton>
-			<AccountSettings.SidebarButton href="/settings/history">
-				History
-			</AccountSettings.SidebarButton>
-			<AccountSettings.SidebarButton href="/settings/attachments">
-				Attachments
-			</AccountSettings.SidebarButton>
-		</AccountSettings.SidebarGroup>
-	</AccountSettings.Sidebar>
-	<AccountSettings.Content>
-		{@render children()}
-	</AccountSettings.Content>
-</AccountSettings.Root>
+
+<div class="flex flex-col place-items-center">
+	<AccountSettings.Root class="w-full max-w-5xl">
+		<AccountSettings.Sidebar class="lg:border-r-0">
+			<AccountSettings.SidebarGroup>
+				<AccountSettings.SidebarButton href="/settings">Account</AccountSettings.SidebarButton>
+				<AccountSettings.SidebarButton href="/settings/customization">
+					Customization
+				</AccountSettings.SidebarButton>
+				<AccountSettings.SidebarButton href="/settings/history">
+					History
+				</AccountSettings.SidebarButton>
+				<AccountSettings.SidebarButton href="/settings/attachments">
+					Attachments
+				</AccountSettings.SidebarButton>
+			</AccountSettings.SidebarGroup>
+		</AccountSettings.Sidebar>
+		<AccountSettings.Content>
+			{@render children()}
+		</AccountSettings.Content>
+	</AccountSettings.Root>
+</div>
