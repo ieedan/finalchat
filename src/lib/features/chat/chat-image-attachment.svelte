@@ -9,7 +9,7 @@
 	import { tv } from 'tailwind-variants';
 
 	const imageAttachmentVariants = tv({
-		base: 'rounded-md overflow-hidden max-w-sm relative',
+		base: 'rounded-md overflow-hidden max-w-sm relative border border-border group/image',
 		variants: {
 			size: {
 				sm: 'max-w-2xs',
@@ -49,7 +49,9 @@
 </script>
 
 <div class={cn(imageAttachmentVariants({ size }), className)}>
-	<div class="absolute right-2 top-2">
+	<div
+		class="absolute right-2 top-2 md:opacity-0 group-hover/image:opacity-100 transition-opacity duration-200"
+	>
 		<Button
 			onclick={() =>
 				downloadImage(
@@ -62,7 +64,9 @@
 			<DownloadIcon class="size-4" />
 		</Button>
 	</div>
-	<div class="absolute left-2 top-2">
+	<div
+		class="absolute left-2 top-2 md:opacity-0 group-hover/image:opacity-100 transition-opacity duration-200"
+	>
 		<Button
 			href={attachment.url}
 			size="icon"

@@ -10,6 +10,13 @@
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { MetaTags } from '$lib/components/meta-tags';
 	import { FinalChat } from '$lib/components/logos';
+	import {
+		ArrowRightIcon,
+		MessageSquarePlusIcon,
+		MousePointerClickIcon,
+		PanelLeftIcon,
+		SendIcon
+	} from '@lucide/svelte';
 
 	let { data } = $props();
 
@@ -28,26 +35,11 @@
 	);
 
 	const shortcuts = $derived([
-		{
-			name: 'New Chat',
-			keys: [cmdOrCtrl, '⇧', 'O']
-		},
-		{
-			name: 'Model Picker',
-			keys: [cmdOrCtrl, '⇧', 'M']
-		},
-		{
-			name: 'Go to Chat',
-			keys: [cmdOrCtrl, 'G']
-		},
-		{
-			name: 'Sidebar',
-			keys: [cmdOrCtrl, 'B']
-		},
-		{
-			name: 'Submit',
-			keys: [cmdOrCtrl, 'Enter']
-		}
+		{ name: 'New Chat', keys: [cmdOrCtrl, '⇧', 'O'], icon: MessageSquarePlusIcon },
+		{ name: 'Model Picker', keys: [cmdOrCtrl, '⇧', 'M'], icon: MousePointerClickIcon },
+		{ name: 'Go to Chat', keys: [cmdOrCtrl, 'G'], icon: ArrowRightIcon },
+		{ name: 'Sidebar', keys: [cmdOrCtrl, 'B'], icon: PanelLeftIcon },
+		{ name: 'Submit', keys: [cmdOrCtrl, 'Enter'], icon: SendIcon }
 	]);
 
 	const greeting = $derived(() => {
@@ -69,13 +61,22 @@
 		<FinalChat class="size-20" />
 	</div>
 	{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
-		<div class="flex flex-col gap-2 w-full max-w-sm">
+		<div class="flex flex-col gap-0 w-full max-w-sm">
 			{#each shortcuts as shortcut (shortcut.name)}
-				<div class="flex items-center justify-between gap-8">
-					<span class="text-muted-foreground">{shortcut.name}</span>
+				<div class="flex items-center justify-between gap-8 px-3 py-2.5 rounded-lg group">
+					<div class="flex items-center gap-3">
+						<div class="flex items-center justify-center size-5 rounded-xs bg-muted/50">
+							<shortcut.icon class="size-4 text-primary" />
+						</div>
+						<span class="text-sm font-medium text-muted-foreground">
+							{shortcut.name}
+						</span>
+					</div>
 					<Kbd.Group class="gap-1">
 						{#each shortcut.keys as key (key)}
-							<Kbd.Root>{key}</Kbd.Root>
+							<Kbd.Root class="rounded-xs">
+								{key}
+							</Kbd.Root>
 						{/each}
 					</Kbd.Group>
 				</div>
