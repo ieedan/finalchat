@@ -181,6 +181,7 @@ class PromptInputSubmitState {
 		disabled:
 			(this.rootState.opts.value.current.trim().length === 0 &&
 				!this.rootState.opts.generating.current) ||
+			this.rootState.uploadingAttachments.size > 0 ||
 			this.opts.disabled.current,
 		loading: this.rootState.loading,
 		'data-generating': this.rootState.opts.generating.current
