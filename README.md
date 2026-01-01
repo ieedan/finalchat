@@ -15,7 +15,6 @@
 - [ ] Work on the mobile experience
 - [ ] Allow customization of font
 - [ ] Custom 404 page
-- [ ] Make model picker go into native mode on mobile
 - [ ] Edit messages
 - [ ] Regenerate messages
 
