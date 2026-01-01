@@ -94,7 +94,7 @@
 			<Streamdown content={message.content} animationEnabled={false} />
 		{/if}
 	</div>
-	{#if message.content}
+	{#if message.content !== undefined}
 		<div
 			class="justify-between w-full group-hover/message-container:opacity-100 md:opacity-0 flex items-center gap-1 transition-opacity duration-200"
 		>
@@ -124,14 +124,16 @@
 			</div>
 			<div class="flex items-center gap-1">
 				<ChatBranchButton {message} bind:createdMessages />
-				<CopyButton
-					text={message.role === 'assistant'
-						? message.parts
-								.filter((p) => p.type === 'text')
-								.map((p) => p.text)
-								.join('')
-						: message.content}
-				/>
+				{#if message.content}
+					<CopyButton
+						text={message.role === 'assistant'
+							? message.parts
+									.filter((p) => p.type === 'text')
+									.map((p) => p.text)
+									.join('')
+							: message.content}
+					/>
+				{/if}
 			</div>
 		</div>
 	{/if}

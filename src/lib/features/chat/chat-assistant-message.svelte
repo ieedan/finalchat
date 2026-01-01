@@ -21,7 +21,7 @@
 	let { message, animationEnabled }: Props = $props();
 </script>
 
-{#if message.parts.length === 0}
+{#if message.parts.length === 0 && message.attachments.length === 0}
 	{#if message.meta.stoppedGenerating === undefined}
 		<ShinyText>Thinking...</ShinyText>
 	{:else}

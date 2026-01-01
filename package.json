@@ -4,7 +4,9 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "dotenvx run -f .env.local -- concurrently -n convex,app -c blue,green \"convex dev\" \"vite dev\"",
+		"dev": "dotenvx run -f .env.local -- concurrently -n convex,app -c blue,green \"pnpm dev:convex\" \"pnpm dev:vite\"",
+		"dev:vite": "vite dev --host",
+		"dev:convex": "convex dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",

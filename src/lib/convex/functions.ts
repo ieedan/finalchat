@@ -5,6 +5,7 @@ import {
 import type { DataModel } from './_generated/dataModel';
 import { Triggers } from 'convex-helpers/server/triggers';
 import { customCtx, customMutation } from 'convex-helpers/server/customFunctions';
+import { r2 } from './chatAttachments';
 
 const triggers = new Triggers<DataModel>();
 
@@ -20,6 +21,15 @@ triggers.register('chat', async (ctx, change) => {
 
 		for (const message of messages) {
 			await ctx.db.delete(message._id);
+		}
+
+		const attachments = await ctx.db
+			.query('chatAttachments')
+			.withIndex('by_chat', (q) => q.eq('chatId', id))
+			.collect();
+
+		for (const attachment of attachments) {
+			await r2.deleteObject(ctx, attachment.key);
 		}
 	}
 });

@@ -71,7 +71,7 @@
 })}
 	<label
 		for={v}
-		class="py-3 px-4 has-data-[state=checked]:bg-accent hover:cursor-pointer last:rounded-b-lg first:rounded-t-lg flex items-center gap-4 justify-between"
+		class="py-3 px-4 bg-popover has-data-[state=checked]:bg-accent hover:cursor-pointer last:rounded-b-lg first:rounded-t-lg flex items-center gap-4 justify-between"
 	>
 		<div class="flex items-center gap-4">
 			<Icon class="size-4" />
