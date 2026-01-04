@@ -40,15 +40,15 @@
 </script>
 
 <div
-	style="display: flex; flex-direction: column; width: 100%; height: 100%; background: #1c1c1c; color: #fafafa; padding: 48px; font-family: system-ui, -apple-system, sans-serif;"
+	tw="flex flex-col w-full h-full bg-background text-foreground p-12 font-sans"
 >
 	<!-- Logo in top left - using SVG directly -->
-	<div style="display: flex; align-items: center; margin-bottom: 48px;">
+	<div tw="flex items-center mb-12">
 		<svg
 			width="48"
 			height="48"
 			viewBox="0 0 464 369"
-			style="fill: #d97706;"
+			tw="text-primary"
 		>
 			<g transform="matrix(1,0,0,1,-744.674384,-723.689943)">
 				<g transform="matrix(0.990844,-0.130447,0.140819,1.069625,308.164017,323.729868)">
@@ -62,16 +62,12 @@
 	</div>
 
 	<!-- Messages -->
-	<div style="display: flex; flex-direction: column; gap: 24px; flex: 1; justify-content: center;">
+	<div tw="flex flex-col gap-6 flex-1 justify-center">
 		{#if userMessage && displayUserText}
 			<!-- User message - matches bg-secondary styling -->
-			<div
-				style="display: flex; flex-direction: column; align-items: flex-end; width: 100%;"
-			>
-				<div
-					style="background: #3a3a3a; color: #fafafa; padding: 20px; border-radius: 12px; max-width: 85%;"
-				>
-					<p style="margin: 0; font-size: 18px; line-height: 1.6; word-break: break-word;">
+			<div tw="flex flex-col items-end w-full">
+				<div tw="bg-secondary text-secondary-foreground p-5 rounded-lg max-w-[85%]">
+					<p tw="m-0 text-lg leading-relaxed break-words">
 						{displayUserText}
 					</p>
 				</div>
@@ -80,13 +76,9 @@
 
 		{#if assistantMessage && displayAssistantText}
 			<!-- Assistant message - matches bg-background styling -->
-			<div
-				style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;"
-			>
-				<div
-					style="background: #1c1c1c; color: #fafafa; padding: 20px; border-radius: 12px; max-width: 85%;"
-				>
-					<p style="margin: 0; font-size: 18px; line-height: 1.6; word-break: break-word;">
+			<div tw="flex flex-col items-start w-full">
+				<div tw="bg-background text-foreground p-5 rounded-lg max-w-[85%]">
+					<p tw="m-0 text-lg leading-relaxed break-words">
 						{displayAssistantText}
 					</p>
 				</div>
