@@ -99,10 +99,10 @@
 	<!-- Badge -->
 	<div
 		class="absolute bottom-12 right-12 px-4 py-2"
-		style="background-color: #2a2a2a; color: #fafafa; border-radius: 9999px;"
+		style="color: #fafafa; border-radius: 9999px;"
 	>
 		<p class="m-0 text-xs font-medium">
-			Check out {displayTitle} on finalchat.app
+			Check out {displayTitle} on finalchat.app!
 		</p>
 	</div>
 </div>
