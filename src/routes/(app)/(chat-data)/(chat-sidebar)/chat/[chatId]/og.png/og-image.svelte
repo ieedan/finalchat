@@ -95,9 +95,9 @@
 
 	<!-- Badge -->
 	<div
-		class="absolute bottom-12 right-12 px-4 py-2"
-		style="background-color: #3a3a3a; color: #fafafa; border-radius: 8px;"
+		class="absolute bottom-12 right-12 px-3 py-1.5"
+		style="background-color: #2a2a2a; color: #fafafa; border-radius: 9999px;"
 	>
-		<p class="m-0 text-sm font-medium">finalchat.app</p>
+		<p class="m-0 text-xs font-medium">finalchat.app</p>
 	</div>
 </div>
