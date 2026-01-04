@@ -24,7 +24,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		return await new ImageResponse(OgImage, {
 			props: {
 				userMessage: firstUserMessage,
-				assistantMessage: firstAssistantMessage
+				assistantMessage: firstAssistantMessage,
+				title: chat.title
 			},
 			width: 1200,
 			height: 630

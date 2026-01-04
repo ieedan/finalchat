@@ -3,10 +3,12 @@
 
 	let {
 		userMessage,
-		assistantMessage
+		assistantMessage,
+		title
 	}: {
 		userMessage: MessageWithAttachments | undefined;
 		assistantMessage: MessageWithAttachments | undefined;
+		title: string;
 	} = $props();
 
 	// Extract text content from messages
@@ -37,6 +39,7 @@
 
 	const displayUserText = truncateText(userText, 200);
 	const displayAssistantText = truncateText(assistantText, 400);
+	const displayTitle = truncateText(title, 40);
 </script>
 
 <div
@@ -95,9 +98,11 @@
 
 	<!-- Badge -->
 	<div
-		class="absolute bottom-12 right-12 px-3 py-1.5"
+		class="absolute bottom-12 right-12 px-4 py-2"
 		style="background-color: #2a2a2a; color: #fafafa; border-radius: 9999px;"
 	>
-		<p class="m-0 text-xs font-medium">finalchat.app</p>
+		<p class="m-0 text-xs font-medium">
+			Check out {displayTitle} on finalchat.app
+		</p>
 	</div>
 </div>
