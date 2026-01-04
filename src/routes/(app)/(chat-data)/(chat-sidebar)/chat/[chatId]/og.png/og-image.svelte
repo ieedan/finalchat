@@ -40,11 +40,11 @@
 </script>
 
 <div
-	class="flex flex-col w-full h-full p-12 font-sans"
+	class="flex flex-col w-full h-full p-12 font-sans relative"
 	style="background-color: #1c1c1c; color: #fafafa;"
 >
 	<!-- Logo in top left - using SVG directly -->
-	<div class="flex items-center mb-12">
+	<div class="absolute top-12 left-12 flex items-center">
 		<svg
 			width="48"
 			height="48"
