@@ -19,13 +19,46 @@
 
 	const getAssistantMessageText = (message: MessageWithAttachments | undefined): string => {
 		if (!message || message.role !== 'assistant') return '';
+		let text = '';
 		if (message.parts) {
-			return message.parts
+			text = message.parts
 				.filter((p) => p.type === 'text')
 				.map((p) => p.text)
 				.join('');
+		} else {
+			text = message.content || '';
 		}
-		return message.content || '';
+		return stripMarkdown(text);
+	};
+
+	const stripMarkdown = (text: string): string => {
+		return text
+			// Remove code blocks (```code```)
+			.replace(/```[\s\S]*?```/g, '')
+			// Remove inline code (`code`)
+			.replace(/`[^`]*`/g, '')
+			// Remove headers (# Header)
+			.replace(/^#{1,6}\s+(.+)$/gm, '$1')
+			// Remove bold (**text** or __text__)
+			.replace(/\*\*([^*]+)\*\*/g, '$1')
+			.replace(/__([^_]+)__/g, '$1')
+			// Remove italic (*text* or _text_)
+			.replace(/\*([^*]+)\*/g, '$1')
+			.replace(/_([^_]+)_/g, '$1')
+			// Remove links [text](url)
+			.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+			// Remove images ![alt](url)
+			.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '')
+			// Remove strikethrough (~~text~~)
+			.replace(/~~([^~]+)~~/g, '$1')
+			// Remove blockquotes (> text)
+			.replace(/^>\s+(.+)$/gm, '$1')
+			// Remove list markers (-, *, +, 1., etc.)
+			.replace(/^[\s]*[-*+]\s+(.+)$/gm, '$1')
+			.replace(/^[\s]*\d+\.\s+(.+)$/gm, '$1')
+			// Clean up extra whitespace
+			.replace(/\n{3,}/g, '\n\n')
+			.trim();
 	};
 
 	const userText = getUserMessageText(userMessage);
