@@ -83,7 +83,7 @@
 			<div class="flex flex-col items-start w-full">
 				<div
 					class="p-5 max-w-[85%]"
-					style="background-color: #1c1c1c; color: #fafafa; border-radius: 12px;"
+					style="background-color: #1c1c1c; color: #fafafa; border-radius: 12px; border: 1px solid #3a3a3a;"
 				>
 					<p class="m-0 text-lg leading-relaxed break-words">
 						{displayAssistantText}
