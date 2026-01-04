@@ -40,15 +40,16 @@
 </script>
 
 <div
-	tw="flex flex-col w-full h-full bg-background text-foreground p-12 font-sans"
+	class="flex flex-col w-full h-full p-12 font-sans"
+	style="background-color: #1c1c1c; color: #fafafa;"
 >
 	<!-- Logo in top left - using SVG directly -->
-	<div tw="flex items-center mb-12">
+	<div class="flex items-center mb-12">
 		<svg
 			width="48"
 			height="48"
 			viewBox="0 0 464 369"
-			tw="text-primary"
+			style="color: #d97706;"
 		>
 			<g transform="matrix(1,0,0,1,-744.674384,-723.689943)">
 				<g transform="matrix(0.990844,-0.130447,0.140819,1.069625,308.164017,323.729868)">
@@ -62,12 +63,15 @@
 	</div>
 
 	<!-- Messages -->
-	<div tw="flex flex-col gap-6 flex-1 justify-center">
+	<div class="flex flex-col gap-6 flex-1 justify-center">
 		{#if userMessage && displayUserText}
 			<!-- User message - matches bg-secondary styling -->
-			<div tw="flex flex-col items-end w-full">
-				<div tw="bg-secondary text-secondary-foreground p-5 rounded-lg max-w-[85%]">
-					<p tw="m-0 text-lg leading-relaxed break-words">
+			<div class="flex flex-col items-end w-full">
+				<div
+					class="p-5 max-w-[85%]"
+					style="background-color: #3a3a3a; color: #fafafa; border-radius: 12px;"
+				>
+					<p class="m-0 text-lg leading-relaxed break-words">
 						{displayUserText}
 					</p>
 				</div>
@@ -76,9 +80,12 @@
 
 		{#if assistantMessage && displayAssistantText}
 			<!-- Assistant message - matches bg-background styling -->
-			<div tw="flex flex-col items-start w-full">
-				<div tw="bg-background text-foreground p-5 rounded-lg max-w-[85%]">
-					<p tw="m-0 text-lg leading-relaxed break-words">
+			<div class="flex flex-col items-start w-full">
+				<div
+					class="p-5 max-w-[85%]"
+					style="background-color: #1c1c1c; color: #fafafa; border-radius: 12px;"
+				>
+					<p class="m-0 text-lg leading-relaxed break-words">
 						{displayAssistantText}
 					</p>
 				</div>
