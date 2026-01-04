@@ -83,6 +83,7 @@
 		"zod": "^4.1.13"
 	},
 	"dependencies": {
-		"animated-svelte": "link:../../../Library/pnpm/global/5/node_modules/animated-svelte"
+		"animated-svelte": "link:../../../Library/pnpm/global/5/node_modules/animated-svelte",
+		"remove-markdown": "^0.6.2"
 	}
 }

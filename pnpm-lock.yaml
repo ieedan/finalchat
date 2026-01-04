@@ -22,6 +22,9 @@ importers:
       animated-svelte:
         specifier: link:../Library/pnpm/global/5/node_modules/animated-svelte
         version: link:../Library/pnpm/global/5/node_modules/animated-svelte
+      remove-markdown:
+        specifier: ^0.6.2
+        version: 0.6.2
     devDependencies:
       '@convex-dev/persistent-text-streaming':
         specifier: ^0.3.0
@@ -3306,6 +3309,9 @@ packages:
 
   regex@6.0.1:
     resolution: {integrity: sha512-uorlqlzAKjKQZ5P+kTJr3eeJGSVroLKoHmquUj4zHWuR+hEyNqlXsSKlYYF5F4NI6nl7tWCs0apKJ0lmfsXAPA==}
+
+  remove-markdown@0.6.2:
+    resolution: {integrity: sha512-EijDXJZbzpGbQBd852ViUzcqgpMujthM+SAEHiWCMcZonRbZ+xViWKLJA/vrwbDwYdxrs1aFDjpBhcGrZoJRGA==}
 
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
@@ -7390,6 +7396,8 @@ snapshots:
   regex@6.0.1:
     dependencies:
       regex-utilities: 2.3.0
+
+  remove-markdown@0.6.2: {}
 
   require-directory@2.1.1: {}
 
