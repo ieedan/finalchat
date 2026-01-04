@@ -92,4 +92,12 @@
 			</div>
 		{/if}
 	</div>
+
+	<!-- Badge -->
+	<div
+		class="absolute bottom-12 right-12 px-4 py-2"
+		style="background-color: #3a3a3a; color: #fafafa; border-radius: 8px;"
+	>
+		<p class="m-0 text-sm font-medium">finalchat.app</p>
+	</div>
 </div>
