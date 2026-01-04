@@ -62,6 +62,7 @@
 		"node-rsa": "^1.1.1",
 		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.0",
+		"remove-markdown": "^0.6.2",
 		"runed": "^0.37.0",
 		"svelte": "^5.45.5",
 		"svelte-check": "^4.3.4",
@@ -83,7 +84,6 @@
 		"zod": "^4.1.13"
 	},
 	"dependencies": {
-		"animated-svelte": "link:../../../Library/pnpm/global/5/node_modules/animated-svelte",
-		"remove-markdown": "^0.6.2"
+		"animated-svelte": "link:../../../Library/pnpm/global/5/node_modules/animated-svelte"
 	}
 }
