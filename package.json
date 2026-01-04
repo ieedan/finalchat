@@ -82,6 +82,7 @@
 		"zod": "^4.1.13"
 	},
 	"dependencies": {
+		"@ethercorps/sveltekit-og": "^4.2.1",
 		"animated-svelte": "link:../../../Library/pnpm/global/5/node_modules/animated-svelte"
 	}
 }
