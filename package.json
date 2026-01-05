@@ -9,6 +9,7 @@
 		"dev:vite": "vite dev --host",
 		"dev:convex": "convex dev",
 		"build": "vite build",
+		"build:local": "dotenvx run -f .env.local -- pnpm build",
 		"preview": "vite preview",
 		"vercel:deploy": "CONVEX_VERBOSE=1 convex deploy --cmd-url-env-var-name PUBLIC_CONVEX_URL --cmd='echo \"export const SERVER_CONVEX_URL = \\\"${PUBLIC_CONVEX_URL}\\\";\" > src/convex.config.ts && pnpm build'",
 		"prepare": "svelte-kit sync || echo ''",
