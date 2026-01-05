@@ -8,7 +8,7 @@ import { SERVER_CONVEX_URL } from '$lib/convex.config';
 configureAuthKit({
 	clientId: env.PUBLIC_WORKOS_CLIENT_ID,
 	apiKey: env.WORKOS_API_KEY,
-	redirectUri: env.PUBLIC_WORKOS_REDIRECT_URI,
+	redirectUri: new URL('/auth/callback', env.VERCEL_URL).toString(),
 	cookiePassword: env.WORKOS_COOKIE_PASSWORD
 });
 
