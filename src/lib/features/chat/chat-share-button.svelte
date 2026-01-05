@@ -5,7 +5,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { Separator } from '$lib/components/ui/separator';
 	import type { Doc } from '$lib/convex/_generated/dataModel';
-	import { CheckIcon, LockIcon, GlobeIcon, ShareIcon, XIcon } from '@lucide/svelte';
+	import { CheckIcon, LockIcon, GlobeIcon, ShareIcon } from '@lucide/svelte';
 	import { Snippet } from '$lib/components/ui/snippet';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
