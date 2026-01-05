@@ -14,8 +14,6 @@ const authKitConfig = {
 
 configureAuthKit(authKitConfig);
 
-console.log('Configured AuthKit with config:', authKitConfig);
-
 const authHandle = authKitHandle();
 
 const injectConvex: Handle = async ({ event, resolve }) => {
