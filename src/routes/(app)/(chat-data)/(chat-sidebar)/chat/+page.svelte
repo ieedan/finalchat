@@ -17,6 +17,7 @@
 		PanelLeftIcon,
 		SendIcon
 	} from '@lucide/svelte';
+	import { page } from '$app/state';
 
 	let { data } = $props();
 
@@ -54,7 +55,21 @@
 	});
 </script>
 
-<MetaTags title="New Chat" />
+<MetaTags
+	title="New Chat"
+	openGraph={{
+		title: 'New Chat - Finalchat',
+		url: page.url.toString(),
+		images: [
+			{
+				url: '/chat/og.png',
+				width: 1200,
+				height: 630,
+				alt: 'New Chat - Finalchat'
+			}
+		]
+	}}
+/>
 
 <div class="w-full h-full flex-col items-center justify-center flex px-4 gap-8">
 	<div class="flex w-full items-center flex-col h-full justify-center md:h-auto">

@@ -46,7 +46,7 @@
 	style="background-color: #1c1c1c; color: #fafafa;"
 >
 	<div class="absolute top-12 left-12 flex items-center">
-		<svg width="100" height="100" viewBox="0 0 464 369" style="color: #d97706;">
+		<svg width="100" height="100" viewBox="0 0 464 369" style="color: #FF6868;">
 			<g transform="matrix(1,0,0,1,-744.674384,-723.689943)">
 				<g transform="matrix(0.990844,-0.130447,0.140819,1.069625,308.164017,323.729868)">
 					<path

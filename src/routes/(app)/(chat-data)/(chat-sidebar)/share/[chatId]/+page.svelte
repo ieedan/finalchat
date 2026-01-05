@@ -40,7 +40,22 @@
 	const sidebar = useSidebar();
 </script>
 
-<MetaTags title={chatQuery.data?.title} description={chatQuery.data?.title} />
+<MetaTags
+	title={chatQuery.data?.title}
+	description={chatQuery.data?.title}
+	openGraph={{
+		title: `${chatQuery.data?.title} - Finalchat`,
+		url: page.url.toString(),
+		images: [
+			{
+				url: `/chat/${chatQuery.data?._id}/og.png`,
+				width: 1200,
+				height: 630,
+				alt: `${chatQuery.data?.title} - Finalchat`
+			}
+		]
+	}}
+/>
 
 <header class="sticky top-0">
 	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20 h-14">
