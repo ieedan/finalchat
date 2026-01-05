@@ -26,7 +26,7 @@
 
 	const streamBody = useStream({
 		getPersistentBody: api.messages.getChatBody,
-		streamUrl: new URL('/messages/stream', env.PUBLIC_CONVEX_URL),
+		streamUrl: new URL('/messages/stream', env.PUBLIC_CONVEX_SITE_URL),
 		driven,
 		chatId: message.chatId,
 		streamId: message.streamId as StreamId,

@@ -18,7 +18,5 @@ const _env = createEnv({
 
 export const env = {
 	..._env,
-	get PUBLIC_CONVEX_SITE_URL() {
-		return _env.PUBLIC_CONVEX_URL.replace('.convex.cloud', '.convex.site');
-	}
+	PUBLIC_CONVEX_SITE_URL: _env.PUBLIC_CONVEX_URL.replace('.convex.cloud', '.convex.site')
 };
