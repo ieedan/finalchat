@@ -10,6 +10,7 @@
 		"dev:convex": "convex dev",
 		"build": "vite build",
 		"preview": "vite preview",
+		"deploy": "CONVEX_VERBOSE=1 convex deploy --cmd-url-env-var-name PUBLIC_CONVEX_URL --cmd='echo \"export const SERVER_CONVEX_URL = \\\"${PUBLIC_CONVEX_URL}\\\";\" > src/convex.config.ts && pnpm build'",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

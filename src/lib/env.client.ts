@@ -1,13 +1,19 @@
 import { createEnv } from '@t3-oss/env-core';
 import { z } from 'zod';
 
-export const env = createEnv({
+const _env = createEnv({
 	client: {
 		PUBLIC_CONVEX_URL: z.url(),
-		PUBLIC_CONVEX_SITE_URL: z.string(),
 		PUBLIC_WORKOS_CLIENT_ID: z.string(),
 		PUBLIC_WORKOS_REDIRECT_URI: z.url()
 	},
 	clientPrefix: 'PUBLIC_',
 	runtimeEnv: import.meta.env
 });
+
+export const env = {
+	..._env,
+	get PUBLIC_CONVEX_SITE_URL() {
+		return _env.PUBLIC_CONVEX_URL.replace('.convex.cloud', '.convex.site')
+	}
+}
