@@ -8,9 +8,12 @@
 	import { useLocalApiKey } from '$lib/features/api-keys/local-key-storage.svelte';
 	import ApiKeyInput from '../api-keys/api-key-input.svelte';
 	import { createApiKey, getApiKey } from '$lib/features/api-keys/api-keys.remote';
+	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 
 	let storage = $state<'Local' | 'Remote'>('Remote');
 	let apiKey = $state<string>('');
+
+	const chatLayoutState = useChatLayout();
 
 	const localApiKey = useLocalApiKey();
 
@@ -26,7 +29,7 @@
 		if (storage === 'Local') {
 			localApiKey.current = apiKey;
 		} else {
-			await createApiKey({ key: apiKey }).updates(getApiKey());
+			await createApiKey({ key: apiKey }).updates(chatLayoutState.apiKeysQuery);
 			localApiKey.current = null;
 		}
 
