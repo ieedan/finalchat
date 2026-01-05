@@ -58,7 +58,7 @@
 />
 
 <header class="sticky top-0">
-	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20 h-14">
+	<div class="px-3 py-2.5 w-full flex items-center justify-between bg-background z-20 h-14">
 		<div class="flex items-center gap-4">
 			<div
 				data-visible={sidebar.isMobile || !sidebar.open}
