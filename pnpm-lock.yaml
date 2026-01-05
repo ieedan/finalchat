@@ -20,8 +20,8 @@ importers:
   .:
     dependencies:
       animated-svelte:
-        specifier: link:../Library/pnpm/global/5/node_modules/animated-svelte
-        version: link:../Library/pnpm/global/5/node_modules/animated-svelte
+        specifier: link:../../../Library/pnpm/global/5/node_modules/animated-svelte
+        version: link:../../../Library/pnpm/global/5/node_modules/animated-svelte
     devDependencies:
       '@convex-dev/persistent-text-streaming':
         specifier: ^0.3.0

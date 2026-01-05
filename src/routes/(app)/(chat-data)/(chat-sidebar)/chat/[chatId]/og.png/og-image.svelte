@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
+	import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 	import removeMarkdown from 'remove-markdown';
 
 	let {
@@ -12,7 +12,6 @@
 		title: string;
 	} = $props();
 
-	// Extract text content from messages
 	const getUserMessageText = (message: MessageWithAttachments | undefined): string => {
 		if (!message || message.role !== 'user') return '';
 		return message.content || '';
@@ -35,7 +34,6 @@
 	const userText = getUserMessageText(userMessage);
 	const assistantText = getAssistantMessageText(assistantMessage);
 
-	// Truncate text if too long
 	const truncateText = (text: string, maxLength: number): string => {
 		if (text.length <= maxLength) return text;
 		return text.slice(0, maxLength - 3) + '...';
@@ -50,14 +48,8 @@
 	class="flex flex-col w-full h-full p-12 font-sans relative"
 	style="background-color: #1c1c1c; color: #fafafa;"
 >
-	<!-- Logo in top left - using SVG directly -->
 	<div class="absolute top-12 left-12 flex items-center">
-		<svg
-			width="48"
-			height="48"
-			viewBox="0 0 464 369"
-			style="color: #d97706;"
-		>
+		<svg width="100" height="100" viewBox="0 0 464 369" style="color: #d97706;">
 			<g transform="matrix(1,0,0,1,-744.674384,-723.689943)">
 				<g transform="matrix(0.990844,-0.130447,0.140819,1.069625,308.164017,323.729868)">
 					<path
@@ -69,44 +61,31 @@
 		</svg>
 	</div>
 
-	<!-- Messages -->
-	<div class="flex flex-col gap-6 flex-1 justify-center">
+	<div class="flex flex-col flex-1 justify-center" style="gap: 1.5rem;">
 		{#if userMessage && displayUserText}
-			<!-- User message - matches bg-secondary styling -->
 			<div class="flex flex-col items-end w-full">
-				<div
-					class="p-5 max-w-[85%]"
+				<p
+					class="p-5 max-w-[85%] text-xl"
 					style="background-color: #3a3a3a; color: #fafafa; border-radius: 12px;"
 				>
-					<p class="m-0 text-lg leading-relaxed break-words">
-						{displayUserText}
-					</p>
-				</div>
+					{displayUserText}
+				</p>
 			</div>
 		{/if}
 
 		{#if assistantMessage && displayAssistantText}
-			<!-- Assistant message - matches bg-background styling -->
 			<div class="flex flex-col items-start w-full">
-				<div
-					class="p-5 max-w-[85%]"
+				<p
+					class="p-5 max-w-[85%] text-xl"
 					style="background-color: #1c1c1c; color: #fafafa; border-radius: 12px; border: 1px solid #3a3a3a;"
 				>
-					<p class="m-0 text-lg leading-relaxed break-words">
-						{displayAssistantText}
-					</p>
-				</div>
+					{displayAssistantText}
+				</p>
 			</div>
 		{/if}
 	</div>
 
-	<!-- Badge -->
-	<div
-		class="absolute bottom-12 right-12 px-4 py-2"
-		style="color: #fafafa; border-radius: 9999px;"
-	>
-		<p class="m-0 text-xs font-medium">
-			Check out {displayTitle} on finalchat.app!
-		</p>
-	</div>
+	<p class="absolute bottom-12 right-12 text-2xl" style="color: #fafafa;">
+		Check out the full chat on finalchat.app!
+	</p>
 </div>
