@@ -3,6 +3,7 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"packageManager": "pnpm@10.17.1",
 	"scripts": {
 		"dev": "dotenvx run -f .env.local -- concurrently -n convex,app -c blue,green \"pnpm dev:convex\" \"pnpm dev:vite\"",
 		"dev:vite": "vite dev --host",
@@ -23,6 +24,7 @@
 		"@dotenvx/dotenvx": "^1.51.1",
 		"@eslint/compat": "^2.0.0",
 		"@eslint/js": "^9.39.1",
+		"@ethercorps/sveltekit-og": "^4.2.1",
 		"@fontsource-variable/geist-mono": "^5.2.7",
 		"@fontsource-variable/ibm-plex-sans": "^5.2.8",
 		"@internationalized/date": "^3.10.0",
@@ -42,6 +44,7 @@
 		"@zxcvbn-ts/language-common": "^3.0.4",
 		"@zxcvbn-ts/language-en": "^3.0.2",
 		"ai": "^5.0.110",
+		"animated-svelte": "^0.0.0",
 		"bits-ui": "^2.14.4",
 		"clsx": "^2.1.1",
 		"concurrently": "^9.2.1",
@@ -61,6 +64,7 @@
 		"node-rsa": "^1.1.1",
 		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.0",
+		"remove-markdown": "^0.6.2",
 		"runed": "^0.37.0",
 		"svelte": "^5.45.5",
 		"svelte-check": "^4.3.4",
@@ -80,8 +84,5 @@
 		"vite-plugin-transform-lucide-imports": "^0.3.0",
 		"vitest": "^4.0.10",
 		"zod": "^4.1.13"
-	},
-	"dependencies": {
-		"animated-svelte": "link:../../../Library/pnpm/global/5/node_modules/animated-svelte"
 	}
 }

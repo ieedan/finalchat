@@ -15,7 +15,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: pnpm Install
+        run: pnpm install
 
       - name: Lint
         run: pnpm lint

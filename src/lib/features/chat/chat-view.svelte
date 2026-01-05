@@ -13,6 +13,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import { MetaTags } from '$lib/components/meta-tags';
 	import ShareButton from './chat-share-button.svelte';
+	import { page } from '$app/state';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -49,6 +50,18 @@
 <MetaTags
 	title={chatViewState.chatQuery.data?.title}
 	description={chatViewState.chatQuery.data?.title}
+	openGraph={{
+		title: `${chatViewState.chatQuery.data?.title} - Finalchat`,
+		url: page.url.toString(),
+		images: [
+			{
+				url: `/chat/${chatViewState.chatQuery.data?._id}/og.png`,
+				width: 1200,
+				height: 630,
+				alt: `${chatViewState.chatQuery.data?.title} - Finalchat`
+			}
+		]
+	}}
 />
 
 <header class="sticky top-0">
