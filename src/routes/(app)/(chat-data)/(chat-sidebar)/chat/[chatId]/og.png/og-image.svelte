@@ -5,11 +5,9 @@
 	let {
 		userMessage,
 		assistantMessage,
-		title
 	}: {
 		userMessage: MessageWithAttachments | undefined;
 		assistantMessage: MessageWithAttachments | undefined;
-		title: string;
 	} = $props();
 
 	const getUserMessageText = (message: MessageWithAttachments | undefined): string => {
@@ -41,7 +39,6 @@
 
 	const displayUserText = truncateText(userText, 200);
 	const displayAssistantText = truncateText(assistantText, 400);
-	const displayTitle = truncateText(title, 40);
 </script>
 
 <div
