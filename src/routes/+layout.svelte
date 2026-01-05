@@ -65,7 +65,7 @@
 	description="Chat with any model available on OpenRouter with your own API key."
 	canonical={new URL(page.url.pathname, page.url.origin).href}
 >
-	<ThemeProvider defaultFontSans={page.data.fontSans} defaultFontMono={page.data.fontMono}>
+	<ThemeProvider defaultFontPreset={page.data.fontPreset}>
 		{@render children()}
 	</ThemeProvider>
 </MetaTags>

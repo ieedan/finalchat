@@ -1,14 +1,12 @@
 import { Context } from 'runed';
-import type { Font } from './types';
-import { FONTS_MONO, FONTS_SANS } from './fonts';
+import type { FontPreset } from './types';
+import { FONT_PRESETS } from './fonts';
 
 type ThemeProviderOptions = {
-	defaultFontSans?: string | null;
-	defaultFontMono?: string | null;
+	defaultFontPreset?: string | null;
 };
 
-const SANS_FONT_COOKIE = 'theme-sans-font';
-const MONO_FONT_COOKIE = 'theme-mono-font';
+const FONT_PRESET_COOKIE = 'theme-font-preset';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
 function setCookie(name: string, value: string) {
@@ -16,47 +14,31 @@ function setCookie(name: string, value: string) {
 }
 
 class ThemeProviderState {
-	#sansFont: Font | null = $state(null);
-	#monoFont: Font | null = $state(null);
+	#fontPreset: FontPreset | null = $state(null);
 
 	constructor(readonly opts: ThemeProviderOptions) {
-		// Initialize from server-provided defaults (from cookies read server-side)
-		if (opts.defaultFontSans) {
-			const font = FONTS_SANS.find((f) => f.name === opts.defaultFontSans);
-			if (font) this.#sansFont = font;
-		}
-
-		if (opts.defaultFontMono) {
-			const font = FONTS_MONO.find((f) => f.name === opts.defaultFontMono);
-			if (font) this.#monoFont = font;
+		// Initialize from server-provided default (from cookie read server-side)
+		if (opts.defaultFontPreset) {
+			const preset = FONT_PRESETS.find((p) => p.name === opts.defaultFontPreset);
+			if (preset) this.#fontPreset = preset;
 		}
 
 		$effect(() => {
-			document.documentElement.style.setProperty('--font-sans', this.sansFont.family);
+			document.documentElement.style.setProperty('--font-sans', this.fontPreset.sansFamily);
 		});
 		$effect(() => {
-			document.documentElement.style.setProperty('--font-mono', this.monoFont.family);
+			document.documentElement.style.setProperty('--font-mono', this.fontPreset.monoFamily);
 		});
 	}
 
-	selectSansFont(font: Font) {
-		this.#sansFont = font;
-		setCookie(SANS_FONT_COOKIE, font.name);
+	selectFontPreset(preset: FontPreset) {
+		this.#fontPreset = preset;
+		setCookie(FONT_PRESET_COOKIE, preset.name);
 	}
 
-	selectMonoFont(font: Font) {
-		this.#monoFont = font;
-		setCookie(MONO_FONT_COOKIE, font.name);
-	}
-
-	get sansFont() {
-		const defaultSansFont = FONTS_SANS.find((font) => font.default) ?? FONTS_SANS[0];
-		return this.#sansFont ?? defaultSansFont;
-	}
-
-	get monoFont() {
-		const defaultMonoFont = FONTS_MONO.find((font) => font.default) ?? FONTS_MONO[0];
-		return this.#monoFont ?? defaultMonoFont;
+	get fontPreset() {
+		const defaultPreset = FONT_PRESETS.find((p) => p.default) ?? FONT_PRESETS[0];
+		return this.#fontPreset ?? defaultPreset;
 	}
 }
 

@@ -1,38 +1,23 @@
-import type { Font } from './types';
+import type { FontPreset } from './types';
 
-export const FONTS_SANS: Font[] = [
+export const FONT_PRESETS: FontPreset[] = [
 	{
-		name: 'IBM Plex Sans',
-		family: "'IBM Plex Sans Variable', sans-serif",
+		name: 'Default',
+		sansFamily: "'IBM Plex Sans Variable', sans-serif",
+		monoFamily: "'Geist Mono', monospace",
 		default: true
 	},
 	{
 		name: 'Dyslexic friendly',
-		family: "'Atkinson Hyperlegible Mono Variable', sans-serif",
+		sansFamily: "'Atkinson Hyperlegible Next Variable', sans-serif",
+		monoFamily: "'Atkinson Hyperlegible Mono Variable', monospace",
 		default: false
 	},
 	{
 		name: 'System',
-		family:
+		sansFamily:
 			"system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-		default: false
-	}
-];
-
-export const FONTS_MONO: Font[] = [
-	{
-		name: 'Geist Mono',
-		family: "'Geist Mono', monospace",
-		default: true
-	},
-	{
-		name: 'Dyslexic friendly',
-		family: "'Atkinson Hyperlegible Next Variable', sans-serif",
-		default: false
-	},
-	{
-		name: 'System',
-		family:
+		monoFamily:
 			"ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
 		default: false
 	}

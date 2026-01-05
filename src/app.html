@@ -4,18 +4,20 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<script>
-			const FONTS_SANS = {
-				"IBM Plex Sans": "'IBM Plex Sans Variable', sans-serif",
-				"Dyslexic friendly": "'Atkinson Hyperlegible Mono Variable', sans-serif",
-				"System": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+			const FONT_PRESETS = {
+				"Default": {
+					sans: "'IBM Plex Sans Variable', sans-serif",
+					mono: "'Geist Mono', monospace"
+				},
+				"Dyslexic friendly": {
+					sans: "'Atkinson Hyperlegible Next Variable', sans-serif",
+					mono: "'Atkinson Hyperlegible Mono Variable', monospace"
+				},
+				"System": {
+					sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+					mono: "ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace"
+				}
 			};
-			const FONTS_MONO = {
-				"Geist Mono": "'Geist Mono', monospace",
-				"Dyslexic friendly": "'Atkinson Hyperlegible Next Variable', sans-serif",
-				"System": "ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace"
-			};
-			const DEFAULT_SANS = "'IBM Plex Sans Variable', sans-serif";
-			const DEFAULT_MONO = "'Geist Mono', monospace";
 
 			const cookies = {};
 			document.cookie.split(";").forEach((pair) => {
@@ -23,12 +25,12 @@
 				if (key && value) cookies[key] = decodeURIComponent(value);
 			});
 
-			const fontSans = FONTS_SANS[cookies["theme-sans-font"]] || DEFAULT_SANS;
-			const fontMono = FONTS_MONO[cookies["theme-mono-font"]] || DEFAULT_MONO;
+			const preset = FONT_PRESETS[cookies["theme-font-preset"]] || FONT_PRESETS["Default"];
 
-			document.documentElement.style.setProperty("--font-sans", fontSans);
-			document.documentElement.style.setProperty("--font-mono", fontMono);
-		</script>%sveltekit.head%
+			document.documentElement.style.setProperty("--font-sans", preset.sans);
+			document.documentElement.style.setProperty("--font-mono", preset.mono);
+		</script>
+		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>

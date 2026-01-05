@@ -4,15 +4,13 @@
 
 	type Props = {
 		children: Snippet;
-		defaultFontSans?: string | null;
-		defaultFontMono?: string | null;
+		defaultFontPreset?: string | null;
 	};
 
-	let { children, defaultFontSans, defaultFontMono }: Props = $props();
+	let { children, defaultFontPreset }: Props = $props();
 
 	setupThemeProvider({
-		defaultFontSans: defaultFontSans,
-		defaultFontMono: defaultFontMono
+		defaultFontPreset
 	});
 </script>
 
