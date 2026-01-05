@@ -32,6 +32,10 @@
 	--sidebar-accent-foreground: var(--foreground);
 	--sidebar-border: var(--border);
 	--sidebar-ring: var(--ring);
+
+	/* Default fonts - overridden by app.html script from cookies */
+	--font-sans: 'IBM Plex Sans Variable', sans-serif;
+	--font-mono: 'Geist Mono', monospace;
 }
 
 @theme inline {
@@ -69,8 +73,11 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 
-	--font-sans: 'IBM Plex Sans Variable', sans-serif;
-	--font-mono: 'Geist Mono', monospace;
+	--font-family-sans: var(--font-sans);
+	--font-family-mono: var(--font-mono);
+	--font-family-system:
+		system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+		sans-serif;
 
 	/* For shiny text */
 	--animate-shimmer: shimmer 1s infinite;
@@ -89,7 +96,7 @@
 
 @layer base {
 	* {
-		@apply border-border outline-ring/50 tracking-wide font-light;
+		@apply border-border outline-ring/50 font-light;
 	}
 	body {
 		@apply bg-background text-foreground;
