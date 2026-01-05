@@ -7,7 +7,7 @@
 	import * as Field from '$lib/components/ui/field';
 	import { useLocalApiKey } from '$lib/features/api-keys/local-key-storage.svelte';
 	import ApiKeyInput from '../api-keys/api-key-input.svelte';
-	import { createApiKey, getApiKey } from '$lib/features/api-keys/api-keys.remote';
+	import { createApiKey } from '$lib/features/api-keys/api-keys.remote';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 
 	let storage = $state<'Local' | 'Remote'>('Remote');
