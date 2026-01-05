@@ -10,7 +10,6 @@
 
 ### Chat Features
 
-- [ ] Og image generation
 - [ ] Enhance prompt button
 - [ ] Work on the mobile experience
 - [ ] Allow customization of font

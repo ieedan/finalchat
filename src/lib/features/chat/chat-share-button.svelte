@@ -5,7 +5,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { Separator } from '$lib/components/ui/separator';
 	import type { Doc } from '$lib/convex/_generated/dataModel';
-	import { CheckIcon, LockIcon, GlobeIcon, ShareIcon, XIcon } from '@lucide/svelte';
+	import { CheckIcon, LockIcon, GlobeIcon, ShareIcon } from '@lucide/svelte';
 	import { Snippet } from '$lib/components/ui/snippet';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
@@ -58,11 +58,8 @@
 			</RadioGroup.Root>
 
 			{#if navigator.canShare( { title: chat.title, url: `https://finalchat.app/share/${chat._id}` } )}
-				<div class="flex items-center gap-2 justify-between">
-					<Drawer.Close class={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'size-10')}>
-						<XIcon />
-					</Drawer.Close>
-					{#if value === 'public'}
+				{#if value === 'public'}
+					<div class="h-10 flex items-center justify-end">
 						<Button
 							onclick={() => {
 								navigator.share({
@@ -76,8 +73,14 @@
 						>
 							<ShareIcon />
 						</Button>
-					{/if}
-				</div>
+					</div>
+				{:else}
+					<div class="h-10 flex items-center justify-center">
+						<span class="text-muted-foreground text-sm text-center">
+							Make your chat public to share it with others.
+						</span>
+					</div>
+				{/if}
 			{:else if value === 'public'}
 				<a
 					href="/share/{chat._id}"

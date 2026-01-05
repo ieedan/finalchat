@@ -3,13 +3,16 @@ import { env } from '$lib/env.server';
 import type { Handle } from '@sveltejs/kit';
 import { ConvexClient } from 'convex/browser';
 import { sequence } from '@sveltejs/kit/hooks';
+import { dev } from '$app/environment';
 
-configureAuthKit({
+const authKitConfig = {
 	clientId: env.PUBLIC_WORKOS_CLIENT_ID,
 	apiKey: env.WORKOS_API_KEY,
-	redirectUri: env.PUBLIC_WORKOS_REDIRECT_URI,
+	redirectUri: `${dev ? 'http' : 'https'}://${env.VERCEL_URL}/auth/callback`,
 	cookiePassword: env.WORKOS_COOKIE_PASSWORD
-});
+};
+
+configureAuthKit(authKitConfig);
 
 const authHandle = authKitHandle();
 

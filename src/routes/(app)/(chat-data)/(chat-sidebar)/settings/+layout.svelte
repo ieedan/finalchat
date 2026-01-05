@@ -11,7 +11,7 @@
 
 <MetaTags title="Settings" titleTemplate="%s ~ Settings ~ Finalchat" />
 
-<header class="sticky top-0 border-b">
+<header class="sticky top-0 border-b z-20 bg-background">
 	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20">
 		<div class="flex items-center gap-2">
 			{#if sidebar.isMobile || !sidebar.open}
@@ -26,7 +26,7 @@
 
 <div class="flex flex-col place-items-center">
 	<AccountSettings.Root class="w-full max-w-5xl">
-		<AccountSettings.Sidebar class="lg:border-r-0">
+		<AccountSettings.Sidebar class="lg:border-r-0 top-[57px] z-20 bg-background">
 			<AccountSettings.SidebarGroup>
 				<AccountSettings.SidebarButton href="/settings">Account</AccountSettings.SidebarButton>
 				<AccountSettings.SidebarButton href="/settings/customization">
