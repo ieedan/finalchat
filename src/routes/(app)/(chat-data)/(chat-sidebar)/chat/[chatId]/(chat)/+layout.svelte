@@ -6,7 +6,7 @@
 	let { children } = $props();
 
 	// svelte-ignore state_referenced_locally
-	setupChatView({ chatId: page.params.chatId as Id<'chat'> });
+	setupChatView({ chatId: page.params.chatId as Id<'chats'> });
 </script>
 
 {@render children()}

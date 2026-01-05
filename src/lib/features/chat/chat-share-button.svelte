@@ -12,7 +12,7 @@
 
 	type Props = {
 		animated?: boolean;
-		chat: Doc<'chat'>;
+		chat: Doc<'chats'>;
 	};
 
 	let { animated = false, chat }: Props = $props();
@@ -22,7 +22,7 @@
 	const client = useConvexClient();
 
 	async function updatePublic() {
-		await client.mutation(api.chat.updatePublic, {
+		await client.mutation(api.chats.updatePublic, {
 			chatId: chat._id,
 			public: value === 'public'
 		});

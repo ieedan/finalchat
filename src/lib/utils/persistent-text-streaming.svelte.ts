@@ -24,7 +24,7 @@ export function useStream({
 	 */
 	driven: boolean;
 	streamId: StreamId | undefined;
-	chatId: Id<'chat'>;
+	chatId: Id<'chats'>;
 	// If provided, this will be passed as the Authorization header.
 	authToken?: string | null;
 	apiKey: string | null;
@@ -120,7 +120,7 @@ async function startStreaming(
 	url: URL,
 	body: {
 		streamId: StreamId;
-		chatId: Id<'chat'>;
+		chatId: Id<'chats'>;
 		apiKey: string | null;
 		systemPrompt?: string | null;
 	},

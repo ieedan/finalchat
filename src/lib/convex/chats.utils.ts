@@ -16,7 +16,7 @@ export type MessageWithAttachments =
 
 export async function getChatMessages(
 	ctx: GenericQueryCtx<DataModel> | GenericMutationCtx<DataModel>,
-	chatId: Id<'chat'>
+	chatId: Id<'chats'>
 ): Promise<MessageWithAttachments[]> {
 	const messages = await ctx.db
 		.query('messages')
@@ -70,7 +70,7 @@ export async function getChatMessages(
 
 export async function getChatMessagesInternal(
 	ctx: GenericQueryCtx<DataModel> | GenericMutationCtx<DataModel>,
-	chatId: Id<'chat'>
+	chatId: Id<'chats'>
 ): Promise<MessageWithAttachments[]> {
 	const messages = await ctx.db
 		.query('messages')

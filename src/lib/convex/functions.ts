@@ -5,11 +5,11 @@ import {
 import type { DataModel } from './_generated/dataModel';
 import { Triggers } from 'convex-helpers/server/triggers';
 import { customCtx, customMutation } from 'convex-helpers/server/customFunctions';
-import { r2 } from './chatAttachments';
+import { r2 } from './r2';
 
 const triggers = new Triggers<DataModel>();
 
-triggers.register('chat', async (ctx, change) => {
+triggers.register('chats', async (ctx, change) => {
 	// delete all messages for the chat
 	if (change.operation === 'delete') {
 		const id = change.oldDoc._id;

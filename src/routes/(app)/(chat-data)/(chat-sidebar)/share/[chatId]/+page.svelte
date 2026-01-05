@@ -18,9 +18,9 @@
 	const chatLayoutState = useChatLayout();
 
 	const chatQuery = useQueryWithFallback(
-		api.chat.getPublic,
+		api.chats.getPublic,
 		{
-			chatId: page.params.chatId as Id<'chat'>
+			chatId: page.params.chatId as Id<'chats'>
 		},
 		{
 			// svelte-ignore state_referenced_locally

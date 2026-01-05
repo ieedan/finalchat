@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { ModelIdCtx } from '$lib/context.svelte.js';
 	import { api } from '$lib/convex/_generated/api';
-	import type { MessageWithAttachments } from '$lib/convex/chat.utils';
+	import type { MessageWithAttachments } from '$lib/convex/chats.utils';
 	import SplitIcon from '@lucide/svelte/icons/split';
 	import { useConvexClient } from 'convex-svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel';
@@ -28,7 +28,7 @@
 		const model = chatLayoutState.models.find((m) => m.id === modelId.current);
 
 		const { newChatId, newAssistantMessageId } = await client.mutation(
-			api.chat.branchFromMessage,
+			api.chats.branchFromMessage,
 			message.role === 'assistant'
 				? {
 						message: {
