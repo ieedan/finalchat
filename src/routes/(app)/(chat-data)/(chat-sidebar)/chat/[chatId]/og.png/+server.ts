@@ -39,7 +39,6 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			{
 				userMessage: firstUserMessage,
 				assistantMessage: firstAssistantMessage,
-				title: chat.title
 			}
 		);
 	} catch {
