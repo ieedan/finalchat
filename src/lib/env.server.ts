@@ -3,7 +3,8 @@ import { z } from 'zod';
 
 const _env = createEnv({
 	server: {
-		PUBLIC_CONVEX_URL: z.url(),
+		// DO NOT REMOVE THIS DEFAULT VALUE. It will be replaced in the build process
+		PUBLIC_CONVEX_URL: z.url().default('{{DEFAULT_CONVEX_URL_HERE}}'),
 		PUBLIC_WORKOS_CLIENT_ID: z.string(),
 		WORKOS_API_KEY: z.string(),
 		WORKOS_COOKIE_PASSWORD: z.string(),

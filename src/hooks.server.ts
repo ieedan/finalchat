@@ -3,7 +3,6 @@ import { env } from '$lib/env.server';
 import type { Handle } from '@sveltejs/kit';
 import { ConvexClient } from 'convex/browser';
 import { sequence } from '@sveltejs/kit/hooks';
-import { SERVER_CONVEX_URL } from '$lib/convex.config';
 import { dev } from '$app/environment';
 
 const authKitConfig = {
@@ -20,7 +19,7 @@ console.log('Configured AuthKit with config:', authKitConfig);
 const authHandle = authKitHandle();
 
 const injectConvex: Handle = async ({ event, resolve }) => {
-	const convex = new ConvexClient(SERVER_CONVEX_URL);
+	const convex = new ConvexClient(env.PUBLIC_CONVEX_URL);
 
 	if (event.locals.auth.accessToken) {
 		// where it's needed we should already be keeping the token up to date with authKit
