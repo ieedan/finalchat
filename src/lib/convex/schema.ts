@@ -4,7 +4,8 @@ import { type Infer, v } from 'convex/values';
 import type { Id } from './_generated/dataModel';
 
 export const ChatMessageUser = v.object({
-	chatId: v.id('chat'),
+	userId: v.string(),
+	chatId: v.id('chats'),
 	role: v.literal('user'),
 	content: v.string(),
 	chatSettings: v.object({
@@ -21,7 +22,7 @@ export type ChatMessageUser = Infer<typeof ChatMessageUser> & {
 };
 
 export const ChatMessageAssistant = v.object({
-	chatId: v.id('chat'),
+	chatId: v.id('chats'),
 	role: v.literal('assistant'),
 	content: v.optional(v.string()),
 	error: v.optional(v.string()),
@@ -59,23 +60,33 @@ export default defineSchema({
 		favoriteModelIds: v.array(v.string()),
 		systemPrompt: v.optional(v.string())
 	}).index('by_user', ['userId']),
+	groups: defineTable({
+		name: v.string(),
+		description: v.optional(v.string()),
+		options: v.object({
+			canViewMembersChats: v.optional(v.boolean()),
+			allowPublicChats: v.optional(v.boolean())
+		})
+	}),
 	apiKeys: defineTable({
-		userId: v.string(),
+		userId: v.optional(v.string()),
+		groupId: v.optional(v.id('groups')),
 		name: v.optional(v.string()),
 		provider: v.union(v.literal('OpenRouter')),
 		key: v.string(),
 		encryptionMode: v.union(v.literal('RSA'))
 	}).index('by_user', ['userId']),
-	chat: defineTable({
+	chats: defineTable({
 		generating: v.boolean(),
 		generatingTitle: v.optional(v.boolean()),
 		userId: v.string(),
+		groupId: v.optional(v.id('groups')),
 		title: v.string(),
 		updatedAt: v.number(),
 		pinned: v.boolean(),
 		branchedFrom: v.optional(
 			v.object({
-				chatId: v.id('chat'),
+				chatId: v.id('chats'),
 				messageId: v.id('messages')
 			})
 		),
@@ -83,7 +94,8 @@ export default defineSchema({
 	}).index('by_user', ['userId']),
 	chatAttachments: defineTable({
 		userId: v.string(),
-		chatId: v.id('chat'),
+		groupId: v.optional(v.id('groups')),
+		chatId: v.id('chats'),
 		messageId: v.id('messages'),
 		key: v.string(),
 		mediaType: v.string()

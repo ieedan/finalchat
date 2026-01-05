@@ -5,20 +5,20 @@ import {
 	getChatMessages,
 	getChatMessagesInternal,
 	type MessageWithAttachments
-} from './chat.utils';
+} from './chats.utils';
 import { internalQuery, query } from './_generated/server';
 import { internal } from './_generated/api';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 
 export const getAll = query({
 	args: {},
-	handler: async (ctx): Promise<Doc<'chat'>[]> => {
+	handler: async (ctx): Promise<Doc<'chats'>[]> => {
 		const user = await ctx.auth.getUserIdentity();
 
 		if (!user) return [];
 
 		const chats = await ctx.db
-			.query('chat')
+			.query('chats')
 			.withIndex('by_user', (q) => q.eq('userId', user.subject))
 			.collect();
 
@@ -28,9 +28,9 @@ export const getAll = query({
 
 export const get = query({
 	args: {
-		chatId: v.id('chat')
+		chatId: v.id('chats')
 	},
-	handler: async (ctx, args): Promise<Doc<'chat'> & { messages: MessageWithAttachments[] }> => {
+	handler: async (ctx, args): Promise<Doc<'chats'> & { messages: MessageWithAttachments[] }> => {
 		const user = await ctx.auth.getUserIdentity();
 
 		const chat = await ctx.db.get(args.chatId);
@@ -48,12 +48,12 @@ export const get = query({
 
 export const getPublic = query({
 	args: {
-		chatId: v.id('chat')
+		chatId: v.id('chats')
 	},
 	handler: async (
 		ctx,
 		args
-	): Promise<(Doc<'chat'> & { messages: MessageWithAttachments[] }) | null> => {
+	): Promise<(Doc<'chats'> & { messages: MessageWithAttachments[] }) | null> => {
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat || !chat.public) return null;
 
@@ -68,9 +68,9 @@ export const getPublic = query({
 
 export const internalGet = internalQuery({
 	args: {
-		chatId: v.id('chat')
+		chatId: v.id('chats')
 	},
-	handler: async (ctx, args): Promise<Doc<'chat'> & { messages: MessageWithAttachments[] }> => {
+	handler: async (ctx, args): Promise<Doc<'chats'> & { messages: MessageWithAttachments[] }> => {
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat) throw new Error('Chat not found');
 
@@ -85,7 +85,7 @@ export const internalGet = internalQuery({
 
 export const updatePinned = mutation({
 	args: {
-		chatId: v.id('chat'),
+		chatId: v.id('chats'),
 		pinned: v.boolean()
 	},
 	handler: async (ctx, args): Promise<void> => {
@@ -104,7 +104,7 @@ export const updatePinned = mutation({
 
 export const updateTitle = mutation({
 	args: {
-		chatId: v.id('chat'),
+		chatId: v.id('chats'),
 		title: v.string()
 	},
 	handler: async (ctx, args): Promise<void> => {
@@ -123,7 +123,7 @@ export const updateTitle = mutation({
 
 export const remove = mutation({
 	args: {
-		ids: v.array(v.id('chat'))
+		ids: v.array(v.id('chats'))
 	},
 	handler: async (ctx, args): Promise<void> => {
 		const user = await ctx.auth.getUserIdentity();
@@ -141,7 +141,7 @@ export const remove = mutation({
 
 export const updateGenerating = internalMutation({
 	args: {
-		chatId: v.id('chat'),
+		chatId: v.id('chats'),
 		generating: v.boolean()
 	},
 	handler: async (ctx, args): Promise<void> => {
@@ -153,7 +153,7 @@ export const updateGenerating = internalMutation({
 
 export const updateGeneratedTitle = internalMutation({
 	args: {
-		chatId: v.id('chat'),
+		chatId: v.id('chats'),
 		title: v.string()
 	},
 	handler: async (ctx, args): Promise<void> => {
@@ -184,7 +184,7 @@ export const branchFromMessage = mutation({
 	handler: async (
 		ctx,
 		args
-	): Promise<{ newChatId: Id<'chat'>; newAssistantMessageId: Id<'messages'> | null }> => {
+	): Promise<{ newChatId: Id<'chats'>; newAssistantMessageId: Id<'messages'> | null }> => {
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) throw new Error('Unauthorized');
 
@@ -193,7 +193,7 @@ export const branchFromMessage = mutation({
 			throw new Error('Source message not found');
 		}
 
-		const ogChat = await ctx.runQuery(internal.chat.internalGet, { chatId: sourceMessage.chatId });
+		const ogChat = await ctx.runQuery(internal.chats.internalGet, { chatId: sourceMessage.chatId });
 		if (!ogChat || ogChat.userId !== user.subject) {
 			throw new Error('Chat not found or you are not authorized to access it');
 		}
@@ -206,7 +206,7 @@ export const branchFromMessage = mutation({
 		const messages = ogChat.messages.slice(0, chatIndex + 1);
 
 		// copy over the chat
-		const newChatId = await ctx.db.insert('chat', {
+		const newChatId = await ctx.db.insert('chats', {
 			userId: user.subject,
 			title: ogChat.title,
 			generating: false,
@@ -231,6 +231,7 @@ export const branchFromMessage = mutation({
 				let newMessageId: Id<'messages'>;
 				if (m.role === 'user') {
 					newMessageId = await ctx.db.insert('messages', {
+						userId: user.subject,
 						role: 'user',
 						chatId: newChatId,
 						content: m.content,
@@ -289,7 +290,7 @@ export const branchFromMessage = mutation({
 
 export const updatePublic = mutation({
 	args: {
-		chatId: v.id('chat'),
+		chatId: v.id('chats'),
 		public: v.boolean()
 	},
 	handler: async (ctx, args): Promise<void> => {

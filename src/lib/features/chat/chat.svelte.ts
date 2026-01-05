@@ -20,7 +20,7 @@ import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
 type ChatLayoutOptions = {
 	user: User;
 	userSettings: Doc<'userSettings'> | null;
-	chats: Doc<'chat'>[];
+	chats: Doc<'chats'>[];
 	apiKey: Doc<'apiKeys'> | null;
 	models: (OpenRouter.Model & { lab: string | null })[];
 };
@@ -28,7 +28,7 @@ type ChatLayoutOptions = {
 class ChatLayoutState {
 	createdMessages = new SvelteSet<Id<'messages'>>();
 	userSettingsQuery: Query<typeof api.userSettings.get>;
-	chatsQuery: Query<typeof api.chat.getAll>;
+	chatsQuery: Query<typeof api.chats.getAll>;
 	apiKeysQuery: RemoteQuery<Doc<'apiKeys'> | null>;
 	localApiKey: PersistedState<string | null>;
 	client: ConvexClient;
@@ -43,7 +43,7 @@ class ChatLayoutState {
 		);
 
 		this.chatsQuery = useQueryWithFallback(
-			api.chat.getAll,
+			api.chats.getAll,
 			{},
 			{
 				fallback: this.opts.chats
@@ -83,7 +83,7 @@ class ChatLayoutState {
 	}
 
 	get chatId() {
-		return page.params.chatId as Id<'chat'> | undefined;
+		return page.params.chatId as Id<'chats'> | undefined;
 	}
 
 	get apiKey(): string | null {
@@ -127,13 +127,13 @@ export function useChatLayout() {
 }
 
 type ChatViewOptions = {
-	chatId: Id<'chat'>;
+	chatId: Id<'chats'>;
 };
 
 class ChatViewState {
-	chatQuery: QueryResult<Doc<'chat'> & { messages: MessageWithAttachments[] }>;
+	chatQuery: QueryResult<Doc<'chats'> & { messages: MessageWithAttachments[] }>;
 	constructor(readonly opts: ChatViewOptions) {
-		this.chatQuery = useCachedQuery(api.chat.get, {
+		this.chatQuery = useCachedQuery(api.chats.get, {
 			chatId: this.opts.chatId
 		});
 	}

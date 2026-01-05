@@ -1,17 +1,10 @@
 import { v } from 'convex/values';
 import { internalMutation, mutation } from './functions';
-import { R2, type R2Callbacks } from '@convex-dev/r2';
-import { components, internal } from './_generated/api';
+import { type R2Callbacks } from '@convex-dev/r2';
+import { internal } from './_generated/api';
 import { httpAction, internalQuery, query } from './_generated/server';
-import { env } from '../env.convex';
 import { createKey, parseUploadKey, type UploadKey } from './chatAttachments.utils';
-
-export const r2 = new R2(components.r2, {
-	R2_ACCESS_KEY_ID: env.R2_ACCESS_KEY_ID,
-	R2_SECRET_ACCESS_KEY: env.R2_SECRET_ACCESS_KEY,
-	R2_ENDPOINT: env.R2_ENDPOINT,
-	R2_BUCKET: env.R2_BUCKET
-});
+import { r2 } from './r2';
 
 const callbacks: R2Callbacks = {
 	onSyncMetadata: internal.chatAttachments.onSyncMetadata
@@ -95,7 +88,7 @@ export const syncRemoval = internalMutation({
 
 export const create = internalMutation({
 	args: {
-		chatId: v.id('chat'),
+		chatId: v.id('chats'),
 		messageId: v.id('messages'),
 		key: v.string(),
 		userId: v.string(),

@@ -17,11 +17,11 @@ import {
 	getChatMessagesInternal,
 	getLastUserAndAssistantMessages,
 	type MessageWithAttachments
-} from './chat.utils';
+} from './chats.utils';
 import { TITLE_GENERATION_MODEL, fetchLinkContentTool } from '../ai.js';
 import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
-import { r2 } from './chatAttachments';
+import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';
 
 export const Prompt = v.object({
@@ -43,7 +43,7 @@ export const Prompt = v.object({
 
 export const create = mutation({
 	args: {
-		chatId: v.optional(v.id('chat')),
+		chatId: v.optional(v.id('chats')),
 		prompt: Prompt,
 		apiKey: v.string()
 	},
@@ -51,16 +51,16 @@ export const create = mutation({
 		ctx,
 		args
 	): Promise<{
-		chatId: Id<'chat'>;
+		chatId: Id<'chats'>;
 		userMessageId: Id<'messages'>;
 		assistantMessageId: Id<'messages'>;
 	}> => {
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) throw new Error('Unauthorized');
 
-		let chatId: Id<'chat'>;
+		let chatId: Id<'chats'>;
 		if (!args.chatId) {
-			chatId = await ctx.db.insert('chat', {
+			chatId = await ctx.db.insert('chats', {
 				userId: user.subject,
 				title: 'Untitled Chat',
 				generating: false,
@@ -80,6 +80,7 @@ export const create = mutation({
 		}
 
 		const userMessageId = await ctx.db.insert('messages', {
+			userId: user.subject,
 			chatId,
 			role: 'user',
 			content: args.prompt.input,
@@ -139,16 +140,16 @@ export const getChatBody = query({
 
 export const generateChatTitle = internalAction({
 	args: {
-		chatId: v.id('chat'),
+		chatId: v.id('chats'),
 		apiKey: v.string()
 	},
 	handler: async (ctx, args) => {
-		const chat = await ctx.runQuery(internal.chat.internalGet, { chatId: args.chatId });
+		const chat = await ctx.runQuery(internal.chats.internalGet, { chatId: args.chatId });
 		if (!chat) throw new Error('Chat not found');
 
 		if (chat.generatingTitle) return;
 
-		await ctx.runMutation(internal.chat.updateGenerating, {
+		await ctx.runMutation(internal.chats.updateGenerating, {
 			chatId: args.chatId,
 			generating: true
 		});
@@ -186,13 +187,13 @@ export const generateChatTitle = internalAction({
 			</chat>`
 			});
 
-			await ctx.runMutation(internal.chat.updateGeneratedTitle, {
+			await ctx.runMutation(internal.chats.updateGeneratedTitle, {
 				chatId: args.chatId,
 				title: text
 			});
 		} catch (error) {
 			console.error(error);
-			await ctx.runMutation(internal.chat.updateGenerating, {
+			await ctx.runMutation(internal.chats.updateGenerating, {
 				chatId: args.chatId,
 				generating: false
 			});
@@ -203,7 +204,7 @@ export const generateChatTitle = internalAction({
 export const streamMessage = httpAction(async (ctx, request) => {
 	const { streamId, chatId, apiKey, systemPrompt } = (await request.json()) as {
 		streamId: StreamId;
-		chatId: Id<'chat'>;
+		chatId: Id<'chats'>;
 		apiKey: string | undefined;
 		systemPrompt: string | undefined;
 	};
@@ -490,12 +491,12 @@ export const startGenerating = internalMutation({
 
 export const getMessagesForChat = internalQuery({
 	args: {
-		chatId: v.id('chat')
+		chatId: v.id('chats')
 	},
 	handler: async (
 		ctx,
 		args
-	): Promise<{ chat: Doc<'chat'>; messages: MessageWithAttachments[] }> => {
+	): Promise<{ chat: Doc<'chats'>; messages: MessageWithAttachments[] }> => {
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat) throw new Error('Chat not found');
 

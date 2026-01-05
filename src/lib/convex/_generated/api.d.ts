@@ -9,11 +9,12 @@
  */
 
 import type * as apiKeys from "../apiKeys.js";
-import type * as chat from "../chat.js";
 import type * as chatAttachments from "../chatAttachments.js";
+import type * as chats from "../chats.js";
 import type * as functions from "../functions.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
+import type * as r2 from "../r2.js";
 import type * as userSettings from "../userSettings.js";
 
 import type {
@@ -24,11 +25,12 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
-  chat: typeof chat;
   chatAttachments: typeof chatAttachments;
+  chats: typeof chats;
   functions: typeof functions;
   http: typeof http;
   messages: typeof messages;
+  r2: typeof r2;
   userSettings: typeof userSettings;
 }>;
 

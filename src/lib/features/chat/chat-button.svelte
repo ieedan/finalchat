@@ -16,7 +16,7 @@
 	import { warm } from '$lib/cache/cached-query.svelte';
 
 	type Props = {
-		chat: Doc<'chat'> & { index: number };
+		chat: Doc<'chats'> & { index: number };
 		gotoOpen: boolean;
 		gotoIndex: number | null;
 	};
@@ -35,7 +35,7 @@
 	}
 
 	async function deleteChat() {
-		await client.mutation(api.chat.remove, {
+		await client.mutation(api.chats.remove, {
 			ids: [chat._id]
 		});
 
@@ -47,7 +47,7 @@
 			return chat.title;
 		}
 
-		client.mutation(api.chat.updateTitle, {
+		client.mutation(api.chats.updateTitle, {
 			chatId: chat._id,
 			title
 		});
@@ -57,7 +57,7 @@
 
 	async function togglePinned() {
 		pinned = !pinned;
-		await client.mutation(api.chat.updatePinned, {
+		await client.mutation(api.chats.updatePinned, {
 			chatId: chat._id,
 			pinned: !chat.pinned
 		});
@@ -91,12 +91,12 @@
 					data-active={page.url.pathname.includes(`/chat/${chat._id}`)}
 					class="group/menu-button hover:bg-sidebar-accent focus-within:bg-sidebar-accent rounded-md flex items-center gap-2 h-8.5 data-[active=true]:bg-sidebar-accent"
 					onpointerover={() => {
-						warm(client, api.chat.get, {
+						warm(client, api.chats.get, {
 							chatId: chat._id
 						});
 					}}
 					onfocus={() => {
-						warm(client, api.chat.get, {
+						warm(client, api.chats.get, {
 							chatId: chat._id
 						});
 					}}

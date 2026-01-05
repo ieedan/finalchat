@@ -7,7 +7,7 @@
 	import { formatDuration, type Milliseconds } from '$lib/utils/time.js';
 	import { untrack } from 'svelte';
 	import ChatAssistantMessage from './chat-assistant-message.svelte';
-	import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
+	import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 	import ChatBranchButton from './chat-branch-button.svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel.js';
 	import { useMedia } from '$lib/hooks/use-media.svelte';

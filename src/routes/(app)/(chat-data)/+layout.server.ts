@@ -6,7 +6,7 @@ import { authKit } from '@workos/authkit-sveltekit';
 export const load = authKit.withAuth(async ({ auth, locals }) => {
 	const [userSettings, chats, apiKey, models] = await Promise.all([
 		locals.convex.query(api.userSettings.get, {}),
-		locals.convex.query(api.chat.getAll, {}),
+		locals.convex.query(api.chats.getAll, {}),
 		getApiKey(),
 		getModels()
 	]);
