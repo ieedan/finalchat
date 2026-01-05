@@ -7,7 +7,7 @@
 	import * as Field from '$lib/components/ui/field';
 	import { useLocalApiKey } from '$lib/features/api-keys/local-key-storage.svelte';
 	import ApiKeyInput from '../api-keys/api-key-input.svelte';
-	import { createApiKey } from '$lib/features/api-keys/api-keys.remote';
+	import { createApiKey, getApiKey } from '$lib/features/api-keys/api-keys.remote';
 
 	let storage = $state<'Local' | 'Remote'>('Remote');
 	let apiKey = $state<string>('');
@@ -26,7 +26,7 @@
 		if (storage === 'Local') {
 			localApiKey.current = apiKey;
 		} else {
-			await createApiKey({ key: apiKey });
+			await createApiKey({ key: apiKey }).updates(getApiKey());
 			localApiKey.current = null;
 		}
 
