@@ -1,0 +1,22 @@
+diff --git a/dist/index.js b/dist/index.js
+index c8be66c97a2776bec3f2d0968388264f3f37368c..1ad83ed69e3b1a2998e79b337cc513eddaf889c3 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -3219,7 +3219,7 @@ __export(index_exports, {
+ });
+ function initializeConfig(providedConfig) {
+   if (providedConfig) {
+-    validateConfig(providedConfig);
++    // validateConfig(providedConfig);
+     return providedConfig;
+   }
+   const config = {
+@@ -3228,7 +3228,7 @@ function initializeConfig(providedConfig) {
+     redirectUri: process.env.WORKOS_REDIRECT_URI || "",
+     cookiePassword: process.env.WORKOS_COOKIE_PASSWORD || ""
+   };
+-  validateConfig(config);
++  // validateConfig(config);
+   return config;
+ }
+ function validateConfig(config) {

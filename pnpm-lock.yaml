@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  '@workos/authkit-sveltekit':
+    hash: 921ba6da5c0cd86785530a89f106b937f87b5e9a02a87bfacaef1a22530bf7db
+    path: patches/@workos__authkit-sveltekit.patch
   bits-ui:
     hash: f669e4d8a3c52b59f7431a4daabb36fb90ce168473063e5ef72ce6ec2cff4cf1
     path: patches/bits-ui.patch
@@ -78,7 +81,7 @@ importers:
         version: 7.77.0
       '@workos/authkit-sveltekit':
         specifier: 0.0.1-alpha.0
-        version: 0.0.1-alpha.0(@sveltejs/kit@2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))
+        version: 0.0.1-alpha.0(patch_hash=921ba6da5c0cd86785530a89f106b937f87b5e9a02a87bfacaef1a22530bf7db)(@sveltejs/kit@2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))
       '@zxcvbn-ts/core':
         specifier: ^3.0.4
         version: 3.0.4
@@ -6070,7 +6073,7 @@ snapshots:
       - koa
       - next
 
-  '@workos/authkit-sveltekit@0.0.1-alpha.0(@sveltejs/kit@2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))':
+  '@workos/authkit-sveltekit@0.0.1-alpha.0(patch_hash=921ba6da5c0cd86785530a89f106b937f87b5e9a02a87bfacaef1a22530bf7db)(@sveltejs/kit@2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))':
     dependencies:
       '@sveltejs/kit': 2.49.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.45.5)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2))
       '@workos/authkit-session': 0.0.1-alpha.3
