@@ -75,8 +75,9 @@
 
 	--font-family-sans: var(--font-sans);
 	--font-family-mono: var(--font-mono);
-	--font-family-system: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-		'Helvetica Neue', Arial, sans-serif;
+	--font-family-system:
+		system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+		sans-serif;
 
 	/* For shiny text */
 	--animate-shimmer: shimmer 1s infinite;
