@@ -1,9 +1,6 @@
 onlyBuiltDependencies:
   - esbuild
 
-overrides:
-  animated-svelte: link:../../../Library/pnpm/global/5/node_modules/animated-svelte
-
 patchedDependencies:
   bits-ui: patches/bits-ui.patch
   convex-svelte: patches/convex-svelte.patch
