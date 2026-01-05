@@ -3,6 +3,7 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"packageManager": "pnpm@10.17.1",
 	"scripts": {
 		"dev": "dotenvx run -f .env.local -- concurrently -n convex,app -c blue,green \"pnpm dev:convex\" \"pnpm dev:vite\"",
 		"dev:vite": "vite dev --host",

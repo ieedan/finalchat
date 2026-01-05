@@ -15,7 +15,7 @@ import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
 import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
 import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
-import type { MessageWithAttachments } from '$lib/convex/chat.utils.js';
+import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 
 type ChatLayoutOptions = {
 	user: User;
