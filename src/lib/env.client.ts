@@ -6,9 +6,9 @@ const _env = createEnv({
 		PUBLIC_CONVEX_URL: z.url(),
 		PUBLIC_WORKOS_CLIENT_ID: z.string()
 	},
+	emptyStringAsUndefined: true,
 	clientPrefix: 'PUBLIC_',
-	runtimeEnv: import.meta.env,
-	emptyStringAsUndefined: true
+	runtimeEnv: import.meta.env
 });
 
 export const env = {
