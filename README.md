@@ -21,6 +21,7 @@
 ## Group Features
 
 Groups allow you to use your own key to pay for multiple users at the same time. You also get more advanced control features like:
+
 - [ ] Option to make it possible to view any chats created by group members
 - [ ] Option to prevent users from making chats public
 

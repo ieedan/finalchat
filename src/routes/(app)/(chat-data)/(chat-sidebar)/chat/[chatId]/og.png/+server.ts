@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			},
 			{
 				userMessage: firstUserMessage,
-				assistantMessage: firstAssistantMessage,
+				assistantMessage: firstAssistantMessage
 			}
 		);
 	} catch {

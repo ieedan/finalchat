@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { buttonVariants } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { cn } from '$lib/utils';
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { Separator } from '$lib/components/ui/separator';
 	import type { Doc } from '$lib/convex/_generated/dataModel';
-	import { CheckIcon, LockIcon, GlobeIcon } from '@lucide/svelte';
+	import { CheckIcon, LockIcon, GlobeIcon, ShareIcon, XIcon } from '@lucide/svelte';
 	import { Snippet } from '$lib/components/ui/snippet';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
+	import * as Drawer from '$lib/components/ui/drawer';
 
 	type Props = {
 		animated?: boolean;
@@ -27,36 +29,104 @@
 			public: value === 'public'
 		});
 	}
+
+	const isMobile = new IsMobile();
 </script>
 
-<Popover.Root>
-	<Popover.Trigger class={cn(buttonVariants({ variant: 'outline' }))}>Share</Popover.Trigger>
-	<Popover.Content align="end" {animated} class="w-sm flex flex-col gap-2">
-		<RadioGroup.Root
-			bind:value
-			class="border border-border rounded-lg gap-0 bg-input"
-			onValueChange={updatePublic}
-		>
-			{@render option({
-				icon: LockIcon,
-				label: 'Private',
-				description: 'Only you have access',
-				value: 'private'
-			})}
-			<Separator />
-			{@render option({
-				icon: GlobeIcon,
-				label: 'Public Access',
-				description: 'Anyone with the link can view',
-				value: 'public'
-			})}
-		</RadioGroup.Root>
+{#if isMobile.current}
+	<Drawer.Root>
+		<Drawer.Trigger class={cn(buttonVariants({ variant: 'outline' }))}>Share</Drawer.Trigger>
+		<Drawer.Content>
+			<RadioGroup.Root
+				bind:value
+				class="border border-border rounded-lg gap-0 bg-input"
+				onValueChange={updatePublic}
+			>
+				{@render option({
+					icon: LockIcon,
+					label: 'Private',
+					description: 'Only you have access',
+					value: 'private'
+				})}
+				<Separator />
+				{@render option({
+					icon: GlobeIcon,
+					label: 'Public Access',
+					description: 'Anyone with the link can view',
+					value: 'public'
+				})}
+			</RadioGroup.Root>
 
-		{#if value === 'public'}
-			<Snippet class="bg-popover" text="https://finalchat.app/share/{chat._id}" />
-		{/if}
-	</Popover.Content>
-</Popover.Root>
+			{#if navigator.canShare( { title: chat.title, url: `https://finalchat.app/share/${chat._id}` } )}
+				<div class="flex items-center gap-2 justify-between">
+					<Drawer.Close class={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'size-10')}>
+						<XIcon />
+					</Drawer.Close>
+					{#if value === 'public'}
+						<Button
+							onclick={() => {
+								navigator.share({
+									title: chat.title,
+									url: `https://finalchat.app/share/${chat._id}`
+								});
+							}}
+							class="size-10"
+							variant="outline"
+							size="icon"
+						>
+							<ShareIcon />
+						</Button>
+					{/if}
+				</div>
+			{:else if value === 'public'}
+				<a
+					href="/share/{chat._id}"
+					target="_blank"
+					class="w-full aspect-video rounded-lg overflow-hidden border border-border"
+				>
+					<img src="/chat/{chat._id}/og.png" alt="OG" class="w-full aspect-video object-fit" />
+				</a>
+				<Snippet class="bg-popover" text="https://finalchat.app/share/{chat._id}" />
+			{/if}
+		</Drawer.Content>
+	</Drawer.Root>
+{:else}
+	<Popover.Root>
+		<Popover.Trigger class={cn(buttonVariants({ variant: 'outline' }))}>Share</Popover.Trigger>
+		<Popover.Content align="end" {animated} class="w-sm flex flex-col gap-2">
+			<RadioGroup.Root
+				bind:value
+				class="border border-border rounded-lg gap-0 bg-input"
+				onValueChange={updatePublic}
+			>
+				{@render option({
+					icon: LockIcon,
+					label: 'Private',
+					description: 'Only you have access',
+					value: 'private'
+				})}
+				<Separator />
+				{@render option({
+					icon: GlobeIcon,
+					label: 'Public Access',
+					description: 'Anyone with the link can view',
+					value: 'public'
+				})}
+			</RadioGroup.Root>
+
+			{#if value === 'public'}
+				<a
+					href="/share/{chat._id}"
+					target="_blank"
+					class="w-full aspect-video rounded-lg overflow-hidden border border-border"
+				>
+					<img src="/chat/{chat._id}/og.png" alt="OG" class="w-full aspect-video object-fit" />
+				</a>
+				<Snippet class="bg-popover" text="https://finalchat.app/share/{chat._id}" />
+			{/if}
+		</Popover.Content>
+	</Popover.Root>
+{/if}
 
 {#snippet option({
 	icon: Icon,

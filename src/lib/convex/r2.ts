@@ -8,4 +8,3 @@ export const r2 = new R2(components.r2, {
 	R2_ENDPOINT: env.R2_ENDPOINT,
 	R2_BUCKET: env.R2_BUCKET
 });
-

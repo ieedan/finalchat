@@ -4,7 +4,7 @@
 
 	let {
 		userMessage,
-		assistantMessage,
+		assistantMessage
 	}: {
 		userMessage: MessageWithAttachments | undefined;
 		assistantMessage: MessageWithAttachments | undefined;

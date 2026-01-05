@@ -9,7 +9,7 @@
 	import * as NativeSelect from '$lib/components/ui/native-select';
 	import { cn } from '$lib/utils';
 	import { buttonVariants } from '$lib/components/ui/button';
-	
+
 	type Props = {
 		models?: Model[];
 		animated?: boolean;
