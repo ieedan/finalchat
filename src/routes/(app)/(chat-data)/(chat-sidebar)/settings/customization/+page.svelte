@@ -8,6 +8,7 @@
 	import { api } from '$lib/convex/_generated/api';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import { toast } from 'svelte-sonner';
+	import SettingsFontCard from '$lib/features/settings/settings-font-card.svelte';
 
 	const client = useConvexClient();
 
@@ -46,4 +47,6 @@
 			<Button onClickPromise={handleSave} disabled={!systemPromptHasChanged}>Save</Button>
 		</Card.Footer>
 	</Card.Root>
+
+	<SettingsFontCard />
 </AccountSettings.Page>

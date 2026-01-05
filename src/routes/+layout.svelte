@@ -1,6 +1,8 @@
 <script lang="ts">
 	import './layout.css';
 	import '@fontsource-variable/ibm-plex-sans';
+	import '@fontsource-variable/atkinson-hyperlegible-mono';
+	import '@fontsource-variable/atkinson-hyperlegible-next';
 	import '@fontsource-variable/geist-mono';
 	import favicon from '$lib/assets/favicon.svg';
 	import { env } from '$lib/env.client';
@@ -13,6 +15,7 @@
 	import { ConfirmDeleteDialog } from '$lib/components/ui/confirm-delete-dialog';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { MetaTags } from '$lib/components/meta-tags';
+	import { ThemeProvider } from '$lib/components/theme-provider';
 
 	let { children } = $props();
 
@@ -62,5 +65,7 @@
 	description="Chat with any model available on OpenRouter with your own API key."
 	canonical={new URL(page.url.pathname, page.url.origin).href}
 >
-	{@render children()}
+	<ThemeProvider defaultFontSans={page.data.fontSans} defaultFontMono={page.data.fontMono}>
+		{@render children()}
+	</ThemeProvider>
 </MetaTags>
