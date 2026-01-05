@@ -147,6 +147,7 @@
 
 {#if isMobile.current}
 	<NativeSelect.Root
+		bind:value={modelPickerState.rootState.opts.modelId.current}
 		class={cn(buttonVariants({ variant: 'input' }), 'max-w-[175px] md:max-w-none')}
 	>
 		{#each sortedModels.filter( (model) => chatLayoutState.userSettings?.favoriteModelIds?.includes(model.id) ) as model (model.id)}
