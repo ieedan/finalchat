@@ -7,7 +7,8 @@ const _env = createEnv({
 		PUBLIC_WORKOS_CLIENT_ID: z.string()
 	},
 	clientPrefix: 'PUBLIC_',
-	runtimeEnv: import.meta.env
+	runtimeEnv: import.meta.env,
+	emptyStringAsUndefined: true
 });
 
 export const env = {
