@@ -52,8 +52,8 @@
 </script>
 
 {#if chatViewState.chat !== null}
-	<header class="sticky top-0">
-		<div class="px-3 py-2.5 w-full flex items-center bg-background justify-between z-20 h-14">
+	<header class="sticky top-0 z-20">
+		<div class="px-3 py-2.5 w-full flex items-center bg-background justify-between h-14">
 			<div class="flex items-center gap-4">
 				<div
 					data-visible={sidebar.isMobile || !sidebar.open}

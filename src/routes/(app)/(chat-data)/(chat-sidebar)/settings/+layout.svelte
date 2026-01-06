@@ -9,7 +9,7 @@
 </script>
 
 <header class="sticky top-0 border-b z-20">
-	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20 bg-background">
+	<div class="px-3 py-2.5 w-full flex items-center justify-between bg-background">
 		<div class="flex items-center gap-2">
 			{#if sidebar.isMobile || !sidebar.open}
 				<div class="size-9"></div>
