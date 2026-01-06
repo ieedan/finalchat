@@ -6,7 +6,6 @@
  */
 
 import { readFileSync, existsSync } from 'fs';
-import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { Octokit } from '@octokit/rest';
@@ -22,29 +21,14 @@ if (!token) {
 	process.exit(1);
 }
 
-// Parse repo info from git remote
-function getRepoInfo(): { owner: string; repo: string } {
-	try {
-		const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
-		// Handle both HTTPS and SSH URLs
-		// https://github.com/owner/repo.git
-		// git@github.com:owner/repo.git
-		const match = remoteUrl.match(/github\.com[:/]([^/]+)\/([^/.]+)/);
-		if (match) {
-			return { owner: match[1], repo: match[2] };
-		}
-	} catch {
-		// Fall back to hardcoded values
-	}
-	return { owner: 'ieedan', repo: 'finalchat' };
-}
+const owner = 'ieedan';
+const repo = 'finalchat';
 
 // Read package.json to get the version
 const packageJson = JSON.parse(readFileSync(join(rootDir, 'package.json'), 'utf-8'));
 const version: string = packageJson.version;
 const tagName = `v${version}`;
 
-const { owner, repo } = getRepoInfo();
 const octokit = new Octokit({ auth: token });
 
 // Check if this release already exists
