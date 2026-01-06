@@ -18,8 +18,8 @@
 	<label
 		for="basic"
 		class={cn(
-			'border rounded-md p-4 flex flex-col justify-between transition-all',
-			mode === 'basic' && 'border-primary bg-accent/50'
+			'border border-border rounded-md p-4 flex flex-col justify-between transition-all bg-background',
+			mode === 'basic' && 'ring-2 ring-primary'
 		)}
 	>
 		<div class="flex flex-col gap-1">
@@ -54,8 +54,8 @@
 	<label
 		for="advanced"
 		class={cn(
-			'border rounded-md p-4 flex flex-col justify-between transition-all',
-			mode === 'advanced' && 'border-primary bg-accent/50'
+			'border border-border rounded-md p-4 flex flex-col justify-between transition-all bg-background',
+			mode === 'advanced' && 'ring-2 ring-primary'
 		)}
 	>
 		<div class="flex flex-col gap-1">

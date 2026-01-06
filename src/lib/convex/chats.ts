@@ -7,8 +7,9 @@ import {
 	type MessageWithAttachments
 } from './chats.utils';
 import { internalQuery, query } from './_generated/server';
-import { internal } from './_generated/api';
+import { api, internal } from './_generated/api';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
+import { Prompt } from './messages';
 
 export const getAll = query({
 	args: {},
@@ -30,12 +31,14 @@ export const get = query({
 	args: {
 		chatId: v.id('chats')
 	},
-	handler: async (ctx, args): Promise<Doc<'chats'> & { messages: MessageWithAttachments[] }> => {
+	handler: async (
+		ctx,
+		args
+	): Promise<(Doc<'chats'> & { messages: MessageWithAttachments[] }) | null> => {
 		const user = await ctx.auth.getUserIdentity();
 
 		const chat = await ctx.db.get(args.chatId);
-		if (!chat || chat.userId !== user?.subject)
-			throw new Error('Chat not found or you are not authorized to access it');
+		if (!chat || (chat.userId !== user?.subject && !chat.public)) return null;
 
 		const messages = await getChatMessages(ctx, args.chatId);
 
@@ -80,6 +83,15 @@ export const internalGet = internalQuery({
 			...chat,
 			messages
 		};
+	}
+});
+
+export const internalGetChat = internalQuery({
+	args: {
+		chatId: v.id('chats')
+	},
+	handler: async (ctx, args): Promise<Doc<'chats'> | null> => {
+		return await ctx.db.get(args.chatId);
 	}
 });
 
@@ -177,9 +189,11 @@ export const branchFromMessage = mutation({
 			}),
 			v.object({
 				_id: v.id('messages'),
-				role: v.literal('assistant')
+				role: v.literal('assistant'),
+				prompt: v.optional(Prompt)
 			})
-		)
+		),
+		apiKey: v.string()
 	},
 	handler: async (
 		ctx,
@@ -194,7 +208,7 @@ export const branchFromMessage = mutation({
 		}
 
 		const ogChat = await ctx.runQuery(internal.chats.internalGet, { chatId: sourceMessage.chatId });
-		if (!ogChat || ogChat.userId !== user.subject) {
+		if (!ogChat || (ogChat.userId !== user.subject && !ogChat.public)) {
 			throw new Error('Chat not found or you are not authorized to access it');
 		}
 
@@ -282,6 +296,19 @@ export const branchFromMessage = mutation({
 					modelId: args.message.modelId
 				}
 			});
+		} else if (
+			sourceMessage.role === 'assistant' &&
+			args.message.role === 'assistant' &&
+			args.message.prompt !== undefined
+		) {
+			// if a prompt is provided with an assistant message we need create a new user message and then generate a new assistant message
+			const { assistantMessageId } = await ctx.runMutation(api.messages.create, {
+				apiKey: args.apiKey,
+				prompt: args.message.prompt,
+				chatId: newChatId
+			});
+
+			newAssistantMessageId = assistantMessageId;
 		}
 
 		return { newChatId, newAssistantMessageId };

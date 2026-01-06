@@ -2,17 +2,14 @@
 	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import { useSidebar } from '$lib/components/ui/sidebar';
 	import { Button } from '$lib/components/ui/button';
-	import { MetaTags } from '$lib/components/meta-tags';
 
 	let { children } = $props();
 
 	const sidebar = useSidebar();
 </script>
 
-<MetaTags title="Settings" titleTemplate="%s ~ Settings ~ Finalchat" />
-
-<header class="sticky top-0 border-b">
-	<div class="px-3 py-2.5 w-full flex items-center justify-between z-20 bg-background">
+<header class="sticky top-0 border-b z-20">
+	<div class="px-3 py-2.5 w-full flex items-center justify-between bg-background">
 		<div class="flex items-center gap-2">
 			{#if sidebar.isMobile || !sidebar.open}
 				<div class="size-9"></div>

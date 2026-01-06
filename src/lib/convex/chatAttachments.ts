@@ -105,22 +105,47 @@ export const create = internalMutation({
 	}
 });
 
-export const downloadFile = httpAction(async (ctx, request) => {
-	const user = await ctx.auth.getUserIdentity();
-	if (!user) throw new Error('Unauthorized not');
+export const internalGetAttachment = internalQuery({
+	args: {
+		key: v.string()
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db
+			.query('chatAttachments')
+			.withIndex('by_key', (q) => q.eq('key', args.key))
+			.first();
+	}
+});
 
+export const downloadFile = httpAction(async (ctx, request) => {
 	const { key } = await request.json();
 
-	const { userId } = parseUploadKey(key as UploadKey);
-	if (userId !== user.subject) throw new Error('Unauthorized');
+	const attachment = await ctx.runQuery(internal.chatAttachments.internalGetAttachment, { key });
+	if (!attachment) {
+		return new Response('Attachment not found', { status: 404 });
+	}
 
-	const response = await fetch(
-		await ctx.runQuery(internal.chatAttachments.internalGetFileUrl, { key })
-	);
+	const chat = await ctx.runQuery(internal.chats.internalGetChat, { chatId: attachment.chatId });
+	if (!chat) {
+		return new Response('Chat not found', { status: 404 });
+	}
+
+	// Check if the chat is public or if the user has access
+	const user = await ctx.auth.getUserIdentity();
+	const isPublic = chat.public === true;
+	const isOwner = user && chat.userId === user.subject;
+
+	if (!isPublic && !isOwner) {
+		return new Response('Unauthorized', { status: 403 });
+	}
+
+	const fileUrl = await ctx.runQuery(internal.chatAttachments.internalGetFileUrl, { key });
+
+	const response = await fetch(fileUrl);
 
 	const newResponse = new Response(response.body, response);
 
-	newResponse.headers.set('Access-Control-Allow-Origin', 'http://localhost:5173');
+	newResponse.headers.set('Access-Control-Allow-Origin', '*');
 
 	return newResponse;
 });

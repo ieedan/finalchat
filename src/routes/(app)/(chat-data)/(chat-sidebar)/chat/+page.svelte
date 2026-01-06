@@ -8,7 +8,6 @@
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
-	import { MetaTags } from '$lib/components/meta-tags';
 	import { FinalChat } from '$lib/components/logos';
 	import {
 		ArrowRightIcon,
@@ -17,7 +16,6 @@
 		PanelLeftIcon,
 		SendIcon
 	} from '@lucide/svelte';
-	import { page } from '$app/state';
 
 	let { data } = $props();
 
@@ -55,51 +53,39 @@
 	});
 </script>
 
-<MetaTags
-	title="New Chat"
-	openGraph={{
-		title: 'New Chat - Finalchat',
-		url: page.url.toString(),
-		images: [
-			{
-				url: '/chat/og.png',
-				width: 1200,
-				height: 630,
-				alt: 'New Chat - Finalchat'
-			}
-		]
-	}}
-/>
-
-<div class="w-full h-full flex-col items-center justify-center flex px-4 gap-8">
-	<div class="flex w-full items-center flex-col h-full justify-center md:h-auto">
-		<FinalChat class="size-20" />
-	</div>
-	{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
-		<div class="md:flex flex-col gap-0 w-full max-w-sm hidden">
-			{#each shortcuts as shortcut (shortcut.name)}
-				<div class="flex items-center justify-between gap-8 px-3 py-2.5 rounded-lg group">
-					<div class="flex items-center gap-3">
-						<div class="flex items-center justify-center size-5 rounded-xs bg-muted/50">
-							<shortcut.icon class="size-4 text-primary" />
-						</div>
-						<span class="text-sm font-medium text-muted-foreground">
-							{shortcut.name}
-						</span>
-					</div>
-					<Kbd.Group class="gap-1">
-						{#each shortcut.keys as key (key)}
-							<Kbd.Root class="rounded-xs">
-								{key}
-							</Kbd.Root>
-						{/each}
-					</Kbd.Group>
-				</div>
-			{/each}
+<div class="w-full h-full flex-col items-center justify-center flex px-4 gap-12">
+	<div class="flex flex-col gap-8">
+		<div class="flex w-full items-center flex-col h-full justify-center md:h-auto">
+			<FinalChat class="size-20" />
 		</div>
-	{:else}
-		<h1 class="text-3xl font-bold">{greeting()}, {chatState.user.firstName}!</h1>
-	{/if}
+		{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+			<div class="md:flex flex-col gap-0 w-full max-w-sm hidden">
+				{#each shortcuts as shortcut (shortcut.name)}
+					<div class="flex items-center justify-between gap-8 px-3 py-2.5 rounded-lg group">
+						<div class="flex items-center gap-3">
+							<div class="flex items-center justify-center size-5 rounded-xs bg-muted/50">
+								<shortcut.icon class="size-4 text-primary" />
+							</div>
+							<span class="text-sm font-medium text-muted-foreground">
+								{shortcut.name}
+							</span>
+						</div>
+						<Kbd.Group class="gap-1">
+							{#each shortcut.keys as key (key)}
+								<Kbd.Root class="rounded-xs">
+									{key}
+								</Kbd.Root>
+							{/each}
+						</Kbd.Group>
+					</div>
+				{/each}
+			</div>
+		{:else}
+			<h1 class="text-3xl font-bold">
+				{greeting()}{chatState.user ? `, ${chatState.user.firstName}` : ''}!
+			</h1>
+		{/if}
+	</div>
 	<div class="flex flex-col gap-4 w-full items-center pb-4">
 		<PromptInput.Root
 			bind:modelId={modelId.current}
@@ -110,6 +96,11 @@
 			bind:attachments={attachmentsList.current}
 			bind:value={query}
 		>
+			<PromptInput.Banner dismissedByError dismissed={chatState.user !== null}>
+				<PromptInput.BannerContent>
+					<p><a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!</p>
+				</PromptInput.BannerContent>
+			</PromptInput.Banner>
 			<PromptInput.Content>
 				<PromptInput.AttachmentList />
 				<PromptInput.Textarea placeholder="Ask me anything..." />
@@ -122,7 +113,7 @@
 						{/if}
 						<PromptInput.AttachmentButton />
 					</div>
-					<PromptInput.Submit />
+					<PromptInput.Submit disabled={chatState.user === null} />
 				</PromptInput.Footer>
 			</PromptInput.Content>
 		</PromptInput.Root>
