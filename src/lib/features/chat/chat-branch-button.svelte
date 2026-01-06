@@ -58,6 +58,8 @@
 	}
 </script>
 
-<Button variant="ghost" size="icon" onClickPromise={branchFromMessage}>
-	<SplitIcon />
-</Button>
+{#if chatLayoutState.user !== null}
+	<Button variant="ghost" size="icon" onClickPromise={branchFromMessage}>
+		<SplitIcon />
+	</Button>
+{/if}
