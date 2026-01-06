@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { AccessTokenCtx } from '$lib/context.svelte.js';
 	import type { Doc } from '$lib/convex/_generated/dataModel';
-	import { env } from '$lib/env.client';
 	import { cn } from '$lib/utils';
-	import { getImageFileExtension } from '$lib/utils/media-types';
-	import { DownloadIcon, EyeIcon } from '@lucide/svelte';
+	import { EyeIcon } from '@lucide/svelte';
 	import { tv } from 'tailwind-variants';
+	import AttachmentDownload from './attachment-download.svelte';
 
 	const imageAttachmentVariants = tv({
 		base: 'rounded-md overflow-hidden max-w-sm relative border border-border group/image',
@@ -25,44 +23,19 @@
 	};
 
 	let { attachment, size = 'sm', className }: Props = $props();
-
-	const accessToken = AccessTokenCtx.get();
-
-	async function downloadImage(filename: string) {
-		const response = await fetch(
-			new URL('/download-image', env.PUBLIC_CONVEX_SITE_URL).toString(),
-			{
-				method: 'POST',
-				body: JSON.stringify({ key: attachment.key }),
-				headers: { Authorization: `Bearer ${accessToken?.current}` }
-			}
-		);
-		const blob = await response.blob();
-
-		const link = document.createElement('a');
-		link.href = URL.createObjectURL(blob);
-		link.download = filename;
-		link.click();
-
-		URL.revokeObjectURL(link.href);
-	}
 </script>
 
 <div class={cn(imageAttachmentVariants({ size }), className)}>
 	<div
 		class="absolute right-2 top-2 md:opacity-0 group-hover/image:opacity-100 transition-opacity duration-200"
 	>
-		<Button
-			onclick={() =>
-				downloadImage(
-					`generated-image${getImageFileExtension(attachment.mediaType ?? 'image/png') ?? '.png'}`
-				)}
+		<AttachmentDownload
+			attachmentKey={attachment.key}
+			mediaType={attachment.mediaType ?? 'image/png'}
+			filename="generated-image"
 			size="icon"
 			variant="outline"
-			class="cursor-pointer"
-		>
-			<DownloadIcon class="size-4" />
-		</Button>
+		/>
 	</div>
 	<div
 		class="absolute left-2 top-2 md:opacity-0 group-hover/image:opacity-100 transition-opacity duration-200"

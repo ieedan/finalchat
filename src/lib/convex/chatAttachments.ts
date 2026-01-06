@@ -117,6 +117,50 @@ export const internalGetAttachment = internalQuery({
 	}
 });
 
+export const getAll = query({
+	args: {},
+	handler: async (ctx) => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return [];
+
+		const attachments = await ctx.db
+			.query('chatAttachments')
+			.withIndex('by_user', (q) => q.eq('userId', user.subject))
+			.collect();
+
+		const attachmentsWithUrls = await Promise.all(
+			attachments.map(async (attachment) => {
+				const url = await r2.getUrl(attachment.key, { expiresIn: undefined });
+				return { ...attachment, url };
+			})
+		);
+
+		return attachmentsWithUrls;
+	}
+});
+
+export const remove = mutation({
+	args: {
+		ids: v.array(v.id('chatAttachments'))
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		for (const id of args.ids) {
+			const attachment = await ctx.db.get(id);
+			if (!attachment || attachment.userId !== user.subject) {
+				throw new Error('Attachment not found or you are not authorized to delete it');
+			}
+
+			// Delete from R2
+			await r2.deleteObject(ctx, attachment.key);
+			// Delete from database
+			await ctx.db.delete(id);
+		}
+	}
+});
+
 export const downloadFile = httpAction(async (ctx, request) => {
 	const { key } = await request.json();
 
