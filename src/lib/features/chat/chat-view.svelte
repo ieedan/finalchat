@@ -14,6 +14,8 @@
 	import { MetaTags } from '$lib/components/meta-tags';
 	import ShareButton from './chat-share-button.svelte';
 	import { page } from '$app/state';
+	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { EyeIcon } from '@lucide/svelte';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -45,6 +47,8 @@
 	const lastAssistantMessage = $derived.by(() => {
 		return chatViewState.chat?.messages.findLast((message) => message.role === 'assistant');
 	});
+
+	const isChatOwner = $derived(chatViewState.chatQuery.data?.userId === chatLayoutState.user?.id);
 </script>
 
 <MetaTags
@@ -75,7 +79,11 @@
 		</div>
 		<div class="flex items-center gap-2">
 			{#if chatViewState.chatQuery.data}
-				<ShareButton chat={chatViewState.chatQuery.data} />
+				{#if isChatOwner}
+					<ShareButton chat={chatViewState.chatQuery.data} />
+				{:else if chatViewState.chatQuery.data.public}
+					<Badge><EyeIcon /> Viewing a shared chat</Badge>
+				{/if}
 			{/if}
 		</div>
 	</div>
@@ -90,6 +98,16 @@
 	})}
 >
 	<div class="flex flex-col w-full max-w-3xl px-4 flex-1">
+		{#if !isChatOwner}
+			<div
+				class="flex flex-col w-full max-w-3xl mt-4 px-4 flex-1 border border-border rounded-md py-3 bg-accent"
+			>
+				<p class="text-sm">
+					You're viewing a shared chat. Start your own chat
+					<a href="/chat" class="underline underline-offset-2">here</a>.
+				</p>
+			</div>
+		{/if}
 		<div class="flex-1 flex flex-col gap-2 py-4">
 			{#each chatViewState.chat?.messages ?? [] as message (message._id)}
 				<ChatMessage
@@ -101,7 +119,9 @@
 			{/each}
 		</div>
 
-		<div class="sticky bottom-0 pb-4 bg-background rounded-t-lg">
+		<div
+			class="sticky bottom-0 pb-4 has-[[data-slot=prompt-input-banner][data-state=open]]:pt-8 bg-background rounded-t-lg transition-[padding]"
+		>
 			{#if !autoScroll.isAtBottom}
 				<div class="absolute w-full h-[24px] bg-background mask-t-from-0% -top-[14px] z-19"></div>
 			{/if}
@@ -117,6 +137,13 @@
 				bind:attachments={attachmentsList.current}
 				class="group/prompt-input z-20"
 			>
+				<PromptInput.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
+					<PromptInput.BannerContent>
+						<p>
+							<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
+						</p>
+					</PromptInput.BannerContent>
+				</PromptInput.Banner>
 				<PromptInput.ScrollToBottom
 					isNearBottom={autoScroll.isNearBottom}
 					scrollToBottom={autoScroll.scrollToBottom}
@@ -142,7 +169,7 @@
 									/>
 								{/if}
 							{/if}
-							<PromptInput.Submit />
+							<PromptInput.Submit disabled={chatLayoutState.user === null}/>
 						</div>
 					</PromptInput.Footer>
 				</PromptInput.Content>

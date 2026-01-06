@@ -86,6 +86,10 @@ class ChatLayoutState {
 		return page.params.chatId as Id<'chats'> | undefined;
 	}
 
+	get isChatOwner() {
+		return this.chatId ? this.chatsQuery.data?.find((c) => c._id === this.chatId)?.userId === this.user?.id : false;
+	}
+
 	get apiKey(): string | null {
 		return (
 			this.localApiKey.current ?? this.apiKeysQuery.current?.key ?? this.opts.apiKey?.key ?? null
@@ -94,6 +98,7 @@ class ChatLayoutState {
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments }) => {
 		if (!this.user) throw new Error('You must be signed in start chatting!');
+		if (!this.apiKey) throw new Error('You need to have an API key setup before you can start chatting!');
 
 		const model = this.models.find((m) => m.id === modelId);
 		if (!model) throw new Error(`Model with id: ${modelId} not found`);
@@ -133,7 +138,7 @@ type ChatViewOptions = {
 };
 
 class ChatViewState {
-	chatQuery: QueryResult<Doc<'chats'> & { messages: MessageWithAttachments[] }>;
+	chatQuery: QueryResult<(Doc<'chats'> & { messages: MessageWithAttachments[] }) | null>;
 	constructor(readonly opts: ChatViewOptions) {
 		this.chatQuery = useCachedQuery(api.chats.get, {
 			chatId: this.opts.chatId

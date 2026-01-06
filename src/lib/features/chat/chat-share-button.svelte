@@ -33,7 +33,7 @@
 
 	const isMobile = new IsMobile();
 
-	const sharePath = $derived(`/share/${chat._id}`);
+	const sharePath = $derived(`/chat/${chat._id}`);
 	const shareUrl = $derived(new URL(sharePath, page.url.origin).toString());
 </script>
 
