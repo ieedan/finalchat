@@ -41,10 +41,8 @@ function greet(name: string) {
 					{#snippet children({ checked })}
 						<div
 							class={cn(
-								'flex h-full flex-col items-center justify-center gap-2 rounded-lg border-2 p-4 transition-colors',
-								checked
-									? 'border-primary bg-background'
-									: 'border-border bg-background hover:border-muted-foreground/50'
+								'flex h-full flex-col items-center bg-background justify-center gap-2 rounded-lg border border-border p-4 transition-colors',
+								checked ? 'ring-2 ring-primary' : 'hover:border-muted-foreground/50'
 							)}
 						>
 							<span class="text-3xl text-foreground" style:font-family={preset.sansFamily}>Aa</span>
