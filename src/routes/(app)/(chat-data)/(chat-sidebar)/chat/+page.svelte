@@ -53,16 +53,25 @@
 			return 'Good evening';
 		}
 	});
+
+	const ogImageUrl = $derived(new URL('/chat/og.png', page.url.origin).toString());
 </script>
 
 <MetaTags
 	title="New Chat"
+	twitter={{
+		cardType: 'summary_large_image',
+		title: 'New Chat - Finalchat',
+		description: 'Chat with any model available on OpenRouter with your own API key.',
+		image: ogImageUrl,
+		creator: '@ieeeedan'
+	}}
 	openGraph={{
 		title: 'New Chat - Finalchat',
 		url: page.url.toString(),
 		images: [
 			{
-				url: '/chat/og.png',
+				url: ogImageUrl,
 				width: 1200,
 				height: 630,
 				alt: 'New Chat - Finalchat'

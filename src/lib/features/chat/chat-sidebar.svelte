@@ -162,16 +162,12 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 		{:else}
 			<div class="border border-border rounded-lg flex flex-col p-4 gap-4">
 				<div class="flex flex-col text-sm gap-1">
-					<span class="font-medium">
-						Get started with Finalchat
-					</span>
+					<span class="font-medium"> Get started with Finalchat </span>
 					<span class="text-muted-foreground">
 						Sign in to save your conversations and access them anywhere.
 					</span>
 				</div>
-				<Button href="/auth/login" size="sm">
-					Sign in
-				</Button>
+				<Button href="/auth/login" size="sm">Sign in</Button>
 			</div>
 		{/if}
 	</Sidebar.Footer>

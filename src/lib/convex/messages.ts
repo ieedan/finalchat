@@ -84,24 +84,27 @@ export const create = mutation({
 			isChatOwner = chat?.userId === user.subject;
 
 			if (!isChatOwner) {
-				const lastMessages = getLastUserAndAssistantMessages(chat.messages)
+				const lastMessages = getLastUserAndAssistantMessages(chat.messages);
 				if (!lastMessages) throw new Error('No last messages found');
 				// if we aren't the chat owner we are going to fork the chat from the last assistant message
-				const { newChatId, newAssistantMessageId } = await ctx.runMutation(api.chats.branchFromMessage, {
-					message: {
-						_id: lastMessages.assistantMessage._id,
-						role: 'assistant',
-						prompt: args.prompt
-					},
-					apiKey: args.apiKey
-				});
+				const { newChatId, newAssistantMessageId } = await ctx.runMutation(
+					api.chats.branchFromMessage,
+					{
+						message: {
+							_id: lastMessages.assistantMessage._id,
+							role: 'assistant',
+							prompt: args.prompt
+						},
+						apiKey: args.apiKey
+					}
+				);
 
 				if (!newAssistantMessageId) throw new Error('Failed to branch from message');
 
 				return {
 					chatId: newChatId,
 					assistantMessageId: newAssistantMessageId
-				}
+				};
 			}
 		}
 
@@ -149,7 +152,7 @@ export const create = mutation({
 
 		return {
 			chatId,
-			assistantMessageId,
+			assistantMessageId
 		};
 	}
 });
