@@ -14,7 +14,7 @@
 </script>
 
 <MetaTags
-	title={chatTitle}
+	title="{chatTitle} - Finalchat"
 	description={chatTitle}
 	twitter={{
 		cardType: 'summary_large_image',
