@@ -6,7 +6,7 @@
 
 	const chatViewState = useChatView();
 
-	const chatTitle = $derived(chatViewState.chatQuery.data?.title ?? 'Finalchat chat');
+	const chatTitle = $derived(chatViewState.chatQuery.data?.title ?? 'Chat');
 
 	const ogImageUrl = $derived(
 		new URL(`/chat/${page.params.chatId}/og.png`, page.url.origin).toString()
