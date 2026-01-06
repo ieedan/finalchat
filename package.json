@@ -18,9 +18,14 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run"
+		"test": "npm run test:unit -- --run",
+		"changeset": "changeset",
+		"changeset:version": "changeset version",
+		"release": "node scripts/release.js"
 	},
 	"devDependencies": {
+		"@changesets/changelog-github": "^0.5.2",
+		"@changesets/cli": "^2.29.8",
 		"@convex-dev/persistent-text-streaming": "^0.3.0",
 		"@convex-dev/r2": "^0.8.1",
 		"@dotenvx/dotenvx": "^1.51.1",
