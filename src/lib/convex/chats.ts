@@ -83,6 +83,15 @@ export const internalGet = internalQuery({
 	}
 });
 
+export const internalGetChat = internalQuery({
+	args: {
+		chatId: v.id('chats')
+	},
+	handler: async (ctx, args): Promise<Doc<'chats'> | null> => {
+		return await ctx.db.get(args.chatId);
+	}
+});
+
 export const updatePinned = mutation({
 	args: {
 		chatId: v.id('chats'),

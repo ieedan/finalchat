@@ -10,12 +10,9 @@
 	import { IsMounted } from 'runed';
 	import { cn } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { useChatLayout } from '$lib/features/chat/chat.svelte.js';
 	import { useSidebar } from '$lib/components/ui/sidebar';
 
 	let { data } = $props();
-
-	const chatLayoutState = useChatLayout();
 
 	const chatQuery = useQueryWithFallback(
 		api.chats.getPublic,
@@ -89,12 +86,7 @@
 		</div>
 		<div class="flex-1 flex flex-col gap-2 py-4">
 			{#each chatQuery.data?.messages as message (message._id)}
-				<ChatMessage
-					{message}
-					apiKey={chatLayoutState.apiKey}
-					bind:createdMessages={chatLayoutState.createdMessages}
-					systemPrompt={chatLayoutState.userSettingsQuery.data?.systemPrompt ?? null}
-				/>
+				<ChatMessage {message} apiKey={null} createdMessages={null} systemPrompt={null} />
 			{/each}
 		</div>
 	</div>
