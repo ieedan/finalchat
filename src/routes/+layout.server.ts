@@ -5,7 +5,10 @@ export async function load(event) {
 		title: 'Finalchat',
 		titleTemplate: '%s ~ Finalchat',
 		description: 'Chat with any model available on OpenRouter with your own API key.',
-		canonical: new URL(event.url.pathname, event.url.origin).href
+		canonical: new URL(event.url.pathname, event.url.origin).href,
+		openGraph: {
+			siteName: 'Finalchat'
+		}
 	});
 	
 	const fontPreset = event.cookies.get('theme-font-preset') ?? null;
