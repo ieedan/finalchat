@@ -40,6 +40,7 @@
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@t3-oss/env-core": "^0.13.8",
 		"@tailwindcss/vite": "^4.1.17",
+		"@tanstack/table-core": "^8.21.3",
 		"@types/node": "^24.10.1",
 		"@types/node-rsa": "^1.1.4",
 		"@workos-inc/node": "^7.77.0",

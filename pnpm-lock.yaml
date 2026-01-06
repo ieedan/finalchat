@@ -76,6 +76,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.17
         version: 4.1.17(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2))
+      '@tanstack/table-core':
+        specifier: ^8.21.3
+        version: 8.21.3
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
@@ -1668,6 +1671,10 @@ packages:
 
   '@takumi-rs/wasm@0.55.4':
     resolution: {integrity: sha512-/iOhQW+nJW0hhv2viu6806JehiAKWFvJ4LXux6CW4XBpP1xWdr4H+VBS7OYMbQu/7XaPITyL7B10lSTtRUAHoA==}
+
+  '@tanstack/table-core@8.21.3':
+    resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
+    engines: {node: '>=12'}
 
   '@tokenizer/inflate@0.2.7':
     resolution: {integrity: sha512-MADQgmZT1eKjp06jpI2yozxaU9uVs4GzzgSL+uEq7bVcJ9V1ZXQkeGNql1fsSI0gMy1vhvNTNbUqrx+pZfJVmg==}
@@ -5658,6 +5665,8 @@ snapshots:
       '@takumi-rs/wasm': 0.55.4
 
   '@takumi-rs/wasm@0.55.4': {}
+
+  '@tanstack/table-core@8.21.3': {}
 
   '@tokenizer/inflate@0.2.7':
     dependencies:
