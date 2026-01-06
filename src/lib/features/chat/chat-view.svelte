@@ -112,7 +112,7 @@
 		})}
 	>
 		<div class="flex flex-col w-full max-w-3xl px-4 flex-1">
-			{#if !isChatOwner}
+			{#if !isChatOwner && chatViewState.chat}
 				<div
 					class="flex flex-col w-full max-w-3xl mt-4 px-4 flex-1 border border-border rounded-md py-3 bg-accent"
 				>
