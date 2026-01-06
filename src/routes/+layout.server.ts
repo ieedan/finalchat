@@ -1,4 +1,4 @@
-import { defineBaseMetaTags } from "svelte-meta-tags";
+import { defineBaseMetaTags } from 'svelte-meta-tags';
 
 export async function load(event) {
 	const baseMetaTags = defineBaseMetaTags({
@@ -10,7 +10,7 @@ export async function load(event) {
 			siteName: 'Finalchat'
 		}
 	});
-	
+
 	const fontPreset = event.cookies.get('theme-font-preset') ?? null;
 
 	return {

@@ -8,4 +8,3 @@ export function load() {
 
 	return { ...pageMetaTags };
 }
-

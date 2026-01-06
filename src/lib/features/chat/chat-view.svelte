@@ -11,9 +11,7 @@
 	import { cn } from '$lib/utils';
 	import { ChatAttachmentUploader } from './chat-attachment-uploader.svelte.js';
 	import * as Sidebar from '$lib/components/ui/sidebar';
-	import { MetaTags } from 'svelte-meta-tags';
 	import ShareButton from './chat-share-button.svelte';
-	import { page } from '$app/state';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { EyeIcon, MessageCircleOffIcon, ArrowLeftIcon } from '@lucide/svelte';
 	import * as Empty from '$lib/components/ui/empty';
@@ -51,35 +49,7 @@
 	});
 
 	const isChatOwner = $derived(chatViewState.chatQuery.data?.userId === chatLayoutState.user?.id);
-
-	const ogImageUrl = $derived(
-		new URL(`/chat/${chatViewState.chatQuery.data?._id}/og.png`, page.url.origin).toString()
-	);
 </script>
-
-<MetaTags
-	title={chatViewState.chatQuery.data?.title}
-	description={chatViewState.chatQuery.data?.title}
-	twitter={{
-		cardType: 'summary_large_image',
-		title: `${chatViewState.chatQuery.data?.title} - Finalchat`,
-		description: chatViewState.chatQuery.data?.title,
-		image: ogImageUrl,
-		creator: '@ieeeedan'
-	}}
-	openGraph={{
-		title: `${chatViewState.chatQuery.data?.title} - Finalchat`,
-		url: page.url.toString(),
-		images: [
-			{
-				url: ogImageUrl,
-				width: 1200,
-				height: 630,
-				alt: `${chatViewState.chatQuery.data?.title} - Finalchat`
-			}
-		]
-	}}
-/>
 
 {#if chatViewState.chat !== null}
 	<header class="sticky top-0">
