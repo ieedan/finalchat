@@ -99,6 +99,7 @@
 						apiKey={chatLayoutState.apiKey}
 						systemPrompt={chatLayoutState.userSettingsQuery.data?.systemPrompt ?? null}
 						bind:createdMessages={chatLayoutState.createdMessages}
+						chatAttachmentUploader={chatAttachmentUploader}
 					/>
 				{/each}
 			</div>
@@ -133,6 +134,7 @@
 						scrollToBottom={autoScroll.scrollToBottom}
 					/>
 					<PromptInput.Content>
+						<PromptInput.AttachmentList />
 						<PromptInput.Textarea placeholder="Ask me anything..." />
 						<PromptInput.Footer class="justify-between">
 							<div class="flex items-center gap-2">

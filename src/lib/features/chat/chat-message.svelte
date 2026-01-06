@@ -12,6 +12,14 @@
 	import type { Id } from '$lib/convex/_generated/dataModel.js';
 	import { useMedia } from '$lib/hooks/use-media.svelte';
 	import ChatImageAttachment from './chat-image-attachment.svelte';
+	import { useChatLayout, useChatView } from './chat.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import { Pencil, PencilOff } from '@lucide/svelte';
+	import * as PromptInput from '$lib/features/chat/components/prompt-input';
+	import type { ChatAttachmentUploader } from './chat-attachment-uploader.svelte.js';
+	import { ModelIdCtx } from '$lib/context.svelte';
+	import ModelPickerBasic from '$lib/features/models/components/models-picker-basic.svelte';
+	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -24,13 +32,14 @@
 	});
 
 	type Props = {
+		chatAttachmentUploader: ChatAttachmentUploader;
 		message: MessageWithAttachments;
 		createdMessages: Set<Id<'messages'>> | null;
 		apiKey: string | null;
 		systemPrompt: string | null;
 	};
 
-	let { message, createdMessages = $bindable(null), apiKey, systemPrompt }: Props = $props();
+	let { message, createdMessages = $bindable(null), chatAttachmentUploader, apiKey, systemPrompt }: Props = $props();
 
 	// this is weird but basically we only care if we transition to a driven state not if we transition out of it
 	let driven = $state(false);
@@ -62,6 +71,12 @@
 	});
 
 	const media = useMedia();
+	const chatLayoutState = useChatLayout();
+	const chatViewState = useChatView();
+
+	let editing = $state(false);
+
+	const modelId = ModelIdCtx.get();
 </script>
 
 <div
@@ -70,59 +85,104 @@
 		'self-start': message.role === 'assistant'
 	})}
 >
-	{#if message.role === 'user'}
-		{#if message.attachments}
-			<div class="w-full justify-end flex items-center gap-2">
-				{#each message.attachments as attachment (attachment.key)}
-					<ChatImageAttachment {attachment} size="sm" />
-				{/each}
-			</div>
-		{/if}
-	{/if}
-	<div data-message-role={message.role} class={chatMessageVariants({ role: message.role })}>
-		{#if message.role === 'assistant'}
-			{#if message.content !== undefined}
-				<ChatAssistantMessage {message} animationEnabled={false} />
-			{:else if message.error}
-				<span class="text-destructive">{message.error}</span>
-			{:else}
-				{#key createdMessages?.has(message._id)}
-					<ChatStreamedContent {message} {driven} {apiKey} {systemPrompt} />
-				{/key}
+	{#if editing}
+		<PromptInput.Root
+			bind:modelId={modelId.current}
+			value={message.content}
+			generating={chatViewState.chatQuery.data?.generating}
+			onSubmit={chatLayoutState.handleSubmit}
+			onUpload={chatAttachmentUploader.uploadMany}
+			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+			attachments={message.attachments}
+			class="group/prompt-input z-20"
+		>
+			<PromptInput.Content>
+				<PromptInput.AttachmentList />
+				<PromptInput.Textarea placeholder="Ask me anything..." />
+				<PromptInput.Footer class="justify-between">
+					<div class="flex items-center gap-2">
+						{#if chatLayoutState.isAdvancedMode}
+							<ModelPickerAdvanced />
+						{:else}
+							<ModelPickerBasic />
+						{/if}
+						<PromptInput.AttachmentButton />
+					</div>
+					<div class="flex items-center gap-2">
+						<PromptInput.Submit disabled={chatLayoutState.user === null} />
+					</div>
+				</PromptInput.Footer>
+			</PromptInput.Content>
+		</PromptInput.Root>
+	{:else}
+		{#if message.role === 'user'}
+			{#if message.attachments}
+				<div class="w-full justify-end flex items-center gap-2">
+					{#each message.attachments as attachment (attachment.key)}
+						<ChatImageAttachment {attachment} size="sm" />
+					{/each}
+				</div>
 			{/if}
-		{:else}
-			<Streamdown content={message.content} animationEnabled={false} />
 		{/if}
-	</div>
+		<div data-message-role={message.role} class={chatMessageVariants({ role: message.role })}>
+			{#if message.role === 'assistant'}
+				{#if message.content !== undefined}
+					<ChatAssistantMessage {message} animationEnabled={false} />
+				{:else if message.error}
+					<span class="text-destructive">{message.error}</span>
+				{:else}
+					{#key createdMessages?.has(message._id)}
+						<ChatStreamedContent {message} {driven} {apiKey} {systemPrompt} />
+					{/key}
+				{/if}
+			{:else}
+				<Streamdown content={message.content} animationEnabled={false} />
+			{/if}
+		</div>
+	{/if}
 	{#if message.content !== undefined}
 		<div
 			class="justify-between w-full group-hover/message-container:opacity-100 md:opacity-0 flex items-center gap-1 transition-opacity duration-200"
 		>
-			<div>
-				{#if message.role === 'assistant'}
-					{@const metadata = [
-						media.lg ? message.meta.modelId : null,
-						message.meta.startedGenerating && message.meta.stoppedGenerating
-							? formatDuration(
-									(message.meta.stoppedGenerating - message.meta.startedGenerating) as Milliseconds
-								)
-							: null,
-						message.meta.cost ? `$${message.meta.cost}` : null,
-						...(message.meta.imageGen
-							? [
-									message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null,
-									tokensPerSecond ? `${tokensPerSecond} tokens/sec` : null
-								]
-							: [])
-					]
-						.filter(Boolean)
-						.join(' ・')}
-					{#if metadata}
-						<span class="text-xs text-muted-foreground">{metadata}</span>
+			{#if !editing}
+				<div>
+					{#if message.role === 'assistant'}
+						{@const metadata = [
+							chatLayoutState.isAdvancedMode && media.lg ? message.meta.modelId : null,
+							message.meta.startedGenerating && message.meta.stoppedGenerating
+								? formatDuration(
+										(message.meta.stoppedGenerating -
+											message.meta.startedGenerating) as Milliseconds
+									)
+								: null,
+							chatLayoutState.isAdvancedMode && message.meta.cost ? `$${message.meta.cost}` : null,
+							...(chatLayoutState.isAdvancedMode && !message.meta.imageGen
+								? [
+										message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null,
+										tokensPerSecond ? `${tokensPerSecond} tokens/sec` : null
+									]
+								: [])
+						]
+							.filter(Boolean)
+							.join(' ・')}
+						{#if metadata}
+							<span class="text-xs text-muted-foreground">{metadata}</span>
+						{/if}
 					{/if}
-				{/if}
-			</div>
+				</div>
+			{:else}
+				<div></div>
+			{/if}
 			<div class="flex items-center gap-1">
+				{#if message.role === 'user'}
+					<Button variant="ghost" size="icon" onclick={() => (editing = !editing)}>
+						{#if editing}
+							<PencilOff />
+						{:else}
+							<Pencil />
+						{/if}
+					</Button>
+				{/if}
 				<ChatBranchButton {message} bind:createdMessages />
 				{#if message.content}
 					<CopyButton
