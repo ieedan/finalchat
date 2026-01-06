@@ -8,7 +8,6 @@
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
-	import { MetaTags } from '$lib/components/meta-tags';
 	import { FinalChat } from '$lib/components/logos';
 	import {
 		ArrowRightIcon,
@@ -17,7 +16,6 @@
 		PanelLeftIcon,
 		SendIcon
 	} from '@lucide/svelte';
-	import { page } from '$app/state';
 
 	let { data } = $props();
 
@@ -53,32 +51,7 @@
 			return 'Good evening';
 		}
 	});
-
-	const ogImageUrl = $derived(new URL('/chat/og.png', page.url.origin).toString());
 </script>
-
-<MetaTags
-	title="New Chat"
-	twitter={{
-		cardType: 'summary_large_image',
-		title: 'New Chat - Finalchat',
-		description: 'Chat with any model available on OpenRouter with your own API key.',
-		image: ogImageUrl,
-		creator: '@ieeeedan'
-	}}
-	openGraph={{
-		title: 'New Chat - Finalchat',
-		url: page.url.toString(),
-		images: [
-			{
-				url: ogImageUrl,
-				width: 1200,
-				height: 630,
-				alt: 'New Chat - Finalchat'
-			}
-		]
-	}}
-/>
 
 <div class="w-full h-full flex-col items-center justify-center flex px-4 gap-12">
 	<div class="flex flex-col gap-8">

@@ -11,7 +11,7 @@
 	import { cn } from '$lib/utils';
 	import { ChatAttachmentUploader } from './chat-attachment-uploader.svelte.js';
 	import * as Sidebar from '$lib/components/ui/sidebar';
-	import { MetaTags } from '$lib/components/meta-tags';
+	import { MetaTags } from 'svelte-meta-tags';
 	import ShareButton from './chat-share-button.svelte';
 	import { page } from '$app/state';
 	import { Badge } from '$lib/components/ui/badge/index.js';

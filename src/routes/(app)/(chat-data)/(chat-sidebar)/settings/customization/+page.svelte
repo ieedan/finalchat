@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as AccountSettings from '$lib/components/layout/account-settings';
-	import { MetaTags } from '$lib/components/meta-tags';
 	import * as Card from '$lib/components/ui/card';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Button } from '$lib/components/ui/button';
@@ -28,8 +27,6 @@
 		systemPrompt !== chatLayoutState.userSettingsQuery.data?.systemPrompt
 	);
 </script>
-
-<MetaTags title="Customization" />
 
 <AccountSettings.Page>
 	<Card.Root class="gap-4">

@@ -14,10 +14,10 @@
 	import { PersistedState } from 'runed';
 	import { ConfirmDeleteDialog } from '$lib/components/ui/confirm-delete-dialog';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import { MetaTags } from '$lib/components/meta-tags';
+	import { MetaTags, deepMerge } from 'svelte-meta-tags';
 	import { ThemeProvider } from '$lib/components/theme-provider';
 
-	let { children } = $props();
+	let { children, data } = $props();
 
 	let accessToken = $derived<string | undefined>(page.data.accessToken as string | undefined);
 
@@ -50,22 +50,19 @@
 		}
 		return accessToken;
 	});
+
+	const metaTags = $derived(deepMerge(data.baseMetaTags, page.data.pageMetaTags));
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
+<MetaTags {...metaTags} />
+
 <ConfirmDeleteDialog />
 <Toaster position="bottom-right" />
 
-<MetaTags
-	title="Finalchat"
-	titleTemplate="%s ~ Finalchat"
-	description="Chat with any model available on OpenRouter with your own API key."
-	canonical={new URL(page.url.pathname, page.url.origin).href}
->
-	<ThemeProvider defaultFontPreset={page.data.fontPreset}>
-		{@render children()}
-	</ThemeProvider>
-</MetaTags>
+<ThemeProvider defaultFontPreset={page.data.fontPreset}>
+	{@render children()}
+</ThemeProvider>
