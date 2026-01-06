@@ -18,7 +18,7 @@ import type * as OpenRouter from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 
 type ChatLayoutOptions = {
-	user: User;
+	user: User | null;
 	userSettings: Doc<'userSettings'> | null;
 	chats: Doc<'chats'>[];
 	apiKey: Doc<'apiKeys'> | null;
@@ -93,6 +93,8 @@ class ChatLayoutState {
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments }) => {
+		if (!this.user) throw new Error('You must be signed in start chatting!');
+
 		const model = this.models.find((m) => m.id === modelId);
 		if (!model) throw new Error(`Model with id: ${modelId} not found`);
 		const { chatId, assistantMessageId } = await this.client.mutation(api.messages.create, {

@@ -5,7 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { DEFAULT_AGE_GROUPS, getAgedGroups } from '$lib/utils/aged-groups';
 	import ChatButton from './chat-button.svelte';
-	import { buttonVariants } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import ChatGotoDialog from './chat-goto-dialog.svelte';
 	import { cn } from '$lib/utils';
@@ -14,10 +14,10 @@
 	import { FinalChat } from '$lib/components/logos';
 	// import { navigating } from '$app/stores';
 
-	const chatContext = useChatLayout();
+	const chatLayoutState = useChatLayout();
 
 	const indexedChats = $derived(
-		chatContext.chatsQuery.data?.map((chat, i) => ({
+		chatLayoutState.chatsQuery.data?.map((chat, i) => ({
 			...chat,
 			index: i + 1
 		})) ?? []
@@ -82,7 +82,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 					href="/chat"
 					class={cn(
 						buttonVariants({ variant: 'default' }),
-						chatContext.userSettingsQuery.data?.onboarding?.mode === 'advanced' &&
+						chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced' &&
 							'flex items-center justify-between'
 					)}
 					{...props}
@@ -91,7 +91,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 						<PlusIcon class="size-4!" />
 						New Chat
 					</span>
-					{#if chatContext.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+					{#if chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
 						<Kbd.Group
 							class="**:data-[slot=kbd]:bg-transparent **:data-[slot=kbd]:text-foreground gap-0"
 						>
@@ -133,31 +133,47 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 		{/each}
 	</Sidebar.Content>
 	<Sidebar.Footer>
-		<Sidebar.MenuButton>
-			{#snippet child({ props })}
-				<a
-					href="/settings"
-					{...props}
-					class={cn(props.class ?? '', 'flex items-center gap-2 h-12')}
-				>
-					<Avatar.Root>
-						<Avatar.Image src={chatContext.user.profilePictureUrl} />
-						<Avatar.Fallback>
-							{chatContext.user.firstName?.charAt(0)}
-						</Avatar.Fallback>
-					</Avatar.Root>
-					<div class="flex flex-col gap-0.5">
-						<span class="text-sm font-medium">
-							{chatContext.user.firstName}
-							{chatContext.user.lastName}
-						</span>
-						<span class="text-xs text-muted-foreground">
-							{chatContext.user.email}
-						</span>
-					</div>
-				</a>
-			{/snippet}
-		</Sidebar.MenuButton>
+		{#if chatLayoutState.user}
+			<Sidebar.MenuButton>
+				{#snippet child({ props })}
+					<a
+						href="/settings"
+						{...props}
+						class={cn(props.class ?? '', 'flex items-center gap-2 h-12')}
+					>
+						<Avatar.Root>
+							<Avatar.Image src={chatLayoutState.user?.profilePictureUrl} />
+							<Avatar.Fallback>
+								{chatLayoutState.user?.firstName?.charAt(0)}
+							</Avatar.Fallback>
+						</Avatar.Root>
+						<div class="flex flex-col gap-0.5">
+							<span class="text-sm font-medium">
+								{chatLayoutState.user?.firstName}
+								{chatLayoutState.user?.lastName}
+							</span>
+							<span class="text-xs text-muted-foreground">
+								{chatLayoutState.user?.email}
+							</span>
+						</div>
+					</a>
+				{/snippet}
+			</Sidebar.MenuButton>
+		{:else}
+			<div class="border border-border rounded-lg flex flex-col p-4 gap-4">
+				<div class="flex flex-col text-sm gap-1">
+					<span class="font-medium">
+						Get started with Finalchat
+					</span>
+					<span class="text-muted-foreground">
+						Sign in to save your conversations and access them anywhere.
+					</span>
+				</div>
+				<Button href="/auth/login" size="sm">
+					Sign in
+				</Button>
+			</div>
+		{/if}
 	</Sidebar.Footer>
 </Sidebar.Root>
 
