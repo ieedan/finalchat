@@ -9,6 +9,7 @@
 	import { toast } from 'svelte-sonner';
 	import SettingsFontCard from '$lib/features/settings/settings-font-card.svelte';
 	import SettingsModeCard from '$lib/features/settings/settings-mode-card.svelte';
+	import SettingsSubmitBehaviorCard from '$lib/features/settings/settings-submit-behavior-card.svelte';
 
 	const client = useConvexClient();
 
@@ -47,6 +48,8 @@
 	</Card.Root>
 
 	<SettingsModeCard />
+
+	<SettingsSubmitBehaviorCard />
 
 	<SettingsFontCard />
 </AccountSettings.Page>

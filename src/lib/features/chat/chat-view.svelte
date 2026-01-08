@@ -49,6 +49,8 @@
 	});
 
 	const isChatOwner = $derived(chatViewState.chatQuery.data?.userId === chatLayoutState.user?.id);
+
+	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
 </script>
 
 {#if chatViewState.chat !== null}
@@ -112,6 +114,7 @@
 				<PromptInput.Root
 					bind:modelId={modelId.current}
 					generating={chatViewState.chatQuery.data?.generating}
+					{submitOnEnter}
 					onSubmit={(opts) => {
 						autoScroll.scrollToBottom(false, 'instant');
 						return chatLayoutState.handleSubmit(opts);

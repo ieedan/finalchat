@@ -5,6 +5,7 @@ import type { ClipboardEventHandler, KeyboardEventHandler } from 'svelte/element
 import type { Model, ModelId } from '../../types';
 import { SvelteMap } from 'svelte/reactivity';
 import imageCompression from 'browser-image-compression';
+import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 
 export type OnSubmit = (opts: {
 	input: string;
@@ -31,9 +32,11 @@ class PromptInputRootState {
 	error = $state<string | null>(null);
 	uploadingAttachments: Map<string, File> = new SvelteMap();
 	textAreaRef = $state<HTMLTextAreaElement | null>(null);
+	isMobile: IsMobile;
 
 	constructor(readonly opts: PromptInputRootStateOptions) {
 		this.onUpload = this.onUpload.bind(this);
+		this.isMobile = new IsMobile();
 	}
 
 	async onUpload(files: File[]) {
@@ -130,10 +133,18 @@ class PromptInputTextareaState {
 	}
 
 	onkeydown(e: Parameters<KeyboardEventHandler<HTMLTextAreaElement>>[0]) {
-		if (
-			e.key === 'Enter' &&
-			(e.metaKey || e.ctrlKey || this.rootState.opts.submitOnEnter?.current)
-		) {
+		if (e.key !== 'Enter') return;
+		if (e.shiftKey) return;
+
+		// On mobile, always submit on Enter (no modifier keys available)
+		// On desktop, submit on Ctrl/Cmd+Enter OR plain Enter if submitOnEnter is true
+		const shouldSubmit =
+			e.metaKey ||
+			e.ctrlKey ||
+			this.rootState.isMobile.current ||
+			this.rootState.opts.submitOnEnter?.current;
+
+		if (shouldSubmit) {
 			e.preventDefault();
 			this.rootState.submit(this.rootState.opts.value.current);
 		}

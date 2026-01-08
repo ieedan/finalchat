@@ -29,7 +29,7 @@
 		onDeleteAttachment: (key: string) => Promise<void>;
 		generating?: boolean;
 		/**
-		 * Whether to submit the form on enter. Otherwise the form will be submitted on shift+enter.
+		 * Whether to submit the form on enter. Otherwise the form will be submitted on Ctrl/Cmd+Enter.
 		 */
 		submitOnEnter?: boolean;
 		optimisticClear?: boolean;
