@@ -70,8 +70,7 @@ export const githubLinkHandler: CustomLinkHandler = {
 
 			// Build headers with optional GitHub token for higher rate limits
 			const headers: HeadersInit = {
-				Accept: 'application/vnd.github.v3+json',
-				'User-Agent': 'finalchat'
+				Accept: 'application/vnd.github.v3+json'
 			};
 			if (env.GITHUB_TOKEN) {
 				headers['Authorization'] = `token ${env.GITHUB_TOKEN}`;
@@ -79,14 +78,9 @@ export const githubLinkHandler: CustomLinkHandler = {
 
 			// Case 1: Repo homepage (e.g., https://github.com/owner/repo)
 			if (pathParts.length === 2) {
-				const [repoResponse, readmeResponse] = await Promise.all([
-					fetch(`${apiBase}/repos/${owner}/${repo}`, {
-						headers
-					}),
-					fetch(`${apiBase}/repos/${owner}/${repo}/readme`, {
-						headers
-					})
-				]);
+				const repoResponse = await fetch(`${apiBase}/repos/${owner}/${repo}`, {
+					headers
+				});
 
 				if (!repoResponse.ok) {
 					return `Error fetching repo: ${repoResponse.status} ${repoResponse.statusText}`;
@@ -104,9 +98,15 @@ export const githubLinkHandler: CustomLinkHandler = {
 				markdown += `**Updated:** ${new Date(repoData.updated_at).toLocaleDateString()}\n\n`;
 				markdown += `**URL:** ${repoData.html_url}\n\n`;
 
+				// Fetch raw README content
+				const defaultBranch = repoData.default_branch || 'main';
+				const readmeUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${defaultBranch}/README.md`;
+				const readmeResponse = await fetch(readmeUrl, {
+					headers
+				});
+
 				if (readmeResponse.ok) {
-					const readmeData = await readmeResponse.json();
-					const readmeContent = Buffer.from(readmeData.content, 'base64').toString('utf-8');
+					const readmeContent = await readmeResponse.text();
 					markdown += `---\n\n## README\n\n${readmeContent}`;
 				} else {
 					markdown += '---\n\n*No README found*';
@@ -172,24 +172,35 @@ export const githubLinkHandler: CustomLinkHandler = {
 				const branch = pathParts[3];
 				const filePath = pathParts.slice(4).join('/');
 
-				const response = await fetch(
+				// Fetch file metadata first
+				const metadataResponse = await fetch(
 					`${apiBase}/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`,
 					{
 						headers
 					}
 				);
 
-				if (!response.ok) {
-					return `Error fetching file: ${response.status} ${response.statusText}`;
+				if (!metadataResponse.ok) {
+					return `Error fetching file: ${metadataResponse.status} ${metadataResponse.statusText}`;
 				}
 
-				const fileData = await response.json();
+				const fileData = await metadataResponse.json();
 
 				if (fileData.type !== 'file') {
 					return 'URL points to a directory, not a file';
 				}
 
-				const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+				// Fetch raw file content directly
+				const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath}`;
+				const contentResponse = await fetch(rawUrl, {
+					headers
+				});
+
+				if (!contentResponse.ok) {
+					return `Error fetching file content: ${contentResponse.status} ${contentResponse.statusText}`;
+				}
+
+				const content = await contentResponse.text();
 				let markdown = `# ${fileData.name}\n\n`;
 				markdown += `**Path:** \`${fileData.path}\`\n`;
 				markdown += `**Size:** ${fileData.size} bytes\n`;
@@ -218,11 +229,7 @@ export const svelteDevLinkHandler: CustomLinkHandler = {
 			// Construct the llms.txt URL
 			const llmsUrl = `${url.origin}${pathname}/llms.txt`;
 
-			const response = await fetch(llmsUrl, {
-				headers: {
-					'User-Agent': 'finalchat'
-				}
-			});
+			const response = await fetch(llmsUrl);
 
 			if (!response.ok) {
 				return `Error fetching llms.txt: ${response.status} ${response.statusText}`;
