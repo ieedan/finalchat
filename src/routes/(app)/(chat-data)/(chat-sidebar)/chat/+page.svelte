@@ -55,9 +55,9 @@
 	});
 </script>
 
-<div class="w-full h-full flex-col items-center justify-center flex px-4 gap-12">
-	<div class="flex flex-col gap-8">
-		<div class="flex w-full items-center flex-col h-full justify-center md:h-auto">
+<div class="w-full h-full flex flex-col px-4 md:items-center md:justify-center md:gap-12">
+	<div class="flex flex-col gap-8 flex-1 md:flex-none justify-center items-center">
+		<div class="flex w-full items-center flex-col justify-center">
 			<FinalChat class="size-20" />
 		</div>
 		{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
@@ -88,7 +88,7 @@
 			</h1>
 		{/if}
 	</div>
-	<div class="flex flex-col gap-4 w-full items-center pb-4">
+	<div class="flex flex-col gap-4 w-full items-center pb-2 sm:pb-4 md:pb-0 mt-auto md:mt-0">
 		<PromptInput.Root
 			bind:modelId={modelId.current}
 			onSubmit={chatState.handleSubmit}
