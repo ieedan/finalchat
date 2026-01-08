@@ -33,12 +33,14 @@
 		[]
 	);
 
+	const submitOnEnter = $derived(chatState.userSettingsQuery.data?.submitOnEnter ?? false);
+
 	const shortcuts = $derived([
 		{ name: 'New Chat', keys: [cmdOrCtrl, '⇧', 'O'], icon: MessageSquarePlusIcon },
 		{ name: 'Model Picker', keys: [cmdOrCtrl, '⇧', 'M'], icon: MousePointerClickIcon },
 		{ name: 'Go to Chat', keys: [cmdOrCtrl, 'G'], icon: ArrowRightIcon },
 		{ name: 'Sidebar', keys: [cmdOrCtrl, 'B'], icon: PanelLeftIcon },
-		{ name: 'Submit', keys: [cmdOrCtrl, 'Enter'], icon: SendIcon }
+		{ name: 'Submit', keys: submitOnEnter ? ['Enter'] : [cmdOrCtrl, 'Enter'], icon: SendIcon }
 	]);
 
 	const greeting = $derived(() => {
@@ -90,7 +92,9 @@
 		<PromptInput.Root
 			bind:modelId={modelId.current}
 			onSubmit={chatState.handleSubmit}
+			{submitOnEnter}
 			class="w-full max-w-2xl"
+			optimisticClear={false}
 			onUpload={chatAttachmentUploader.uploadMany}
 			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
 			bind:attachments={attachmentsList.current}

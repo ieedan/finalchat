@@ -31,6 +31,8 @@ export const updateMode = mutation({
 				onboarding: {
 					mode: args.mode
 				},
+				// in basic mode users probably would just prefer to submit on Enter
+				submitOnEnter: args.mode === 'basic',
 				favoriteModelIds: DEFAULT_ENABLED_MODEL_IDS
 			});
 			return;
@@ -114,6 +116,23 @@ export const updateSystemPrompt = mutation({
 
 		await ctx.db.patch(userSettings?._id, {
 			systemPrompt: args.systemPrompt
+		});
+	}
+});
+
+export const updateSubmitOnEnter = mutation({
+	args: {
+		submitOnEnter: v.boolean()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return;
+
+		const userSettings = await getUserSettings(ctx, user);
+		if (!userSettings) return;
+
+		await ctx.db.patch(userSettings?._id, {
+			submitOnEnter: args.submitOnEnter
 		});
 	}
 });

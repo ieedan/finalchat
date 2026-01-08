@@ -2,6 +2,11 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
+	import { useChatLayout } from '$lib/features/chat/chat.svelte';
+
+	const chatLayoutState = useChatLayout();
+
+	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
 
 	const shortcuts = $derived([
 		{
@@ -22,7 +27,7 @@
 		},
 		{
 			name: 'Submit',
-			keys: [cmdOrCtrl, 'Enter']
+			keys: submitOnEnter ? ['Enter'] : [cmdOrCtrl, 'Enter']
 		}
 	]);
 </script>
