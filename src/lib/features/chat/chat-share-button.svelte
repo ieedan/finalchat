@@ -71,11 +71,11 @@
 									url: shareUrl
 								});
 							}}
-							class="size-10"
-							variant="outline"
-							size="icon"
+							class="w-full"
+							variant="default"
 						>
 							<ShareIcon />
+							Share
 						</Button>
 					</div>
 				{:else}
