@@ -97,7 +97,7 @@
 						</p>
 					</div>
 				{/if}
-				<div class="flex flex-col gap-2 py-4">
+				<div class="flex flex-col gap-2 py-2 sm:py-4">
 					{#each chatViewState.chat?.messages ?? [] as message (message._id)}
 						<ChatMessage
 							{message}
@@ -110,7 +110,7 @@
 			</div>
 		</div>
 		<div
-			class="sticky bottom-0 pb-4 has-[[data-slot=prompt-input-banner][data-state=open]]:pt-8 bg-background rounded-t-lg transition-[padding]"
+			class="sticky bottom-0 pb-2 sm:pb-4 has-[[data-slot=prompt-input-banner][data-state=open]]:pt-8 bg-background rounded-t-lg transition-[padding]"
 		>
 			{#if !autoScroll.isAtBottom}
 				<div class="absolute w-full h-[24px] bg-background mask-t-from-0% -top-[14px] z-19"></div>
