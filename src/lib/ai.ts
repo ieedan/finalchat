@@ -1,6 +1,4 @@
-import z from 'zod';
 import type { Model, ModelId } from './features/chat/types';
-import { tool } from 'ai';
 
 export const TITLE_GENERATION_MODEL = 'google/gemini-2.5-flash-lite' as ModelId;
 
@@ -35,32 +33,3 @@ export const BASIC_MODELS: Model[] = [
 		description: 'Image generation model.'
 	}
 ];
-
-export const fetchLinkContentTool = tool({
-	name: 'fetch-link-content',
-	description: 'Fetch the text content of a link',
-	inputSchema: z.object({
-		link: z.string()
-	}),
-	execute: async ({ link }, { abortSignal }) => {
-		try {
-			const response = await fetch(link, {
-				method: 'GET',
-				signal: abortSignal
-			});
-			if (!response.ok) {
-				throw new Error(`${response.status} ${response.statusText}`);
-			}
-			const contentType = response.headers.get('content-type');
-			const allowedTypes = ['text/plain', 'text/markdown'];
-			if (allowedTypes.some((type) => contentType?.includes(type))) {
-				return await response.text();
-			}
-			throw new Error(
-				'Link response was not markdown. Maybe you need to add .md or .mdx to the end of the link?'
-			);
-		} catch (error) {
-			return `Error reading link content: ${error instanceof Error ? error.message : error}`;
-		}
-	}
-});

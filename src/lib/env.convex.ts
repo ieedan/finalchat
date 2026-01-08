@@ -8,7 +8,8 @@ export const env = createEnv({
 		R2_ACCESS_KEY_ID: z.string(),
 		R2_SECRET_ACCESS_KEY: z.string(),
 		R2_ENDPOINT: z.url(),
-		R2_BUCKET: z.string()
+		R2_BUCKET: z.string(),
+		GITHUB_TOKEN: z.optional(z.string())
 	},
 	emptyStringAsUndefined: true,
 	runtimeEnv: process.env
