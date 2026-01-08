@@ -218,14 +218,14 @@
 									value={model.id}
 									onSelect={() => handleSelect(model.id)}
 								>
-								<div class="flex items-center gap-2">
-									<span>{model.name}</span>
-									<div>
-										{#if model.id === selectedModel.id}
-											<CheckIcon class="size-4" />
-										{/if}
+									<div class="flex items-center gap-2">
+										<span>{model.name}</span>
+										<div>
+											{#if model.id === selectedModel.id}
+												<CheckIcon class="size-4" />
+											{/if}
+										</div>
 									</div>
-								</div>
 									<div class="flex items-center gap-1.5">
 										{#if supportsImages(model)}
 											<ImageIcon class="size-3.5 text-muted-foreground/50" />

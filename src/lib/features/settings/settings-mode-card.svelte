@@ -30,7 +30,7 @@
 			// or the first favorite model if available
 			const favoriteModels = chatLayoutState.enabledModels;
 			modelId.current =
-				favoriteModels.length > 0 ? favoriteModels[0].id : chatLayoutState.models[0]?.id ?? null;
+				favoriteModels.length > 0 ? favoriteModels[0].id : (chatLayoutState.models[0]?.id ?? null);
 		}
 
 		toast.success('Mode updated!');
