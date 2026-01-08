@@ -24,6 +24,8 @@ import { createChunkAppender, partsToModelMessage } from '../utils/stream-transp
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';
+import { env } from '../env.convex';
+import type { ContextType } from './ai.utils';
 
 export const Prompt = v.object({
 	modelId: v.string(),
@@ -331,7 +333,12 @@ ${systemPrompt}
 							({ steps }) => {
 								return steps.length >= 10;
 							}
-						]
+						],
+						experimental_context: {
+							env: {
+								GITHUB_TOKEN: env.GITHUB_TOKEN
+							}
+						} satisfies ContextType
 					});
 
 					streamResult = agent.stream({

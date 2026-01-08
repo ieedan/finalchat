@@ -1,6 +1,11 @@
 import z from 'zod';
 import { tool } from 'ai';
-import { env } from '../env.convex';
+
+export type ContextType = {
+	env: {
+		GITHUB_TOKEN: string | undefined;
+	};
+};
 
 export const fetchLinkContentTool = tool({
 	name: 'fetch-link-content',
@@ -8,13 +13,15 @@ export const fetchLinkContentTool = tool({
 	inputSchema: z.object({
 		link: z.string()
 	}),
-	execute: async ({ link }, { abortSignal }) => {
+	execute: async ({ link }, { abortSignal, experimental_context }) => {
 		try {
 			// any custom link handlers will run before the default handler
 			const handlers = [githubLinkHandler, svelteDevLinkHandler];
 			for (const handler of handlers) {
 				if (handler.matches(link)) {
-					return await handler.handler(link);
+					return await handler.handler(link, {
+						experimental_context: experimental_context as ContextType
+					});
 				}
 			}
 
@@ -41,12 +48,13 @@ export const fetchLinkContentTool = tool({
 
 type CustomLinkHandler = {
 	matches: (link: string) => boolean;
-	handler: (link: string) => Promise<string>;
+	handler: (link: string, opts?: { experimental_context: ContextType }) => Promise<string>;
 };
 
-const githubLinkHandler: CustomLinkHandler = {
+export const githubLinkHandler: CustomLinkHandler = {
 	matches: (link) => link.startsWith('https://github.com'),
-	handler: async (link) => {
+	handler: async (link, opts = { experimental_context: { env: { GITHUB_TOKEN: undefined } } }) => {
+		const env = opts.experimental_context.env;
 		try {
 			const url = new URL(link);
 			const pathParts = url.pathname.split('/').filter(Boolean);
@@ -199,7 +207,7 @@ const githubLinkHandler: CustomLinkHandler = {
 	}
 };
 
-const svelteDevLinkHandler: CustomLinkHandler = {
+export const svelteDevLinkHandler: CustomLinkHandler = {
 	matches: (link) => link.startsWith('https://svelte.dev/docs/'),
 	handler: async (link) => {
 		try {
