@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { githubLinkHandler, svelteDevLinkHandler } from './ai';
+import { githubLinkHandler, svelteDevLinkHandler } from './ai.utils.js';
 
 // Store original fetch before any stubbing
 const originalFetch = typeof globalThis.fetch !== 'undefined' ? globalThis.fetch : undefined;
@@ -560,7 +560,8 @@ describe('githubLinkHandler', () => {
 
 		describe('handler', () => {
 			it('should fetch llms.txt from Svelte.dev docs route', async () => {
-				const mockContent = '# Remote functions\n\nRemote functions are a tool for type-safe communication...';
+				const mockContent =
+					'# Remote functions\n\nRemote functions are a tool for type-safe communication...';
 
 				vi.mocked(fetch).mockResolvedValueOnce({
 					ok: true,

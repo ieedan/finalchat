@@ -18,7 +18,8 @@ import {
 	getLastUserAndAssistantMessages,
 	type MessageWithAttachments
 } from './chats.utils';
-import { TITLE_GENERATION_MODEL, fetchLinkContentTool } from '../ai.js';
+import { TITLE_GENERATION_MODEL } from '../ai.js';
+import { fetchLinkContentTool } from './ai.utils.js';
 import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
