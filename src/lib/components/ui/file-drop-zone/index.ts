@@ -1,5 +1,6 @@
 import Root from './file-drop-zone.svelte';
 import Trigger from './file-drop-zone-trigger.svelte';
+import Textarea from './file-drop-zone-textarea.svelte';
 
 export function displaySize(bytes: number): string {
 	if (bytes < KILOBYTE) return `${bytes.toFixed(0)} B`;
@@ -22,4 +23,4 @@ export const ACCEPT_IMAGE = 'image/*';
 export const ACCEPT_VIDEO = 'video/*';
 export const ACCEPT_AUDIO = 'audio/*';
 
-export { Root, Trigger };
+export { Root, Trigger, Textarea };

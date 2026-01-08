@@ -4,6 +4,7 @@ import type { ReadableBoxedValues, WritableBoxedValues } from 'svelte-toolbelt';
 import type { ClipboardEventHandler, KeyboardEventHandler } from 'svelte/elements';
 import type { Model, ModelId } from '../../types';
 import { SvelteMap } from 'svelte/reactivity';
+import imageCompression from 'browser-image-compression';
 
 export type OnSubmit = (opts: {
 	input: string;
@@ -39,10 +40,20 @@ class PromptInputRootState {
 		try {
 			// add the pending files
 			for (const file of files) {
-				this.uploadingAttachments.set(file.name, file);
+				let compressedFile: File = file;
+				if (file.type.startsWith('image/')) {
+					compressedFile = await imageCompression(file, {
+						maxSizeMB: 1,
+						maxWidthOrHeight: 1920
+					});
+				}
+
+				this.uploadingAttachments.set(file.name, compressedFile);
 			}
 
-			const uploadedImages = await this.opts.onUpload.current?.(files);
+			const uploadedImages = await this.opts.onUpload.current?.(
+				this.uploadingAttachments.values().toArray()
+			);
 
 			// remove the pending files
 			for (const file of files) {
@@ -130,24 +141,8 @@ class PromptInputTextareaState {
 		this.opts.onkeydown?.current?.(e);
 	}
 
-	onpaste(e: Parameters<ClipboardEventHandler<HTMLTextAreaElement>>[0]) {
-		const clipboardData = e.clipboardData;
-		if (clipboardData) {
-			const items = Array.from(clipboardData.items);
-			const images = items
-				.filter((item) => item.type.startsWith('image/'))
-				.map((item) => item.getAsFile())
-				.filter((file) => file !== null);
-
-			this.rootState.onUpload(images);
-		}
-
-		this.opts.onpaste?.current?.(e);
-	}
-
 	props = $derived.by(() => ({
 		onkeydown: this.onkeydown.bind(this),
-		onpaste: this.onpaste.bind(this),
 		disabled: this.rootState.loading
 	}));
 }
