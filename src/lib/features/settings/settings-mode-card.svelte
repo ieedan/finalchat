@@ -22,7 +22,16 @@
 			mode
 		});
 
-		modelId.current = BASIC_MODELS[0].id;
+		// Set the default model based on the selected mode
+		if (mode === 'basic') {
+			modelId.current = BASIC_MODELS[0].id;
+		} else {
+			// For advanced mode, use the first model from the available models
+			// or the first favorite model if available
+			const favoriteModels = chatLayoutState.enabledModels;
+			modelId.current =
+				favoriteModels.length > 0 ? favoriteModels[0].id : (chatLayoutState.models[0]?.id ?? null);
+		}
 
 		toast.success('Mode updated!');
 	}
