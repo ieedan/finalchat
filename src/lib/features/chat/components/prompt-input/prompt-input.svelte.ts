@@ -223,9 +223,18 @@ class ModelPickerState {
 		readonly opts: ModelPickerStateOptions,
 		readonly rootState: PromptInputRootState
 	) {
-		if (this.rootState.opts.modelId.current === null) {
-			this.rootState.opts.modelId.current = this.opts.models.current[0].id;
-		}
+		// Watch for changes to models and ensure modelId is always valid
+		watch(
+			() => [this.opts.models.current, this.rootState.opts.modelId.current] as const,
+			([models, modelId]) => {
+				if (models.length === 0) return;
+
+				// If modelId is null or not in the available models, set to first model
+				if (modelId === null || !models.some((m) => m.id === modelId)) {
+					this.rootState.opts.modelId.current = models[0].id;
+				}
+			}
+		);
 	}
 
 	onSelect() {

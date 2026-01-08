@@ -24,7 +24,8 @@
 	});
 
 	const selectedModel = $derived(
-		models.find((model) => model.id === modelPickerState.rootState.opts.modelId.current)
+		models.find((model) => model.id === modelPickerState.rootState.opts.modelId.current) ??
+			models[0]
 	);
 
 	let open = $state(false);
@@ -54,7 +55,7 @@
 		onValueChange={() => modelPickerState.onSelect()}
 	>
 		<Select.Trigger>
-			{selectedModel?.name}
+			{selectedModel.name}
 		</Select.Trigger>
 		<Select.Content align="start" {animated} side="top">
 			{#each models as model (model.id)}

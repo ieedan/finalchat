@@ -65,7 +65,9 @@
 	);
 
 	const selectedModel = $derived(
-		sortedModels.find((model) => model.id === modelPickerState.rootState.opts.modelId.current)
+		chatLayoutState.models.find(
+			(model) => model.id === modelPickerState.rootState.opts.modelId.current
+		) ?? chatLayoutState.models[0]
 	);
 
 	let mode = $state<'list' | 'grid'>('list');
@@ -166,7 +168,7 @@
 		<Popover.Trigger
 			class={cn(buttonVariants({ variant: 'input' }), 'max-w-[175px] md:max-w-none')}
 		>
-			<span class="truncate">{selectedModel?.name}</span>
+			<span class="truncate">{selectedModel.name}</span>
 			<ChevronDownIcon class="size-4" />
 		</Popover.Trigger>
 		<Popover.Content class="p-0 w-fit" align="start" {animated} side="top">
@@ -216,14 +218,14 @@
 									value={model.id}
 									onSelect={() => handleSelect(model.id)}
 								>
-									<div class="flex items-center gap-2">
-										<span>{model.name}</span>
-										<div>
-											{#if model.id === selectedModel?.id}
-												<CheckIcon class="size-4" />
-											{/if}
-										</div>
+								<div class="flex items-center gap-2">
+									<span>{model.name}</span>
+									<div>
+										{#if model.id === selectedModel.id}
+											<CheckIcon class="size-4" />
+										{/if}
 									</div>
+								</div>
 									<div class="flex items-center gap-1.5">
 										{#if supportsImages(model)}
 											<ImageIcon class="size-3.5 text-muted-foreground/50" />
