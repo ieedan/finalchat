@@ -16,6 +16,11 @@
 		PanelLeftIcon,
 		SendIcon
 	} from '@lucide/svelte';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
+	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
+	import { cn } from '$lib/utils.js';
+	import ModelsPickerAdvancedMobile from '$lib/features/models/components/models-picker-advanced-mobile.svelte';
+	import ModelsPickerBasicMobile from '$lib/features/models/components/models-picker-basic-mobile.svelte';
 
 	let { data } = $props();
 
@@ -53,10 +58,20 @@
 			return 'Good evening';
 		}
 	});
+
+	const isMobile = new IsMobile();
 </script>
 
 <div class="w-full h-full flex flex-col px-4 md:items-center md:justify-center md:gap-12">
-	<div class="flex flex-col gap-8 flex-1 md:flex-none justify-center items-center">
+	<div
+		class={cn(
+			'flex flex-col gap-8 flex-1 justify-center items-center',
+			// mobile
+			'fixed left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2',
+			// desktop
+			'md:flex-none md:static'
+		)}
+	>
 		<div class="flex w-full items-center flex-col justify-center">
 			<FinalChat class="size-20" />
 		</div>
@@ -89,37 +104,68 @@
 		{/if}
 	</div>
 	<div class="flex flex-col gap-4 w-full items-center pb-2 sm:pb-4 md:pb-0 mt-auto md:mt-0">
-		<PromptInput.Root
-			bind:modelId={modelId.current}
-			onSubmit={chatState.handleSubmit}
-			{submitOnEnter}
-			class="w-full max-w-2xl"
-			optimisticClear={false}
-			onUpload={chatAttachmentUploader.uploadMany}
-			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
-			bind:attachments={attachmentsList.current}
-			bind:value={query}
-		>
-			<PromptInput.Banner dismissedByError dismissed={chatState.user !== null}>
-				<PromptInput.BannerContent>
-					<p><a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!</p>
-				</PromptInput.BannerContent>
-			</PromptInput.Banner>
-			<PromptInput.Content>
-				<PromptInput.AttachmentList />
-				<PromptInput.Textarea placeholder="Ask me anything..." />
-				<PromptInput.Footer class="justify-between">
-					<div class="flex items-center gap-2">
-						{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
-							<ModelPickerAdvanced />
-						{:else}
-							<ModelPickerBasic />
-						{/if}
-						<PromptInput.AttachmentButton />
-					</div>
-					<PromptInput.Submit disabled={chatState.user === null} />
-				</PromptInput.Footer>
-			</PromptInput.Content>
-		</PromptInput.Root>
+		{#if isMobile.current}
+			<PromptInputMobile.Root
+				bind:modelId={modelId.current}
+				onSubmit={chatState.handleSubmit}
+				{submitOnEnter}
+				class="w-full max-w-2xl"
+				optimisticClear={false}
+				onUpload={chatAttachmentUploader.uploadMany}
+				onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+				bind:attachments={attachmentsList.current}
+				bind:value={query}
+			>
+				<PromptInputMobile.Plus>
+					{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+						<ModelsPickerAdvancedMobile />
+					{:else}
+						<ModelsPickerBasicMobile />
+					{/if}
+					<PromptInputMobile.PlusSeparator />
+					<PromptInputMobile.AddAttachment />
+				</PromptInputMobile.Plus>
+				<PromptInputMobile.InputWrapper>
+					<PromptInputMobile.AttachmentList />
+					<PromptInputMobile.Input placeholder="Ask me anything..." />
+				</PromptInputMobile.InputWrapper>
+				<PromptInputMobile.Submit disabled={chatState.user === null} />
+			</PromptInputMobile.Root>
+		{:else}
+			<PromptInput.Root
+				bind:modelId={modelId.current}
+				onSubmit={chatState.handleSubmit}
+				{submitOnEnter}
+				class="w-full max-w-2xl"
+				optimisticClear={false}
+				onUpload={chatAttachmentUploader.uploadMany}
+				onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+				bind:attachments={attachmentsList.current}
+				bind:value={query}
+			>
+				<PromptInput.Banner dismissedByError dismissed={chatState.user !== null}>
+					<PromptInput.BannerContent>
+						<p>
+							<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
+						</p>
+					</PromptInput.BannerContent>
+				</PromptInput.Banner>
+				<PromptInput.Content>
+					<PromptInput.AttachmentList />
+					<PromptInput.Textarea placeholder="Ask me anything..." />
+					<PromptInput.Footer class="justify-between">
+						<div class="flex items-center gap-2">
+							{#if chatState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+								<ModelPickerAdvanced />
+							{:else}
+								<ModelPickerBasic />
+							{/if}
+							<PromptInput.AttachmentButton />
+						</div>
+						<PromptInput.Submit disabled={chatState.user === null} />
+					</PromptInput.Footer>
+				</PromptInput.Content>
+			</PromptInput.Root>
+		{/if}
 	</div>
 </div>
