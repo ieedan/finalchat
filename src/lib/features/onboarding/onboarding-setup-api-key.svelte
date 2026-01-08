@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import * as Modal from '$lib/components/ui/modal';
 	import { Button } from '$lib/components/ui/button';
 	import { api } from '$lib/convex/_generated/api';
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
@@ -43,9 +43,9 @@
 </script>
 
 <form method="POST" onsubmit={submit} class="contents">
-	<AlertDialog.Header>
-		<AlertDialog.Title>Setup API Key</AlertDialog.Title>
-		<AlertDialog.Description>
+	<Modal.Header>
+		<Modal.Title>Setup API Key</Modal.Title>
+		<Modal.Description>
 			Paste an
 			<a
 				href="https://openrouter.ai/settings/keys"
@@ -56,15 +56,14 @@
 				OpenRouter
 			</a>
 			API key to get started.
-		</AlertDialog.Description>
-	</AlertDialog.Header>
+		</Modal.Description>
+	</Modal.Header>
 	<Field.Group class="gap-2">
 		<ApiKeyInput bind:apiKey bind:storage />
 	</Field.Group>
-	<div class="flex items-center justify-between">
-		<div></div>
+	<div class="flex items-center justify-end">
 		<!-- <Button variant="outline" onClickPromise={skip}>Skip</Button> -->
-		<Button type="submit" class="gap-1" disabled={!canSubmit} loading={submitting}>
+		<Button type="submit" class="gap-1 w-full md:w-auto" disabled={!canSubmit} loading={submitting}>
 			Next
 			<ArrowRightIcon />
 		</Button>
