@@ -4,6 +4,7 @@
 	import { TextareaAutosize } from 'runed';
 	import { usePromptInputTextarea } from './prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
+	import * as FileDropZone from '$lib/components/ui/file-drop-zone';
 
 	let {
 		ref = $bindable(null),
@@ -31,16 +32,21 @@
 	});
 </script>
 
-<!-- svelte-ignore a11y_autofocus -->
-<textarea
-	bind:value={textareaState.rootState.opts.value.current}
-	bind:this={ref}
-	class={cn(
-		'p-3 outline-none resize-none disabled:cursor-not-allowed disabled:opacity-50',
-		className
-	)}
-	style="height: 48px;"
-	{autofocus}
-	{...textareaState.props}
-	{...rest}
-></textarea>
+<FileDropZone.Textarea>
+	{#snippet child({ props: textareaProps })}
+		<!-- svelte-ignore a11y_autofocus -->
+		<textarea
+			bind:value={textareaState.rootState.opts.value.current}
+			bind:this={ref}
+			class={cn(
+				'p-3 outline-none resize-none disabled:cursor-not-allowed disabled:opacity-50',
+				className
+			)}
+			style="height: 48px;"
+			{autofocus}
+			{...textareaProps}
+			{...textareaState.props}
+			{...rest}
+		></textarea>
+	{/snippet}
+</FileDropZone.Textarea>

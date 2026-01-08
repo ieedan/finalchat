@@ -4,14 +4,9 @@
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import ImagePlusIcon from '@lucide/svelte/icons/image-plus';
 
-	const attachmentButtonState = usePromptInputAttachmentButton();
+	usePromptInputAttachmentButton();
 </script>
 
-<FileDropZone.Root
-	onUpload={attachmentButtonState.rootState.onUpload}
-	accept={FileDropZone.ACCEPT_IMAGE}
->
-	<FileDropZone.Trigger class={buttonVariants({ variant: 'input', size: 'icon' })}>
-		<ImagePlusIcon class="size-4" />
-	</FileDropZone.Trigger>
-</FileDropZone.Root>
+<FileDropZone.Trigger class={buttonVariants({ variant: 'input', size: 'icon' })}>
+	<ImagePlusIcon class="size-4" />
+</FileDropZone.Trigger>

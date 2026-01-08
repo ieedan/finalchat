@@ -51,6 +51,7 @@
 		"ai": "^5.0.110",
 		"animated-svelte": "^0.0.0",
 		"bits-ui": "^2.14.4",
+		"browser-image-compression": "^2.0.2",
 		"clsx": "^2.1.1",
 		"concurrently": "^9.2.1",
 		"convex": "^1.30.0",
