@@ -75,7 +75,9 @@
 				</div>
 			</div>
 			{#if !autoScroll.isAtTop}
-				<div class="absolute w-full h-[24px] bg-background mask-b-from-0% -bottom-[14px] z-19"></div>
+				<div
+					class="absolute w-full h-[24px] bg-background mask-b-from-0% -bottom-[14px] z-19"
+				></div>
 			{/if}
 		</header>
 		<div
