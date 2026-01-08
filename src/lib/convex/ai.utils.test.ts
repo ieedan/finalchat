@@ -38,12 +38,11 @@ describe('githubLinkHandler', () => {
 				license: { name: 'MIT' },
 				created_at: '2023-01-01T00:00:00Z',
 				updated_at: '2024-01-01T00:00:00Z',
-				html_url: 'https://github.com/owner/repo'
+				html_url: 'https://github.com/owner/repo',
+				default_branch: 'main'
 			};
 
-			const mockReadmeData = {
-				content: Buffer.from('# Test README\n\nThis is a test.').toString('base64')
-			};
+			const mockReadmeContent = '# Test README\n\nThis is a test.';
 
 			vi.mocked(fetch)
 				.mockResolvedValueOnce({
@@ -52,7 +51,7 @@ describe('githubLinkHandler', () => {
 				} as Response)
 				.mockResolvedValueOnce({
 					ok: true,
-					json: async () => mockReadmeData
+					text: async () => mockReadmeContent
 				} as Response);
 
 			const result = await githubLinkHandler.handler('https://github.com/owner/repo');
@@ -73,8 +72,15 @@ describe('githubLinkHandler', () => {
 				'https://api.github.com/repos/owner/repo',
 				expect.objectContaining({
 					headers: expect.objectContaining({
-						Accept: 'application/vnd.github.v3+json',
-						'User-Agent': 'finalchat'
+						Accept: 'application/vnd.github.v3+json'
+					})
+				})
+			);
+			expect(fetch).toHaveBeenCalledWith(
+				'https://raw.githubusercontent.com/owner/repo/main/README.md',
+				expect.objectContaining({
+					headers: expect.objectContaining({
+						Accept: 'application/vnd.github.v3+json'
 					})
 				})
 			);
@@ -91,7 +97,8 @@ describe('githubLinkHandler', () => {
 				license: null,
 				created_at: '2023-01-01T00:00:00Z',
 				updated_at: '2024-01-01T00:00:00Z',
-				html_url: 'https://github.com/owner/repo'
+				html_url: 'https://github.com/owner/repo',
+				default_branch: 'main'
 			};
 
 			vi.mocked(fetch)
@@ -134,14 +141,20 @@ describe('githubLinkHandler', () => {
 				path: 'src/test.ts',
 				size: 100,
 				sha: 'abc123',
-				html_url: 'https://github.com/owner/repo/blob/main/src/test.ts',
-				content: Buffer.from('const x = 1;').toString('base64')
+				html_url: 'https://github.com/owner/repo/blob/main/src/test.ts'
 			};
 
-			vi.mocked(fetch).mockResolvedValueOnce({
-				ok: true,
-				json: async () => mockFileData
-			} as Response);
+			const mockFileContent = 'const x = 1;';
+
+			vi.mocked(fetch)
+				.mockResolvedValueOnce({
+					ok: true,
+					json: async () => mockFileData
+				} as Response)
+				.mockResolvedValueOnce({
+					ok: true,
+					text: async () => mockFileContent
+				} as Response);
 
 			const result = await githubLinkHandler.handler(
 				'https://github.com/owner/repo/blob/main/src/test.ts'
@@ -153,8 +166,13 @@ describe('githubLinkHandler', () => {
 			expect(result).toContain('**SHA:** `abc123`');
 			expect(result).toContain('```ts\nconst x = 1;\n```');
 
+			expect(fetch).toHaveBeenCalledTimes(2);
 			expect(fetch).toHaveBeenCalledWith(
 				'https://api.github.com/repos/owner/repo/contents/src/test.ts?ref=main',
+				expect.any(Object)
+			);
+			expect(fetch).toHaveBeenCalledWith(
+				'https://raw.githubusercontent.com/owner/repo/main/src/test.ts',
 				expect.any(Object)
 			);
 		});
@@ -166,14 +184,20 @@ describe('githubLinkHandler', () => {
 				path: 'src/lib/utils/file.js',
 				size: 200,
 				sha: 'def456',
-				html_url: 'https://github.com/owner/repo/blob/develop/src/lib/utils/file.js',
-				content: Buffer.from('console.log("test");').toString('base64')
+				html_url: 'https://github.com/owner/repo/blob/develop/src/lib/utils/file.js'
 			};
 
-			vi.mocked(fetch).mockResolvedValueOnce({
-				ok: true,
-				json: async () => mockFileData
-			} as Response);
+			const mockFileContent = 'console.log("test");';
+
+			vi.mocked(fetch)
+				.mockResolvedValueOnce({
+					ok: true,
+					json: async () => mockFileData
+				} as Response)
+				.mockResolvedValueOnce({
+					ok: true,
+					text: async () => mockFileContent
+				} as Response);
 
 			const result = await githubLinkHandler.handler(
 				'https://github.com/owner/repo/blob/develop/src/lib/utils/file.js'
@@ -196,6 +220,34 @@ describe('githubLinkHandler', () => {
 			);
 
 			expect(result).toContain('Error fetching file: 404 Not Found');
+		});
+
+		it('should handle file content fetch error', async () => {
+			const mockFileData = {
+				type: 'file',
+				name: 'test.ts',
+				path: 'src/test.ts',
+				size: 100,
+				sha: 'abc123',
+				html_url: 'https://github.com/owner/repo/blob/main/src/test.ts'
+			};
+
+			vi.mocked(fetch)
+				.mockResolvedValueOnce({
+					ok: true,
+					json: async () => mockFileData
+				} as Response)
+				.mockResolvedValueOnce({
+					ok: false,
+					status: 404,
+					statusText: 'Not Found'
+				} as Response);
+
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo/blob/main/src/test.ts'
+			);
+
+			expect(result).toContain('Error fetching file content: 404 Not Found');
 		});
 
 		it('should handle directory instead of file', async () => {
@@ -574,14 +626,7 @@ describe('githubLinkHandler', () => {
 
 				expect(result).toBe(mockContent);
 
-				expect(fetch).toHaveBeenCalledWith(
-					'https://svelte.dev/docs/kit/remote-functions/llms.txt',
-					expect.objectContaining({
-						headers: expect.objectContaining({
-							'User-Agent': 'finalchat'
-						})
-					})
-				);
+				expect(fetch).toHaveBeenCalledWith('https://svelte.dev/docs/kit/remote-functions/llms.txt');
 			});
 
 			it('should handle trailing slash in URL', async () => {
@@ -597,10 +642,7 @@ describe('githubLinkHandler', () => {
 				);
 
 				expect(result).toBe(mockContent);
-				expect(fetch).toHaveBeenCalledWith(
-					'https://svelte.dev/docs/kit/remote-functions/llms.txt',
-					expect.any(Object)
-				);
+				expect(fetch).toHaveBeenCalledWith('https://svelte.dev/docs/kit/remote-functions/llms.txt');
 			});
 
 			it('should handle fetch error', async () => {

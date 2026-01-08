@@ -12,18 +12,27 @@
 	let { tool }: Props = $props();
 </script>
 
-<div class="pb-2">
+<div class="pb-2 max-w-full">
 	{#if tool.toolName === 'fetchLinkContent'}
 		{@const link = (tool.input as { link: string }).link}
 		<div class="py-2">
 			{#if tool.result}
-				<div class="flex items-center gap-2 text-muted-foreground">
-					<BookOpenCheckIcon class="size-4" />
-					Read {link}
+				<div class="text-muted-foreground text-nowrap flex items-center gap-1.5">
+					<BookOpenCheckIcon class="size-4 inline shrink-0" />
+					<span class="truncate">
+						<span class="font-medium">Read</span>
+						<a
+							href={link}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="hover:text-foreground transition-colors">{link}</a
+						>
+					</span>
 				</div>
 			{:else}
 				<ShinyText>
-					Reading {link}...
+					<span class="font-medium">Reading</span>
+					{link}...
 				</ShinyText>
 			{/if}
 		</div>
