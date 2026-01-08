@@ -44,7 +44,7 @@ type CustomLinkHandler = {
 	handler: (link: string) => Promise<string>;
 };
 
-export const githubLinkHandler: CustomLinkHandler = {
+const githubLinkHandler: CustomLinkHandler = {
 	matches: (link) => link.startsWith('https://github.com'),
 	handler: async (link) => {
 		try {
@@ -199,7 +199,7 @@ export const githubLinkHandler: CustomLinkHandler = {
 	}
 };
 
-export const svelteDevLinkHandler: CustomLinkHandler = {
+const svelteDevLinkHandler: CustomLinkHandler = {
 	matches: (link) => link.startsWith('https://svelte.dev/docs/'),
 	handler: async (link) => {
 		try {
