@@ -5,10 +5,8 @@
 	import { buttonVariants } from '$lib/components/ui/button';
 	import type { Snippet } from 'svelte';
 
-	let {
-		class: className,
-		children
-	}: { open?: boolean; class?: string; children: Snippet } = $props();
+	let { class: className, children }: { open?: boolean; class?: string; children: Snippet } =
+		$props();
 </script>
 
 <DropdownMenu.Root>

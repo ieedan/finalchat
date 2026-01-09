@@ -24,7 +24,10 @@
 <Button
 	{variant}
 	{size}
-	class={cn('group relative data-[generating=true]:animate-pulse size-12 rounded-full [&_svg]:size-5!', className)}
+	class={cn(
+		'group relative data-[generating=true]:animate-pulse size-12 rounded-full [&_svg]:size-5!',
+		className
+	)}
 	{...submitState.props}
 	{...rest}
 >

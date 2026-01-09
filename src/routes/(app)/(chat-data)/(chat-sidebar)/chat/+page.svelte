@@ -16,7 +16,6 @@
 		PanelLeftIcon,
 		SendIcon
 	} from '@lucide/svelte';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import { cn } from '$lib/utils.js';
 	import { BASIC_MODELS } from '$lib/ai';
@@ -46,17 +45,6 @@
 		{ name: 'Sidebar', keys: [cmdOrCtrl, 'B'], icon: PanelLeftIcon },
 		{ name: 'Submit', keys: submitOnEnter ? ['Enter'] : [cmdOrCtrl, 'Enter'], icon: SendIcon }
 	]);
-
-	const greeting = $derived(() => {
-		const hour = new Date().getHours();
-		if (hour >= 5 && hour < 12) {
-			return 'Good morning';
-		} else if (hour >= 12 && hour < 18) {
-			return 'Good afternoon';
-		} else {
-			return 'Good evening';
-		}
-	});
 
 	const mobileModels = $derived(
 		chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'
@@ -139,7 +127,7 @@
 
 			<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
 		</PromptInputMobile.Root>
-		
+
 		<!-- Desktop Prompt Input -->
 		<PromptInput.Root
 			bind:modelId={modelId.current}

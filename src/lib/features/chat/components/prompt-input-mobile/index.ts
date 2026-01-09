@@ -14,16 +14,16 @@ import ModelPicker from './prompt-input-mobile-model-picker.svelte';
 
 export {
 	Root,
-    Submit,
-    Plus,
-    PlusSeparator,
-    InputWrapper,
-    Input,
-    AttachmentList,
-    AddAttachment,
-    Banner,
-    BannerContent,
-    BannerDismiss,
-    BannerWrapper,
-    ModelPicker,
+	Submit,
+	Plus,
+	PlusSeparator,
+	InputWrapper,
+	Input,
+	AttachmentList,
+	AddAttachment,
+	Banner,
+	BannerContent,
+	BannerDismiss,
+	BannerWrapper,
+	ModelPicker
 };
