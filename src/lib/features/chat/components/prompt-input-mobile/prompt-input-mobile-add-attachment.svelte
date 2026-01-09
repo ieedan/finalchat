@@ -2,14 +2,14 @@
 	import * as FileDropZone from '$lib/components/ui/file-drop-zone';
 	import { usePromptInputAttachmentButton } from '../prompt-input/prompt-input.svelte.js';
 	import ImagePlusIcon from '@lucide/svelte/icons/image-plus';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import PromptInputPlusItem from './prompt-input-plus-item.svelte';
 
 	usePromptInputAttachmentButton();
 </script>
 
 <FileDropZone.Trigger>
-	<DropdownMenu.Item>
+	<PromptInputPlusItem>
 		<ImagePlusIcon class="size-4" />
 		Add Image
-	</DropdownMenu.Item>
+	</PromptInputPlusItem>
 </FileDropZone.Trigger>

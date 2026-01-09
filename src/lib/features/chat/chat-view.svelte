@@ -144,6 +144,8 @@
 						class="group/prompt-input z-20 md:hidden"
 					>
 						<PromptInputMobile.Plus>
+							<PromptInputMobile.NewChat />
+							<PromptInputMobile.PlusSeparator />
 							<PromptInputMobile.ModelPicker models={mobileModels} />
 							<PromptInputMobile.PlusSeparator />
 							<PromptInputMobile.AddAttachment />

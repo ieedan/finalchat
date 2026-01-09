@@ -106,6 +106,8 @@
 			bind:value={query}
 		>
 			<PromptInputMobile.Plus>
+				<PromptInputMobile.NewChat />
+				<PromptInputMobile.PlusSeparator />
 				<PromptInputMobile.ModelPicker models={mobileModels} />
 				<PromptInputMobile.PlusSeparator />
 				<PromptInputMobile.AddAttachment />

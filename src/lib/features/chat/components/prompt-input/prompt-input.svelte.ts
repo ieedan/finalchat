@@ -84,6 +84,7 @@ class PromptInputRootState {
 	}
 
 	async submit(input: string) {
+		if (this.opts.value.current.trim().length === 0) return;
 		const previousValue = this.opts.value.current;
 		if (this.opts.optimisticClear?.current) {
 			this.opts.value.current = '';

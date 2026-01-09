@@ -26,8 +26,9 @@
 	const client = useConvexClient();
 
 	async function startDeleteChat(shiftKey?: boolean) {
+		sidebar.setOpenMobile(false);
 		confirmDelete({
-			title: 'Are you sure you want to delete this chat?',
+			title: `Are you sure you want to delete "${chat.title}"?`,
 			description: 'This action cannot be undone.',
 			skipConfirmation: shiftKey,
 			onConfirm: deleteChat

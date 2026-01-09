@@ -11,6 +11,8 @@ import BannerContent from './prompt-input-banner-content.svelte';
 import BannerDismiss from './prompt-input-mobile-banner-dismiss.svelte';
 import BannerWrapper from './prompt-input-mobile-banner-wrapper.svelte';
 import ModelPicker from './prompt-input-mobile-model-picker.svelte';
+import PlusItem from './prompt-input-plus-item.svelte';
+import NewChat from './prompt-input-mobile-new-chat.svelte';
 
 export {
 	Root,
@@ -25,5 +27,7 @@ export {
 	BannerContent,
 	BannerDismiss,
 	BannerWrapper,
-	ModelPicker
+	ModelPicker,
+	PlusItem,
+	NewChat
 };
