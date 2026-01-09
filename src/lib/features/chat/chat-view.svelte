@@ -17,7 +17,6 @@
 	import { EyeIcon, MessageCircleOffIcon, ArrowLeftIcon } from '@lucide/svelte';
 	import * as Empty from '$lib/components/ui/empty';
 	import { Button } from '$lib/components/ui/button';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import { BASIC_MODELS } from '$lib/ai.js';
 
 	const chatLayoutState = useChatLayout();
@@ -55,7 +54,13 @@
 
 	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
 
-	const isMobile = new IsMobile();
+	const mobileModels = $derived(
+		chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'
+			? chatLayoutState.models.filter((model) =>
+					chatLayoutState.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
+				)
+			: BASIC_MODELS
+	);
 </script>
 
 {#if chatViewState.chat !== null}
@@ -122,103 +127,94 @@
 			{/if}
 			<div class="flex justify-center w-full">
 				<div class="w-full max-w-3xl px-4">
-					{#if isMobile.current}
-						{@const models =
-							chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'
-								? chatLayoutState.models.filter((model) =>
-										chatLayoutState.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
-									)
-								: BASIC_MODELS}
-						<PromptInputMobile.Root
-							bind:modelId={modelId.current}
-							generating={chatViewState.chatQuery.data?.generating}
-							{submitOnEnter}
-							onSubmit={(opts) => {
-								autoScroll.scrollToBottom(false, 'instant');
-								return chatLayoutState.handleSubmit(opts);
-							}}
-							onUpload={chatAttachmentUploader.uploadMany}
-							onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
-							bind:attachments={attachmentsList.current}
-							class="group/prompt-input z-20"
-						>
-							<PromptInputMobile.Plus>
-								<PromptInputMobile.ModelPicker {models} />
-								<PromptInputMobile.PlusSeparator />
-								<PromptInputMobile.AddAttachment />
-							</PromptInputMobile.Plus>
+					<!-- Mobile prompt input -->
+					<PromptInputMobile.Root
+						bind:modelId={modelId.current}
+						generating={chatViewState.chatQuery.data?.generating}
+						{submitOnEnter}
+						onSubmit={(opts) => {
+							autoScroll.scrollToBottom(false, 'instant');
+							return chatLayoutState.handleSubmit(opts);
+						}}
+						onUpload={chatAttachmentUploader.uploadMany}
+						onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+						bind:attachments={attachmentsList.current}
+						class="group/prompt-input z-20 md:hidden"
+					>
+						<PromptInputMobile.Plus>
+							<PromptInputMobile.ModelPicker models={mobileModels} />
+							<PromptInputMobile.PlusSeparator />
+							<PromptInputMobile.AddAttachment />
+						</PromptInputMobile.Plus>
 
-							<PromptInputMobile.BannerWrapper>
-								<PromptInputMobile.Banner
-									dismissedByError
-									dismissed={chatLayoutState.user !== null}
-								>
-									<PromptInputMobile.BannerContent>
-										<p>
-											<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
-										</p>
-									</PromptInputMobile.BannerContent>
-								</PromptInputMobile.Banner>
-								<PromptInputMobile.InputWrapper>
-									<PromptInputMobile.AttachmentList />
-									<PromptInputMobile.Input placeholder="Ask me anything..." />
-								</PromptInputMobile.InputWrapper>
-							</PromptInputMobile.BannerWrapper>
-
-							<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
-						</PromptInputMobile.Root>
-					{:else}
-						<PromptInput.Root
-							bind:modelId={modelId.current}
-							generating={chatViewState.chatQuery.data?.generating}
-							{submitOnEnter}
-							onSubmit={(opts) => {
-								autoScroll.scrollToBottom(false, 'instant');
-								return chatLayoutState.handleSubmit(opts);
-							}}
-							onUpload={chatAttachmentUploader.uploadMany}
-							onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
-							bind:attachments={attachmentsList.current}
-							class="group/prompt-input z-20"
-						>
-							<PromptInput.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
-								<PromptInput.BannerContent>
+						<PromptInputMobile.BannerWrapper>
+							<PromptInputMobile.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
+								<PromptInputMobile.BannerContent>
 									<p>
 										<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
 									</p>
-								</PromptInput.BannerContent>
-							</PromptInput.Banner>
-							<PromptInput.ScrollToBottom
-								isNearBottom={autoScroll.isNearBottom}
-								scrollToBottom={autoScroll.scrollToBottom}
-							/>
-							<PromptInput.Content>
-								<PromptInput.Textarea placeholder="Ask me anything..." />
-								<PromptInput.Footer class="justify-between">
-									<div class="flex items-center gap-2">
-										{#if chatLayoutState.isAdvancedMode}
-											<ModelPickerAdvanced />
-										{:else}
-											<ModelPickerBasic />
+								</PromptInputMobile.BannerContent>
+							</PromptInputMobile.Banner>
+							<PromptInputMobile.InputWrapper>
+								<PromptInputMobile.AttachmentList />
+								<PromptInputMobile.Input placeholder="Ask me anything..." />
+							</PromptInputMobile.InputWrapper>
+						</PromptInputMobile.BannerWrapper>
+
+						<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
+					</PromptInputMobile.Root>
+
+					<!-- Desktop Prompt Input -->
+					<PromptInput.Root
+						bind:modelId={modelId.current}
+						generating={chatViewState.chatQuery.data?.generating}
+						{submitOnEnter}
+						onSubmit={(opts) => {
+							autoScroll.scrollToBottom(false, 'instant');
+							return chatLayoutState.handleSubmit(opts);
+						}}
+						onUpload={chatAttachmentUploader.uploadMany}
+						onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+						bind:attachments={attachmentsList.current}
+						class="group/prompt-input z-20 hidden md:block"
+					>
+						<PromptInput.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
+							<PromptInput.BannerContent>
+								<p>
+									<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
+								</p>
+							</PromptInput.BannerContent>
+						</PromptInput.Banner>
+						<PromptInput.ScrollToBottom
+							isNearBottom={autoScroll.isNearBottom}
+							scrollToBottom={autoScroll.scrollToBottom}
+						/>
+						<PromptInput.Content>
+							<PromptInput.Textarea placeholder="Ask me anything..." />
+							<PromptInput.Footer class="justify-between">
+								<div class="flex items-center gap-2">
+									{#if chatLayoutState.isAdvancedMode}
+										<ModelPickerAdvanced />
+									{:else}
+										<ModelPickerBasic />
+									{/if}
+									<PromptInput.AttachmentButton />
+								</div>
+								<div class="flex items-center gap-2">
+									{#if chatLayoutState.isAdvancedMode}
+										{#if lastAssistantMessage?.meta.tokenUsage !== undefined && selectedModel?.context_length !== undefined}
+											<PromptInput.ContextIndicator
+												class="hidden md:block"
+												tokensUsed={lastAssistantMessage.meta.tokenUsage}
+												contextLength={selectedModel.context_length}
+											/>
 										{/if}
-										<PromptInput.AttachmentButton />
-									</div>
-									<div class="flex items-center gap-2">
-										{#if chatLayoutState.isAdvancedMode}
-											{#if lastAssistantMessage?.meta.tokenUsage !== undefined && selectedModel?.context_length !== undefined}
-												<PromptInput.ContextIndicator
-													class="hidden md:block"
-													tokensUsed={lastAssistantMessage.meta.tokenUsage}
-													contextLength={selectedModel.context_length}
-												/>
-											{/if}
-										{/if}
-										<PromptInput.Submit disabled={chatLayoutState.user === null} />
-									</div>
-								</PromptInput.Footer>
-							</PromptInput.Content>
-						</PromptInput.Root>
-					{/if}
+									{/if}
+									<PromptInput.Submit disabled={chatLayoutState.user === null} />
+								</div>
+							</PromptInput.Footer>
+						</PromptInput.Content>
+					</PromptInput.Root>
 				</div>
 			</div>
 		</div>

@@ -58,7 +58,13 @@
 		}
 	});
 
-	const isMobile = new IsMobile();
+	const mobileModels = $derived(
+		chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'
+			? chatLayoutState.models.filter((model) =>
+					chatLayoutState.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
+				)
+			: BASIC_MODELS
+	);
 </script>
 
 <div class="w-full h-full flex flex-col px-4 md:items-center md:justify-center md:gap-12">
@@ -99,81 +105,75 @@
 		{/if}
 	</div>
 	<div class="flex flex-col gap-4 w-full items-center pb-2 sm:pb-4 md:pb-0 mt-auto md:mt-0">
-		{#if isMobile.current}
-			{@const models =
-				chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'
-					? chatLayoutState.models.filter((model) =>
-							chatLayoutState.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
-						)
-					: BASIC_MODELS}
-			<PromptInputMobile.Root
-				bind:modelId={modelId.current}
-				onSubmit={chatLayoutState.handleSubmit}
-				{submitOnEnter}
-				class="w-full max-w-2xl"
-				optimisticClear={false}
-				onUpload={chatAttachmentUploader.uploadMany}
-				onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
-				bind:attachments={attachmentsList.current}
-				bind:value={query}
-			>
-				<PromptInputMobile.Plus>
-					<PromptInputMobile.ModelPicker {models} />
-					<PromptInputMobile.PlusSeparator />
-					<PromptInputMobile.AddAttachment />
-				</PromptInputMobile.Plus>
+		<!-- Mobile Prompt Input -->
+		<PromptInputMobile.Root
+			bind:modelId={modelId.current}
+			onSubmit={chatLayoutState.handleSubmit}
+			{submitOnEnter}
+			class="w-full max-w-2xl md:hidden"
+			optimisticClear={false}
+			onUpload={chatAttachmentUploader.uploadMany}
+			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+			bind:attachments={attachmentsList.current}
+			bind:value={query}
+		>
+			<PromptInputMobile.Plus>
+				<PromptInputMobile.ModelPicker models={mobileModels} />
+				<PromptInputMobile.PlusSeparator />
+				<PromptInputMobile.AddAttachment />
+			</PromptInputMobile.Plus>
 
-				<PromptInputMobile.BannerWrapper>
-					<PromptInputMobile.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
-						<PromptInputMobile.BannerContent>
-							<p>
-								<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
-							</p>
-						</PromptInputMobile.BannerContent>
-					</PromptInputMobile.Banner>
-					<PromptInputMobile.InputWrapper>
-						<PromptInputMobile.AttachmentList />
-						<PromptInputMobile.Input placeholder="Ask me anything..." />
-					</PromptInputMobile.InputWrapper>
-				</PromptInputMobile.BannerWrapper>
-
-				<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
-			</PromptInputMobile.Root>
-		{:else}
-			<PromptInput.Root
-				bind:modelId={modelId.current}
-				onSubmit={chatLayoutState.handleSubmit}
-				{submitOnEnter}
-				class="w-full max-w-2xl"
-				optimisticClear={false}
-				onUpload={chatAttachmentUploader.uploadMany}
-				onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
-				bind:attachments={attachmentsList.current}
-				bind:value={query}
-			>
-				<PromptInput.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
-					<PromptInput.BannerContent>
+			<PromptInputMobile.BannerWrapper>
+				<PromptInputMobile.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
+					<PromptInputMobile.BannerContent>
 						<p>
 							<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
 						</p>
-					</PromptInput.BannerContent>
-				</PromptInput.Banner>
-				<PromptInput.Content>
-					<PromptInput.AttachmentList />
-					<PromptInput.Textarea placeholder="Ask me anything..." />
-					<PromptInput.Footer class="justify-between">
-						<div class="flex items-center gap-2">
-							{#if chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
-								<ModelPickerAdvanced />
-							{:else}
-								<ModelPickerBasic />
-							{/if}
-							<PromptInput.AttachmentButton />
-						</div>
-						<PromptInput.Submit disabled={chatLayoutState.user === null} />
-					</PromptInput.Footer>
-				</PromptInput.Content>
-			</PromptInput.Root>
-		{/if}
+					</PromptInputMobile.BannerContent>
+				</PromptInputMobile.Banner>
+				<PromptInputMobile.InputWrapper>
+					<PromptInputMobile.AttachmentList />
+					<PromptInputMobile.Input placeholder="Ask me anything..." />
+				</PromptInputMobile.InputWrapper>
+			</PromptInputMobile.BannerWrapper>
+
+			<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
+		</PromptInputMobile.Root>
+		
+		<!-- Desktop Prompt Input -->
+		<PromptInput.Root
+			bind:modelId={modelId.current}
+			onSubmit={chatLayoutState.handleSubmit}
+			{submitOnEnter}
+			class="w-full max-w-2xl hidden md:block"
+			optimisticClear={false}
+			onUpload={chatAttachmentUploader.uploadMany}
+			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+			bind:attachments={attachmentsList.current}
+			bind:value={query}
+		>
+			<PromptInput.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
+				<PromptInput.BannerContent>
+					<p>
+						<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
+					</p>
+				</PromptInput.BannerContent>
+			</PromptInput.Banner>
+			<PromptInput.Content>
+				<PromptInput.AttachmentList />
+				<PromptInput.Textarea placeholder="Ask me anything..." />
+				<PromptInput.Footer class="justify-between">
+					<div class="flex items-center gap-2">
+						{#if chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+							<ModelPickerAdvanced />
+						{:else}
+							<ModelPickerBasic />
+						{/if}
+						<PromptInput.AttachmentButton />
+					</div>
+					<PromptInput.Submit disabled={chatLayoutState.user === null} />
+				</PromptInput.Footer>
+			</PromptInput.Content>
+		</PromptInput.Root>
 	</div>
 </div>
