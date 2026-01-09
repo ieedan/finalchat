@@ -10,6 +10,6 @@
 	}: ComponentProps<typeof DropdownMenu.Item> = $props();
 </script>
 
-<DropdownMenu.Item class={cn('py-2.5 px-3', className)} {...restProps}>
+<DropdownMenu.Item class={cn('py-2.5 px-3 rounded-xl', className)} {...restProps}>
 	{@render children?.()}
 </DropdownMenu.Item>

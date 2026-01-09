@@ -53,13 +53,13 @@
 	<DropdownMenu.Trigger
 		class={cn(
 			buttonVariants({ variant: 'outline' }),
-			'size-12 rounded-full [&_svg]:size-5! z-20',
+			'size-12 rounded-4xl [&_svg]:size-5! z-20',
 			className
 		)}
 	>
 		<PlusIcon />
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content align="start" sideOffset={5}>
+	<DropdownMenu.Content align="start" sideOffset={5} class="rounded-3xl p-2 min-w-[250px]">
 		{@render children?.()}
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

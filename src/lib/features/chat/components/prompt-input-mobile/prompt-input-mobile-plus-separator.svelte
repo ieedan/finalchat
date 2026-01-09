@@ -10,4 +10,4 @@
 	}: ComponentProps<typeof DropdownMenu.Separator> = $props();
 </script>
 
-<DropdownMenu.Separator bind:ref class={cn('', className)} {...restProps} />
+<DropdownMenu.Separator bind:ref class={cn('my-1.5 -mx-2', className)} {...restProps} />
