@@ -12,6 +12,7 @@
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 	import * as Drawer from '$lib/components/ui/drawer';
 	import { page } from '$app/state';
+	import { animated as a } from 'animated-svelte';
 
 	type Props = {
 		animated?: boolean;
@@ -63,7 +64,12 @@
 
 			{#if navigator.canShare({ title: chat.title, url: shareUrl })}
 				{#if value === 'public'}
-					<div class="h-10 flex items-center justify-end">
+					<a.div
+						initial={{ opacity: 0, scale: 0.95 }}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={{ duration: 0.15, timingFunction: 'ease-out' }}
+						class="h-10 flex items-center justify-end"
+					>
 						<Button
 							onclick={() => {
 								navigator.share({
@@ -71,19 +77,24 @@
 									url: shareUrl
 								});
 							}}
-							class="size-10"
-							variant="outline"
-							size="icon"
+							class="w-full"
+							variant="default"
 						>
 							<ShareIcon />
+							Share
 						</Button>
-					</div>
+					</a.div>
 				{:else}
-					<div class="h-10 flex items-center justify-center">
+					<a.div
+						initial={{ opacity: 0, scale: 0.95 }}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={{ duration: 0.15, timingFunction: 'ease-out' }}
+						class="h-10 flex items-center justify-center"
+					>
 						<span class="text-muted-foreground text-sm text-center">
 							Make your chat public to share it with others.
 						</span>
-					</div>
+					</a.div>
 				{/if}
 			{:else if value === 'public'}
 				<a

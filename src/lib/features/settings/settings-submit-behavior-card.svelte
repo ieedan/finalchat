@@ -22,7 +22,7 @@
 
 <Card.Root>
 	<Card.Content>
-		<div class="flex items-center justify-between">
+		<div class="flex items-center justify-between gap-4">
 			<div class="flex flex-col gap-1">
 				<Label for="submit-on-enter" class="text-sm font-medium">Submit on Enter</Label>
 				<p class="text-xs text-muted-foreground">

@@ -99,7 +99,7 @@ class ChatLayoutState {
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments }) => {
-		if (!this.user) throw new Error('You must be signed in start chatting!');
+		if (!this.user) throw new Error('You must be signed in to start chatting!');
 		if (!this.apiKey)
 			throw new Error('You need to have an API key setup before you can start chatting!');
 
