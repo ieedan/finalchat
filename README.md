@@ -7,6 +7,6 @@
 
 I built this because I wanted a chat app that was fast, free, and wonderful to use on both desktop and mobile.
 
-I call it *Finalchat* because this is my final draft. This is everything I learned from [thom.chat](https://thom.chat) and [comprably.ai](https://comprably.ai). The last chat app.
+I call it _Finalchat_ because this is my final draft. This is everything I learned from [thom.chat](https://thom.chat) and [comprably.ai](https://comprably.ai). The last chat app.
 
 But to really be the last chat app it can't be closed source and it can't be SaaS. So here it is open source and free to use.

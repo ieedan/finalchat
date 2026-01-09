@@ -4,7 +4,6 @@ about: Suggest something we should add to finalchat
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
 **Is your feature request related to a problem? Please describe.**

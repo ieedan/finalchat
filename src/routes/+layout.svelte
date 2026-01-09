@@ -16,6 +16,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { MetaTags, deepMerge } from 'svelte-meta-tags';
 	import { ThemeProvider } from '$lib/components/theme-provider';
+	import { onMount } from 'svelte';
 
 	let { children, data } = $props();
 
@@ -52,6 +53,21 @@
 	});
 
 	const metaTags = $derived(deepMerge(data.baseMetaTags, page.data.pageMetaTags));
+
+	onMount(() => {
+		console.log(`
+ _   _            _           _    
+| |_| |__   ___  | | __ _ ___| |_  
+| __| '_ \\ / _ \\ | |/ _\` / __| __| 
+| |_| | | |  __/ | | (_| \\__ \\ |_  
+ \\__|_| |_|\\___| |_|\\__,_|___/\\__|                         
+  ___  _ __   ___                  
+ / _ \\| '_ \\ / _ \\                 
+| (_) | | | |  __/                 
+ \\___/|_| |_|\\___|                 
+   
+ - GitHub https://github.com/ieedan/finalchat`);
+	});
 </script>
 
 <svelte:head>
