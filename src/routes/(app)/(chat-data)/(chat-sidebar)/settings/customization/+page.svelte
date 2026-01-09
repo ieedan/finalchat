@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as AccountSettings from '$lib/components/layout/account-settings';
-	import { MetaTags } from '$lib/components/meta-tags';
 	import * as Card from '$lib/components/ui/card';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Button } from '$lib/components/ui/button';
@@ -9,6 +8,8 @@
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import { toast } from 'svelte-sonner';
 	import SettingsFontCard from '$lib/features/settings/settings-font-card.svelte';
+	import SettingsModeCard from '$lib/features/settings/settings-mode-card.svelte';
+	import SettingsSubmitBehaviorCard from '$lib/features/settings/settings-submit-behavior-card.svelte';
 
 	const client = useConvexClient();
 
@@ -29,8 +30,6 @@
 	);
 </script>
 
-<MetaTags title="Customization" />
-
 <AccountSettings.Page>
 	<Card.Root class="gap-4">
 		<Card.Header>
@@ -47,6 +46,10 @@
 			<Button onClickPromise={handleSave} disabled={!systemPromptHasChanged}>Save</Button>
 		</Card.Footer>
 	</Card.Root>
+
+	<SettingsModeCard />
+
+	<SettingsSubmitBehaviorCard />
 
 	<SettingsFontCard />
 </AccountSettings.Page>

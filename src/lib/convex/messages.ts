@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 import { httpAction, internalAction, internalQuery, query } from './_generated/server';
 import { mutation, internalMutation } from './functions';
-import { internal } from './_generated/api';
+import { api, internal } from './_generated/api';
 import { type StreamId, StreamIdValidator } from '@convex-dev/persistent-text-streaming';
 import type { Doc, Id } from './_generated/dataModel';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
@@ -18,11 +18,14 @@ import {
 	getLastUserAndAssistantMessages,
 	type MessageWithAttachments
 } from './chats.utils';
-import { TITLE_GENERATION_MODEL, fetchLinkContentTool } from '../ai.js';
+import { TITLE_GENERATION_MODEL } from '../ai.js';
+import { fetchLinkContentTool } from './ai.utils.js';
 import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';
+import { env } from '../env.convex';
+import type { ContextType } from './ai.utils';
 
 export const Prompt = v.object({
 	modelId: v.string(),
@@ -52,12 +55,12 @@ export const create = mutation({
 		args
 	): Promise<{
 		chatId: Id<'chats'>;
-		userMessageId: Id<'messages'>;
 		assistantMessageId: Id<'messages'>;
 	}> => {
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) throw new Error('Unauthorized');
 
+		let isChatOwner: boolean;
 		let chatId: Id<'chats'>;
 		if (!args.chatId) {
 			chatId = await ctx.db.insert('chats', {
@@ -72,11 +75,40 @@ export const create = mutation({
 				chatId,
 				apiKey: args.apiKey
 			});
+
+			isChatOwner = true;
 		} else {
 			chatId = args.chatId;
 			await ctx.db.patch(chatId, {
 				updatedAt: Date.now()
 			});
+
+			const chat = await ctx.runQuery(internal.chats.internalGet, { chatId });
+			isChatOwner = chat?.userId === user.subject;
+
+			if (!isChatOwner) {
+				const lastMessages = getLastUserAndAssistantMessages(chat.messages);
+				if (!lastMessages) throw new Error('No last messages found');
+				// if we aren't the chat owner we are going to fork the chat from the last assistant message
+				const { newChatId, newAssistantMessageId } = await ctx.runMutation(
+					api.chats.branchFromMessage,
+					{
+						message: {
+							_id: lastMessages.assistantMessage._id,
+							role: 'assistant',
+							prompt: args.prompt
+						},
+						apiKey: args.apiKey
+					}
+				);
+
+				if (!newAssistantMessageId) throw new Error('Failed to branch from message');
+
+				return {
+					chatId: newChatId,
+					assistantMessageId: newAssistantMessageId
+				};
+			}
 		}
 
 		const userMessageId = await ctx.db.insert('messages', {
@@ -123,8 +155,7 @@ export const create = mutation({
 
 		return {
 			chatId,
-			assistantMessageId,
-			userMessageId
+			assistantMessageId
 		};
 	}
 });
@@ -302,7 +333,12 @@ ${systemPrompt}
 							({ steps }) => {
 								return steps.length >= 10;
 							}
-						]
+						],
+						experimental_context: {
+							env: {
+								GITHUB_TOKEN: env.GITHUB_TOKEN
+							}
+						} satisfies ContextType
 					});
 
 					streamResult = agent.stream({

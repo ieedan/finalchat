@@ -1,6 +1,7 @@
 import type { ReadableBoxedValues } from 'svelte-toolbelt';
 import type { FileRejectedReason } from './types';
 import { Context } from 'runed';
+import type { HTMLAttributes } from 'svelte/elements';
 
 type FileDropZoneStateOptions = ReadableBoxedValues<{
 	id: string;
@@ -29,7 +30,7 @@ class FileDropZoneState {
 
 	async ondrop(
 		e: DragEvent & {
-			currentTarget: EventTarget & HTMLLabelElement;
+			currentTarget: EventTarget;
 		}
 	) {
 		if (this.opts.disabled.current || !this.canUploadFiles) return;
@@ -118,16 +119,17 @@ class FileDropZoneState {
 		this.uploading = false;
 	};
 
-	canUploadFiles = $derived.by(
-		() =>
-			!this.opts.disabled.current &&
-			!this.uploading &&
-			!(
-				this.opts.maxFiles.current !== undefined &&
-				this.opts.fileCount.current !== undefined &&
-				this.opts.fileCount.current >= this.opts.maxFiles.current
-			)
-	);
+	canUploadFiles = $derived.by(() => {
+		if (this.opts.disabled.current) return false;
+		if (this.uploading) return false;
+		if (
+			this.opts.maxFiles.current !== undefined &&
+			this.opts.fileCount.current !== undefined &&
+			this.opts.fileCount.current >= this.opts.maxFiles.current
+		)
+			return false;
+		return true;
+	});
 
 	props = $derived.by(() => ({
 		disabled: !this.canUploadFiles,
@@ -164,6 +166,51 @@ class FileDropZoneTrigger {
 	}));
 }
 
+type FileDropZoneTextareaOptions = ReadableBoxedValues<{
+	ondragover: HTMLAttributes<HTMLTextAreaElement>['ondragover'];
+	ondrop: HTMLAttributes<HTMLTextAreaElement>['ondrop'];
+	onpaste: HTMLAttributes<HTMLTextAreaElement>['onpaste'];
+}>;
+
+class FileDropZoneTextareaState {
+	constructor(
+		readonly opts: FileDropZoneTextareaOptions,
+		readonly rootState: FileDropZoneState
+	) {}
+
+	ondragover(e: Parameters<NonNullable<HTMLAttributes<HTMLTextAreaElement>['ondragover']>>[0]) {
+		e.preventDefault();
+		this.opts.ondragover.current?.(e);
+	}
+
+	ondrop(e: Parameters<NonNullable<HTMLAttributes<HTMLTextAreaElement>['ondrop']>>[0]) {
+		this.rootState.ondrop(e);
+		this.opts.ondrop.current?.(e);
+	}
+
+	onpaste(e: Parameters<NonNullable<HTMLAttributes<HTMLTextAreaElement>['onpaste']>>[0]) {
+		const clipboardData = e.clipboardData;
+		if (!clipboardData) {
+			this.opts.onpaste.current?.(e);
+			return;
+		}
+
+		const files = Array.from(clipboardData.items)
+			.map((item) => item.getAsFile())
+			.filter((file) => file !== null);
+
+		this.rootState.upload(files);
+
+		this.opts.onpaste.current?.(e);
+	}
+
+	props = $derived.by(() => ({
+		ondragover: this.ondragover.bind(this),
+		ondrop: this.ondrop.bind(this),
+		onpaste: this.onpaste.bind(this)
+	}));
+}
+
 const ctx = new Context<FileDropZoneState>('file-drop-zone-state');
 
 export function useFileDropZone(opts: FileDropZoneStateOptions) {
@@ -172,4 +219,8 @@ export function useFileDropZone(opts: FileDropZoneStateOptions) {
 
 export function useFileDropZoneTrigger() {
 	return new FileDropZoneTrigger(ctx.get());
+}
+
+export function useFileDropZoneTextarea(opts: FileDropZoneTextareaOptions) {
+	return new FileDropZoneTextareaState(opts, ctx.get());
 }

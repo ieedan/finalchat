@@ -34,7 +34,8 @@
 						message: {
 							_id: message._id,
 							role: 'assistant'
-						}
+						},
+						apiKey: chatLayoutState.apiKey ?? ''
 					}
 				: {
 						message: {
@@ -44,7 +45,8 @@
 							supportedParameters: model?.supported_parameters ?? [],
 							inputModalities: model?.architecture.input_modalities ?? ['text'],
 							outputModalities: model?.architecture.output_modalities ?? ['text']
-						}
+						},
+						apiKey: chatLayoutState.apiKey ?? ''
 					}
 		);
 
@@ -56,6 +58,8 @@
 	}
 </script>
 
-<Button variant="ghost" size="icon" onClickPromise={branchFromMessage}>
-	<SplitIcon />
-</Button>
+{#if chatLayoutState.user !== null}
+	<Button variant="ghost" size="icon" onClickPromise={branchFromMessage}>
+		<SplitIcon />
+	</Button>
+{/if}

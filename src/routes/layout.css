@@ -111,3 +111,7 @@ html {
 .bg-popover {
 	--input: var(--background);
 }
+
+.bg-card {
+	--input: var(--background);
+}

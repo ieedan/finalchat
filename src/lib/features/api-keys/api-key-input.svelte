@@ -60,7 +60,9 @@
 		<Password.Input
 			class="w-full border-none pl-1 bg-transparent! focus:ring-0!"
 			placeholder="sk-or-v1-..."
-			autocomplete="off"
+			autocomplete="one-time-code"
+			data-1p-ignore
+			data-lpignore="true"
 			bind:value={apiKey}
 		>
 			<Password.ToggleVisibility />

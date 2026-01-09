@@ -105,22 +105,91 @@ export const create = internalMutation({
 	}
 });
 
-export const downloadFile = httpAction(async (ctx, request) => {
-	const user = await ctx.auth.getUserIdentity();
-	if (!user) throw new Error('Unauthorized not');
+export const internalGetAttachment = internalQuery({
+	args: {
+		key: v.string()
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db
+			.query('chatAttachments')
+			.withIndex('by_key', (q) => q.eq('key', args.key))
+			.first();
+	}
+});
 
+export const getAll = query({
+	args: {},
+	handler: async (ctx) => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return [];
+
+		const attachments = await ctx.db
+			.query('chatAttachments')
+			.withIndex('by_user', (q) => q.eq('userId', user.subject))
+			.collect();
+
+		const attachmentsWithUrls = await Promise.all(
+			attachments.map(async (attachment) => {
+				const url = await r2.getUrl(attachment.key, { expiresIn: undefined });
+				return { ...attachment, url };
+			})
+		);
+
+		return attachmentsWithUrls;
+	}
+});
+
+export const remove = mutation({
+	args: {
+		ids: v.array(v.id('chatAttachments'))
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new Error('Unauthorized');
+
+		for (const id of args.ids) {
+			const attachment = await ctx.db.get(id);
+			if (!attachment || attachment.userId !== user.subject) {
+				throw new Error('Attachment not found or you are not authorized to delete it');
+			}
+
+			// Delete from R2
+			await r2.deleteObject(ctx, attachment.key);
+			// Delete from database
+			await ctx.db.delete(id);
+		}
+	}
+});
+
+export const downloadFile = httpAction(async (ctx, request) => {
 	const { key } = await request.json();
 
-	const { userId } = parseUploadKey(key as UploadKey);
-	if (userId !== user.subject) throw new Error('Unauthorized');
+	const attachment = await ctx.runQuery(internal.chatAttachments.internalGetAttachment, { key });
+	if (!attachment) {
+		return new Response('Attachment not found', { status: 404 });
+	}
 
-	const response = await fetch(
-		await ctx.runQuery(internal.chatAttachments.internalGetFileUrl, { key })
-	);
+	const chat = await ctx.runQuery(internal.chats.internalGetChat, { chatId: attachment.chatId });
+	if (!chat) {
+		return new Response('Chat not found', { status: 404 });
+	}
+
+	// Check if the chat is public or if the user has access
+	const user = await ctx.auth.getUserIdentity();
+	const isPublic = chat.public === true;
+	const isOwner = user && chat.userId === user.subject;
+
+	if (!isPublic && !isOwner) {
+		return new Response('Unauthorized', { status: 403 });
+	}
+
+	const fileUrl = await ctx.runQuery(internal.chatAttachments.internalGetFileUrl, { key });
+
+	const response = await fetch(fileUrl);
 
 	const newResponse = new Response(response.body, response);
 
-	newResponse.headers.set('Access-Control-Allow-Origin', 'http://localhost:5173');
+	newResponse.headers.set('Access-Control-Allow-Origin', '*');
 
 	return newResponse;
 });

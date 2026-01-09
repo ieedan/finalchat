@@ -8,6 +8,7 @@
 	import PromptInputBanner from './prompt-input-banner.svelte';
 	import PromptInputBannerDismiss from './prompt-input-banner-dismiss.svelte';
 	import type { ModelId } from '../../types.js';
+	import * as FileDropZone from '$lib/components/ui/file-drop-zone';
 
 	let {
 		class: className,
@@ -28,7 +29,7 @@
 		onDeleteAttachment: (key: string) => Promise<void>;
 		generating?: boolean;
 		/**
-		 * Whether to submit the form on enter. Otherwise the form will be submitted on shift+enter.
+		 * Whether to submit the form on enter. Otherwise the form will be submitted on Ctrl/Cmd+Enter.
 		 */
 		submitOnEnter?: boolean;
 		optimisticClear?: boolean;
@@ -57,21 +58,34 @@
 			(v) => (modelId = v)
 		)
 	});
+
+	const fileCount = $derived(promptInputState.uploadingAttachments.size + attachments.length);
+	const maxFiles = 3;
 </script>
 
-<div class={cn('relative', className)} {...rest}>
-	<PromptInputBanner
-		dismissed={promptInputState.error === null}
-		dismissedByError={false}
-		onDismiss={() => (promptInputState.error = null)}
-	>
-		<PromptInputBannerContent>
-			<div class="flex items-center gap-1.5 relative min-w-0">
-				<AlertCircleIcon class="size-4 text-destructive shrink-0" />
-				<span class="text-sm text-destructive truncate min-w-0">{promptInputState.error}</span>
-			</div>
-			<PromptInputBannerDismiss />
-		</PromptInputBannerContent>
-	</PromptInputBanner>
-	{@render children?.()}
-</div>
+<FileDropZone.Root
+	onUpload={promptInputState.onUpload}
+	accept={FileDropZone.ACCEPT_IMAGE}
+	{maxFiles}
+	{fileCount}
+	onFileRejected={(opts) => {
+		promptInputState.error = `${opts.file.name} not uploaded: ${opts.reason}`;
+	}}
+>
+	<div class={cn('relative', className)} {...rest}>
+		<PromptInputBanner
+			dismissed={promptInputState.error === null}
+			dismissedByError={false}
+			onDismiss={() => (promptInputState.error = null)}
+		>
+			<PromptInputBannerContent>
+				<div class="flex items-center gap-1.5 relative min-w-0">
+					<AlertCircleIcon class="size-4 text-destructive shrink-0" />
+					<span class="text-sm text-destructive truncate min-w-0">{promptInputState.error}</span>
+				</div>
+				<PromptInputBannerDismiss />
+			</PromptInputBannerContent>
+		</PromptInputBanner>
+		{@render children?.()}
+	</div>
+</FileDropZone.Root>

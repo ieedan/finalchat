@@ -4,6 +4,8 @@ import type { ReadableBoxedValues, WritableBoxedValues } from 'svelte-toolbelt';
 import type { ClipboardEventHandler, KeyboardEventHandler } from 'svelte/elements';
 import type { Model, ModelId } from '../../types';
 import { SvelteMap } from 'svelte/reactivity';
+import imageCompression from 'browser-image-compression';
+import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 
 export type OnSubmit = (opts: {
 	input: string;
@@ -30,19 +32,31 @@ class PromptInputRootState {
 	error = $state<string | null>(null);
 	uploadingAttachments: Map<string, File> = new SvelteMap();
 	textAreaRef = $state<HTMLTextAreaElement | null>(null);
+	isMobile: IsMobile;
 
 	constructor(readonly opts: PromptInputRootStateOptions) {
 		this.onUpload = this.onUpload.bind(this);
+		this.isMobile = new IsMobile();
 	}
 
 	async onUpload(files: File[]) {
 		try {
 			// add the pending files
 			for (const file of files) {
-				this.uploadingAttachments.set(file.name, file);
+				let compressedFile: File = file;
+				if (file.type.startsWith('image/')) {
+					compressedFile = await imageCompression(file, {
+						maxSizeMB: 1,
+						maxWidthOrHeight: 1920
+					});
+				}
+
+				this.uploadingAttachments.set(file.name, compressedFile);
 			}
 
-			const uploadedImages = await this.opts.onUpload.current?.(files);
+			const uploadedImages = await this.opts.onUpload.current?.(
+				this.uploadingAttachments.values().toArray()
+			);
 
 			// remove the pending files
 			for (const file of files) {
@@ -70,6 +84,7 @@ class PromptInputRootState {
 	}
 
 	async submit(input: string) {
+		if (this.opts.value.current.trim().length === 0) return;
 		const previousValue = this.opts.value.current;
 		if (this.opts.optimisticClear?.current) {
 			this.opts.value.current = '';
@@ -119,10 +134,18 @@ class PromptInputTextareaState {
 	}
 
 	onkeydown(e: Parameters<KeyboardEventHandler<HTMLTextAreaElement>>[0]) {
-		if (
-			e.key === 'Enter' &&
-			(e.metaKey || e.ctrlKey || this.rootState.opts.submitOnEnter?.current)
-		) {
+		if (e.key !== 'Enter') return;
+		if (e.shiftKey) return;
+
+		// On mobile, always submit on Enter (no modifier keys available)
+		// On desktop, submit on Ctrl/Cmd+Enter OR plain Enter if submitOnEnter is true
+		const shouldSubmit =
+			e.metaKey ||
+			e.ctrlKey ||
+			this.rootState.isMobile.current ||
+			this.rootState.opts.submitOnEnter?.current;
+
+		if (shouldSubmit) {
 			e.preventDefault();
 			this.rootState.submit(this.rootState.opts.value.current);
 		}
@@ -130,24 +153,8 @@ class PromptInputTextareaState {
 		this.opts.onkeydown?.current?.(e);
 	}
 
-	onpaste(e: Parameters<ClipboardEventHandler<HTMLTextAreaElement>>[0]) {
-		const clipboardData = e.clipboardData;
-		if (clipboardData) {
-			const items = Array.from(clipboardData.items);
-			const images = items
-				.filter((item) => item.type.startsWith('image/'))
-				.map((item) => item.getAsFile())
-				.filter((file) => file !== null);
-
-			this.rootState.onUpload(images);
-		}
-
-		this.opts.onpaste?.current?.(e);
-	}
-
 	props = $derived.by(() => ({
 		onkeydown: this.onkeydown.bind(this),
-		onpaste: this.onpaste.bind(this),
 		disabled: this.rootState.loading
 	}));
 }
@@ -228,9 +235,18 @@ class ModelPickerState {
 		readonly opts: ModelPickerStateOptions,
 		readonly rootState: PromptInputRootState
 	) {
-		if (this.rootState.opts.modelId.current === null) {
-			this.rootState.opts.modelId.current = this.opts.models.current[0].id;
-		}
+		// Watch for changes to models and ensure modelId is always valid
+		watch(
+			() => [this.opts.models.current, this.rootState.opts.modelId.current] as const,
+			([models, modelId]) => {
+				if (models.length === 0) return;
+
+				// If modelId is null or not in the available models, set to first model
+				if (modelId === null || !models.some((m) => m.id === modelId)) {
+					this.rootState.opts.modelId.current = models[0].id;
+				}
+			}
+		);
 	}
 
 	onSelect() {
@@ -240,37 +256,37 @@ class ModelPickerState {
 	}
 }
 
-const ctx = new Context<PromptInputRootState>('prompt-input-root-state');
-const bannerCtx = new Context<PromptInputBannerState>('prompt-input-banner-state');
+export const PromptInputCtx = new Context<PromptInputRootState>('prompt-input-root-state');
+const BannerCtx = new Context<PromptInputBannerState>('prompt-input-banner-state');
 
 export function usePromptInput(props: PromptInputRootStateOptions) {
-	return ctx.set(new PromptInputRootState(props));
+	return PromptInputCtx.set(new PromptInputRootState(props));
 }
 
 export function usePromptInputTextarea(props: PromptInputTextareaStateOptions) {
-	return new PromptInputTextareaState(props, ctx.get());
+	return new PromptInputTextareaState(props, PromptInputCtx.get());
 }
 
 export function usePromptInputAttachmentList() {
-	return new PromptInputAttachmentListState(ctx.get());
+	return new PromptInputAttachmentListState(PromptInputCtx.get());
 }
 
 export function usePromptInputAttachmentButton() {
-	return new PromptInputAttachmentButtonState(ctx.get());
+	return new PromptInputAttachmentButtonState(PromptInputCtx.get());
 }
 
 export function usePromptInputSubmit(props: PromptInputSubmitStateOptions) {
-	return new PromptInputSubmitState(props, ctx.get());
+	return new PromptInputSubmitState(props, PromptInputCtx.get());
 }
 
 export function usePromptInputBanner(props: PromptInputBannerStateOptions) {
-	return bannerCtx.set(new PromptInputBannerState(props, ctx.get()));
+	return BannerCtx.set(new PromptInputBannerState(props, PromptInputCtx.get()));
 }
 
 export function usePromptInputBannerDismiss(props: PromptInputBannerDismissStateOptions) {
-	return new PromptInputBannerDismissState(props, bannerCtx.get());
+	return new PromptInputBannerDismissState(props, BannerCtx.get());
 }
 
 export function useModelPicker(props: ModelPickerStateOptions) {
-	return new ModelPickerState(props, ctx.get());
+	return new ModelPickerState(props, PromptInputCtx.get());
 }

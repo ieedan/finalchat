@@ -6,7 +6,7 @@
 
 	let { children } = $props();
 
-	const chatState = useChatLayout();
+	const chatLayoutState = useChatLayout();
 </script>
 
 <Sidebar.Provider>
@@ -16,4 +16,7 @@
 	</Sidebar.Inset>
 </Sidebar.Provider>
 
-<OnboardingDialog userSettings={chatState.userSettingsQuery.data} />
+<OnboardingDialog
+	user={chatLayoutState.user}
+	userSettings={chatLayoutState.userSettingsQuery.data}
+/>

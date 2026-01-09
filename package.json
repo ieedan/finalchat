@@ -40,6 +40,7 @@
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@t3-oss/env-core": "^0.13.8",
 		"@tailwindcss/vite": "^4.1.17",
+		"@tanstack/table-core": "^8.21.3",
 		"@types/node": "^24.10.1",
 		"@types/node-rsa": "^1.1.4",
 		"@workos-inc/node": "^7.77.0",
@@ -50,6 +51,7 @@
 		"ai": "^5.0.110",
 		"animated-svelte": "^0.0.0",
 		"bits-ui": "^2.14.4",
+		"browser-image-compression": "^2.0.2",
 		"clsx": "^2.1.1",
 		"concurrently": "^9.2.1",
 		"convex": "^1.30.0",
@@ -86,7 +88,7 @@
 		"vite": "^7.2.6",
 		"vite-plugin-devtools-json": "^1.0.0",
 		"vite-plugin-transform-lucide-imports": "^0.3.0",
-		"vitest": "^4.0.10",
+		"vitest": "^4.0.15",
 		"zod": "^4.1.13"
 	}
 }

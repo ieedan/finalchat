@@ -58,7 +58,8 @@ export default defineSchema({
 			})
 		),
 		favoriteModelIds: v.array(v.string()),
-		systemPrompt: v.optional(v.string())
+		systemPrompt: v.optional(v.string()),
+		submitOnEnter: v.optional(v.boolean())
 	}).index('by_user', ['userId']),
 	groups: defineTable({
 		name: v.string(),
