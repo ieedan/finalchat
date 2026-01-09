@@ -66,13 +66,15 @@
 {#if chatViewState.chat !== null}
 	<div class="flex flex-col h-full">
 		<header class="sticky top-0 z-20">
-			<div class="px-3 py-2.5 w-full flex items-center bg-background justify-between h-14">
-				<div class="flex items-center gap-4">
+			<div class="px-3 py-2.5 w-full flex gap-4 items-center bg-background justify-between h-14">
+				<div class="flex items-center gap-4 min-w-0 flex-1">
 					<div
 						data-visible={sidebar.isMobile || !sidebar.open}
 						class="size-9 data-[visible=false]:w-0 transition-all duration-200"
 					></div>
-					<span class="text-foreground text-sm">{chatViewState.chatQuery.data?.title}</span>
+					<span class="text-foreground text-sm truncate min-w-0">
+						{chatViewState.chatQuery.data?.title}
+					</span>
 				</div>
 				<div class="flex items-center gap-2">
 					{#if chatViewState.chatQuery.data}
