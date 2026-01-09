@@ -13,7 +13,7 @@
 </script>
 
 <div
-	class={cn('flex-1 w-full relative flex flex-col items-center justify-center z-10', className)}
+	class={cn('flex-1 w-full relative flex flex-col items-center justify-center z-20', className)}
 	{...rest}
 >
 	<PromptInputBanner
