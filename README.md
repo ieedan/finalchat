@@ -3,24 +3,10 @@
 </p>
 
 <h1 align="center">Finalchat</h1>
+<p align="center">The last chat app you'll ever need.</p>
 
-## TODO
+I built this because I wanted a chat app that was fast, free, and wonderful to use on both desktop and mobile.
 
-- [ ] Setup PKCE for OpenRouter https://openrouter.ai/docs/guides/overview/auth/oauth#step-2-exchange-the-code-for-a-user-controlled-api-key
+I call it *Finalchat* because this is my final draft. This is everything I learned from [thom.chat](https://thom.chat) and [comprably.ai](https://comprably.ai). The last chat app.
 
-### Chat Features
-
-- [ ] Enhance prompt button
-- [ ] Work on the mobile experience
-- [ ] Edit messages
-- [ ] Regenerate messages
-
-## Group Features
-
-Groups allow you to use your own key to pay for multiple users at the same time. You also get more advanced control features like:
-
-- [ ] Option to make it possible to view any chats created by group members
-- [ ] Option to prevent users from making chats public
-
-1. Users can only belong to 1 group
-2. Users may leave a group at any time
+But to really be the last chat app it can't be closed source and it can't be SaaS. So here it is open source and free to use.

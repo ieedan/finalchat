@@ -25,3 +25,4 @@ export { default as Perplexity } from './perplexity.svelte';
 export { default as Qwen } from './qwen.svelte';
 export { default as XAI } from './xai.svelte';
 export { default as FinalChat } from './finalchat.svelte';
+export { default as Github } from './github.svelte';

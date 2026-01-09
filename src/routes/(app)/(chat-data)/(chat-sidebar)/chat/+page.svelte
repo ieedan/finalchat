@@ -8,7 +8,7 @@
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
-	import { FinalChat } from '$lib/components/logos';
+	import { FinalChat, Github } from '$lib/components/logos';
 	import {
 		ArrowRightIcon,
 		MessageSquarePlusIcon,
@@ -19,6 +19,7 @@
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import { cn } from '$lib/utils.js';
 	import { BASIC_MODELS } from '$lib/ai';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	let { data } = $props();
 
@@ -166,4 +167,16 @@
 			</PromptInput.Content>
 		</PromptInput.Root>
 	</div>
+</div>
+
+<div class="hidden md:flex fixed bottom-2 right-2">
+	<Button
+		href="https://github.com/ieedan/finalchat"
+		target="_blank"
+		rel="noopener noreferrer"
+		variant="ghost"
+		size="icon"
+	>
+		<Github />
+	</Button>
 </div>
