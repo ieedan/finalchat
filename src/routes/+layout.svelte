@@ -16,6 +16,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { MetaTags, deepMerge } from 'svelte-meta-tags';
 	import { ThemeProvider } from '$lib/components/theme-provider';
+	import Startup from '$lib/components/startup.svelte';
 
 	let { children, data } = $props();
 
@@ -60,6 +61,7 @@
 
 <MetaTags {...metaTags} />
 
+<Startup />
 <ConfirmDeleteDialog />
 <Toaster position="bottom-right" />
 
