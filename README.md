@@ -31,7 +31,7 @@ But to really be the last chat app it can't be closed source and it can't be Saa
 - UI [shadcn-svelte](https://ui.shadcn.com/docs/installation/svelte)
 - Object storage [R2](https://www.r2.dev)
 
-## Want an "Open in finalchat" button?
+## Want an "Open in Finalchat" button?
 
 You can pass your prompt in the `q` query parameter along to the `/chat` route like so:
 
