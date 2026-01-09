@@ -22,6 +22,7 @@ But to really be the last chat app it can't be closed source and it can't be Saa
 - The best model picker in any chat app
 - Upload and generate images
 - Hotkeys for everything
+- Models can read links with custom handlers for GitHub and other common sites
 
 ## The stack
 
@@ -29,3 +30,11 @@ But to really be the last chat app it can't be closed source and it can't be Saa
 - Database [Convex](https://www.convex.dev)
 - UI [shadcn-svelte](https://ui.shadcn.com/docs/installation/svelte)
 - Object storage [R2](https://www.r2.dev)
+
+## Want an "Open in finalchat" button?
+
+You can pass your prompt in the `q` query parameter along to the `/chat` route like so:
+
+```
+https://finalchat.app/chat?q=Read https://example.com and tell me about it
+```
