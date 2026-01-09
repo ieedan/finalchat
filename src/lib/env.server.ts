@@ -10,7 +10,8 @@ const _env = createEnv({
 		WORKOS_COOKIE_PASSWORD: z.string(),
 		API_KEY_ENCRYPTION_KEY: z.string(),
 		OPENROUTER_API_KEY: z.string(),
-		VERCEL_URL: z.string()
+		VERCEL_URL: z.string(),
+		VERCEL_ENV: z.enum(['production', 'preview', 'development']).default('development')
 	},
 	emptyStringAsUndefined: true,
 	runtimeEnv: process.env
