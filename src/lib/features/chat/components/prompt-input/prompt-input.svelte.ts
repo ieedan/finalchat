@@ -255,37 +255,37 @@ class ModelPickerState {
 	}
 }
 
-const ctx = new Context<PromptInputRootState>('prompt-input-root-state');
-const bannerCtx = new Context<PromptInputBannerState>('prompt-input-banner-state');
+export const PromptInputCtx = new Context<PromptInputRootState>('prompt-input-root-state');
+const BannerCtx = new Context<PromptInputBannerState>('prompt-input-banner-state');
 
 export function usePromptInput(props: PromptInputRootStateOptions) {
-	return ctx.set(new PromptInputRootState(props));
+	return PromptInputCtx.set(new PromptInputRootState(props));
 }
 
 export function usePromptInputTextarea(props: PromptInputTextareaStateOptions) {
-	return new PromptInputTextareaState(props, ctx.get());
+	return new PromptInputTextareaState(props, PromptInputCtx.get());
 }
 
 export function usePromptInputAttachmentList() {
-	return new PromptInputAttachmentListState(ctx.get());
+	return new PromptInputAttachmentListState(PromptInputCtx.get());
 }
 
 export function usePromptInputAttachmentButton() {
-	return new PromptInputAttachmentButtonState(ctx.get());
+	return new PromptInputAttachmentButtonState(PromptInputCtx.get());
 }
 
 export function usePromptInputSubmit(props: PromptInputSubmitStateOptions) {
-	return new PromptInputSubmitState(props, ctx.get());
+	return new PromptInputSubmitState(props, PromptInputCtx.get());
 }
 
 export function usePromptInputBanner(props: PromptInputBannerStateOptions) {
-	return bannerCtx.set(new PromptInputBannerState(props, ctx.get()));
+	return BannerCtx.set(new PromptInputBannerState(props, PromptInputCtx.get()));
 }
 
 export function usePromptInputBannerDismiss(props: PromptInputBannerDismissStateOptions) {
-	return new PromptInputBannerDismissState(props, bannerCtx.get());
+	return new PromptInputBannerDismissState(props, BannerCtx.get());
 }
 
 export function useModelPicker(props: ModelPickerStateOptions) {
-	return new ModelPickerState(props, ctx.get());
+	return new ModelPickerState(props, PromptInputCtx.get());
 }

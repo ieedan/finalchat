@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import type { HTMLAttributes } from 'svelte/elements';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { PlusIcon } from '@lucide/svelte';
 	import { buttonVariants } from '$lib/components/ui/button';
+	import type { Snippet } from 'svelte';
 
-	let { class: className, children, ...rest }: HTMLAttributes<HTMLDivElement> = $props();
+	let {
+		class: className,
+		children
+	}: { open?: boolean; class?: string; children: Snippet } = $props();
 </script>
 
 <DropdownMenu.Root>
@@ -18,7 +21,7 @@
 	>
 		<PlusIcon />
 	</DropdownMenu.Trigger>
-    <DropdownMenu.Content align="start" sideOffset={5} class="rounded-4xl">
-        {@render children?.()}
-    </DropdownMenu.Content>
+	<DropdownMenu.Content align="start" sideOffset={5}>
+		{@render children?.()}
+	</DropdownMenu.Content>
 </DropdownMenu.Root>

@@ -8,7 +8,7 @@
 </script>
 
 <FileDropZone.Trigger>
-	<DropdownMenu.Item class="rounded-4xl">
+	<DropdownMenu.Item>
 		<ImagePlusIcon class="size-4" />
 		Add Image
 	</DropdownMenu.Item>
