@@ -99,7 +99,7 @@ export const create = internalMutation({
 			chatId: args.chatId,
 			messageId: args.messageId,
 			key: args.key,
-			userId: args.userId,
+			workosUserId: args.userId,
 			mediaType: args.mediaType
 		});
 	}
@@ -125,7 +125,7 @@ export const getAll = query({
 
 		const attachments = await ctx.db
 			.query('chatAttachments')
-			.withIndex('by_user', (q) => q.eq('userId', user.subject))
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', user.subject))
 			.collect();
 
 		const attachmentsWithUrls = await Promise.all(
@@ -149,7 +149,7 @@ export const remove = mutation({
 
 		for (const id of args.ids) {
 			const attachment = await ctx.db.get(id);
-			if (!attachment || attachment.userId !== user.subject) {
+			if (!attachment || attachment.workosUserId !== user.subject) {
 				throw new Error('Attachment not found or you are not authorized to delete it');
 			}
 
@@ -177,7 +177,7 @@ export const downloadFile = httpAction(async (ctx, request) => {
 	// Check if the chat is public or if the user has access
 	const user = await ctx.auth.getUserIdentity();
 	const isPublic = chat.public === true;
-	const isOwner = user && chat.userId === user.subject;
+	const isOwner = user && chat.workosUserId === user.subject;
 
 	if (!isPublic && !isOwner) {
 		return new Response('Unauthorized', { status: 403 });

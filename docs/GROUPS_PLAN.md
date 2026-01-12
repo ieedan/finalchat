@@ -1,6 +1,6 @@
 ## Groups Plan
 
-Groups allow users to create groups (workos orgs) that can include other users. 
+Groups allow users to create groups (workos orgs) that can include other users.
 
 These groups give users access to a group API key that can be used for inference.
 
@@ -11,7 +11,6 @@ These groups give users access to a group API key that can be used for inference
 
 - canViewMembersChats - boolean - if true group owners can view chats created by group members (we will let the user know before joining the group)
 - allowPublicChats - boolean - if true group members can share their chats with members outside of the organization
-
 
 ## User experience
 

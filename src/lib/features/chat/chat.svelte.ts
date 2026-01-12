@@ -1,7 +1,6 @@
 import { useQueryWithFallback, type Query } from '$lib/convex.svelte';
 import { api } from '$lib/convex/_generated/api';
 import type { Doc, Id } from '$lib/convex/_generated/dataModel';
-import type { User } from '@workos-inc/node';
 import type { OnSubmit } from './components/prompt-input/prompt-input.svelte.js';
 import { useConvexClient } from 'convex-svelte';
 import { page } from '$app/state';
@@ -16,11 +15,10 @@ import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte
 import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
-import type { UserSettings } from '$lib/convex/userSettings.utils.js';
+import type { User } from '$lib/convex/users.utils.js';
 
 type ChatLayoutOptions = {
 	user: User | null;
-	userSettings: UserSettings | null;
 	chats: Doc<'chats'>[];
 	apiKey: Doc<'apiKeys'> | null;
 	models: (OpenRouter.Model & { lab: string | null })[];
@@ -28,18 +26,18 @@ type ChatLayoutOptions = {
 
 class ChatLayoutState {
 	createdMessages = new SvelteSet<Id<'messages'>>();
-	userSettingsQuery: Query<typeof api.userSettings.get>;
+	userQuery: Query<typeof api.users.get>;
 	chatsQuery: Query<typeof api.chats.getAll>;
 	apiKeysQuery: RemoteQuery<Doc<'apiKeys'> | null>;
 	localApiKey: PersistedState<string | null>;
 	client: ConvexClient;
 	constructor(readonly opts: ChatLayoutOptions) {
 		this.client = useConvexClient();
-		this.userSettingsQuery = useQueryWithFallback(
-			api.userSettings.get,
+		this.userQuery = useQueryWithFallback(
+			api.users.get,
 			{},
 			{
-				fallback: this.opts.userSettings
+				fallback: this.opts.user
 			}
 		);
 
@@ -58,7 +56,7 @@ class ChatLayoutState {
 	}
 
 	get isAdvancedMode() {
-		return this.userSettingsQuery.data?.onboarding?.mode === 'advanced';
+		return this.userQuery.data?.settings?.onboarding?.mode === 'advanced';
 	}
 
 	get models() {
@@ -67,20 +65,16 @@ class ChatLayoutState {
 
 	get enabledModels() {
 		return this.models.filter((model) =>
-			this.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
+			this.userQuery.data?.settings?.favoriteModelIds?.includes(model.id)
 		);
 	}
 
 	get user() {
-		return this.opts.user;
-	}
-
-	get userSettings() {
-		return this.userSettingsQuery.data;
+		return this.userQuery.data;
 	}
 
 	get hasOnboarded() {
-		return this.userSettingsQuery.data?.onboarding?.completed;
+		return this.userQuery.data?.settings?.onboarding?.completed;
 	}
 
 	get chatId() {
@@ -89,7 +83,8 @@ class ChatLayoutState {
 
 	get isChatOwner() {
 		return this.chatId
-			? this.chatsQuery.data?.find((c) => c._id === this.chatId)?.userId === this.user?.id
+			? this.chatsQuery.data?.find((c) => c._id === this.chatId)?.workosUserId ===
+					this.user?.workosUserId
 			: false;
 	}
 

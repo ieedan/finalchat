@@ -15,12 +15,11 @@ export const getAll = query({
 	args: {},
 	handler: async (ctx): Promise<Doc<'chats'>[]> => {
 		const user = await ctx.auth.getUserIdentity();
-
 		if (!user) return [];
 
 		const chats = await ctx.db
 			.query('chats')
-			.withIndex('by_user', (q) => q.eq('userId', user.subject))
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', user.subject))
 			.collect();
 
 		return chats.sort((a, b) => b.updatedAt - a.updatedAt);
@@ -38,7 +37,7 @@ export const get = query({
 		const user = await ctx.auth.getUserIdentity();
 
 		const chat = await ctx.db.get(args.chatId);
-		if (!chat || (chat.userId !== user?.subject && !chat.public)) return null;
+		if (!chat || (chat.workosUserId !== user?.subject && !chat.public)) return null;
 
 		const messages = await getChatMessages(ctx, args.chatId);
 
@@ -105,7 +104,7 @@ export const updatePinned = mutation({
 		if (!user) throw new Error('Unauthorized');
 
 		const chat = await ctx.db.get(args.chatId);
-		if (!chat || chat.userId !== user.subject)
+		if (!chat || chat.workosUserId !== user.subject)
 			throw new Error('Chat not found or you are not authorized to access it');
 
 		await ctx.db.patch(args.chatId, {
@@ -124,7 +123,7 @@ export const updateTitle = mutation({
 		if (!user) throw new Error('Unauthorized');
 
 		const chat = await ctx.db.get(args.chatId);
-		if (!chat || chat.userId !== user.subject)
+		if (!chat || chat.workosUserId !== user.subject)
 			throw new Error('Chat not found or you are not authorized to access it');
 
 		await ctx.db.patch(args.chatId, {
@@ -143,7 +142,7 @@ export const remove = mutation({
 
 		for (const id of args.ids) {
 			const chat = await ctx.db.get(id);
-			if (!chat || chat.userId !== user.subject)
+			if (!chat || chat.workosUserId !== user.subject)
 				throw new Error('Chat not found or you are not authorized to access it');
 
 			await ctx.db.delete(id);
@@ -208,7 +207,7 @@ export const branchFromMessage = mutation({
 		}
 
 		const ogChat = await ctx.runQuery(internal.chats.internalGet, { chatId: sourceMessage.chatId });
-		if (!ogChat || (ogChat.userId !== user.subject && !ogChat.public)) {
+		if (!ogChat || (ogChat.workosUserId !== user.subject && !ogChat.public)) {
 			throw new Error('Chat not found or you are not authorized to access it');
 		}
 
@@ -221,7 +220,7 @@ export const branchFromMessage = mutation({
 
 		// copy over the chat
 		const newChatId = await ctx.db.insert('chats', {
-			userId: user.subject,
+			workosUserId: user.subject,
 			title: ogChat.title,
 			generating: false,
 			updatedAt: Date.now(),
@@ -245,7 +244,7 @@ export const branchFromMessage = mutation({
 				let newMessageId: Id<'messages'>;
 				if (m.role === 'user') {
 					newMessageId = await ctx.db.insert('messages', {
-						userId: user.subject,
+						workosUserId: user.subject,
 						role: 'user',
 						chatId: newChatId,
 						content: m.content,
@@ -275,7 +274,7 @@ export const branchFromMessage = mutation({
 						ctx.db.insert('chatAttachments', {
 							messageId: newMessageId,
 							chatId: newChatId,
-							userId: user.subject,
+							workosUserId: user.subject,
 							key: a.key,
 							mediaType: a.mediaType
 						})
@@ -325,7 +324,7 @@ export const updatePublic = mutation({
 		if (!user) throw new Error('Unauthorized');
 
 		const chat = await ctx.db.get(args.chatId);
-		if (!chat || chat.userId !== user.subject)
+		if (!chat || chat.workosUserId !== user.subject)
 			throw new Error('Chat not found or you are not authorized to access it');
 
 		await ctx.db.patch(args.chatId, {

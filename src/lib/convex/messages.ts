@@ -64,7 +64,7 @@ export const create = mutation({
 		let chatId: Id<'chats'>;
 		if (!args.chatId) {
 			chatId = await ctx.db.insert('chats', {
-				userId: user.subject,
+				workosUserId: user.subject,
 				title: 'Untitled Chat',
 				generating: false,
 				updatedAt: Date.now(),
@@ -84,7 +84,7 @@ export const create = mutation({
 			});
 
 			const chat = await ctx.runQuery(internal.chats.internalGet, { chatId });
-			isChatOwner = chat?.userId === user.subject;
+			isChatOwner = chat?.workosUserId === user.subject;
 
 			if (!isChatOwner) {
 				const lastMessages = getLastUserAndAssistantMessages(chat.messages);
@@ -112,7 +112,7 @@ export const create = mutation({
 		}
 
 		const userMessageId = await ctx.db.insert('messages', {
-			userId: user.subject,
+			workosUserId: user.subject,
 			chatId,
 			role: 'user',
 			content: args.prompt.input,
@@ -393,7 +393,7 @@ ${systemPrompt}
 									}
 
 									const key = await r2.store(ctx, bytes, {
-										key: createKey(chat.userId),
+										key: createKey(chat.workosUserId),
 										type: file.mediaType
 									});
 
@@ -401,7 +401,7 @@ ${systemPrompt}
 										chatId,
 										messageId: last.assistantMessage._id,
 										key,
-										userId: chat.userId,
+										userId: chat.workosUserId,
 										mediaType: file.mediaType
 									});
 								})()

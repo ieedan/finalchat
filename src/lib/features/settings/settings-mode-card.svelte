@@ -15,10 +15,10 @@
 
 	const modelId = ModelIdCtx.get();
 
-	let mode = $derived(chatLayoutState.userSettingsQuery.data?.onboarding?.mode ?? 'advanced');
+	let mode: 'basic' | 'advanced' = $derived(chatLayoutState.isAdvancedMode ? 'advanced' : 'basic');
 
 	async function handleChangeMode() {
-		await client.mutation(api.userSettings.updateMode, {
+		await client.mutation(api.users.updateMode, {
 			mode
 		});
 
@@ -36,9 +36,7 @@
 		toast.success('Mode updated!');
 	}
 
-	const modeHasChanged = $derived(
-		mode !== chatLayoutState.userSettingsQuery.data?.onboarding?.mode
-	);
+	const modeHasChanged = $derived(mode !== chatLayoutState.user?.settings?.onboarding?.mode);
 </script>
 
 <Card.Root>

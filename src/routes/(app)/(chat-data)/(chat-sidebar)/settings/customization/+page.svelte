@@ -15,10 +15,10 @@
 
 	const chatLayoutState = useChatLayout();
 
-	let systemPrompt = $derived(chatLayoutState.userSettingsQuery.data?.systemPrompt ?? '');
+	let systemPrompt = $derived(chatLayoutState.user?.settings?.systemPrompt ?? '');
 
 	async function handleSave() {
-		await client.mutation(api.userSettings.updateSystemPrompt, {
+		await client.mutation(api.users.updateSystemPrompt, {
 			systemPrompt: systemPrompt
 		});
 
@@ -26,7 +26,7 @@
 	}
 
 	const systemPromptHasChanged = $derived(
-		systemPrompt !== chatLayoutState.userSettingsQuery.data?.systemPrompt
+		systemPrompt !== chatLayoutState.user?.settings?.systemPrompt
 	);
 </script>
 

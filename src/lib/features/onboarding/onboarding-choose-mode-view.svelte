@@ -12,7 +12,7 @@
 
 	async function submit() {
 		try {
-			await convex.mutation(api.userSettings.updateMode, {
+			await convex.mutation(api.users.updateMode, {
 				mode
 			});
 		} catch (error) {

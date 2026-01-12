@@ -26,6 +26,33 @@ export const authKit = new AuthKit<DataModel>(components.workOSAuthKit, {
 });
 
 export const { authKitEvent } = authKit.events({
+	'user.created': async (ctx, event) => {
+		await ctx.db.insert('users', {
+			workosUserId: event.data.id,
+			firstName: event.data.firstName,
+			lastName: event.data.lastName,
+			email: event.data.email,
+			profilePictureUrl: event.data.profilePictureUrl
+		});
+	},
+	'user.deleted': async (ctx, event) => {
+		const user = await ctx.db
+			.query('users')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', event.data.id))
+			.first();
+		if (!user) return;
+		await ctx.db.delete(user._id);
+	},
+	'user.updated': async (ctx, event) => {
+		const user = await ctx.db
+			.query('users')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', event.data.id))
+			.first();
+		if (!user) return;
+		await ctx.db.patch(user._id, {
+			workosUserId: event.data.id
+		});
+	},
 	'organization_membership.created': async (ctx, event) => {
 		if (event.data.status !== 'active') return;
 		await updateUserMembership(ctx, {
@@ -70,11 +97,11 @@ export const { authKitEvent } = authKit.events({
 			workosInvitationId: event.data.id,
 			invitedEmail: event.data.email,
 			organization: {
-				id: event.data.organizationId,
+				workosOrganizationId: event.data.organizationId,
 				name: organization.name
 			},
 			invitedBy: {
-				id: event.data.inviterUserId,
+				workosUserId: event.data.inviterUserId,
 				name: `${inviter.firstName} ${inviter.lastName}`,
 				email: inviter.email
 			},
@@ -156,5 +183,3 @@ export const { authKitEvent } = authKit.events({
 		});
 	}
 });
-
-

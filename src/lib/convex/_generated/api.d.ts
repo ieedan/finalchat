@@ -17,8 +17,7 @@ import type * as groups from "../groups.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as r2 from "../r2.js";
-import type * as user from "../user.js";
-import type * as userSettings from "../userSettings.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -36,8 +35,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   messages: typeof messages;
   r2: typeof r2;
-  user: typeof user;
-  userSettings: typeof userSettings;
+  users: typeof users;
 }>;
 
 /**

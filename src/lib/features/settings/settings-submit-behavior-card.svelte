@@ -11,10 +11,10 @@
 	const client = useConvexClient();
 	const chatLayoutState = useChatLayout();
 
-	let submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
+	let submitOnEnter = $derived(chatLayoutState.user?.settings?.submitOnEnter ?? false);
 
 	async function handleChange(value: boolean) {
-		await client.mutation(api.userSettings.updateSubmitOnEnter, {
+		await client.mutation(api.users.updateSubmitOnEnter, {
 			submitOnEnter: value
 		});
 	}

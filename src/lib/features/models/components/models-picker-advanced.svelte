@@ -113,19 +113,19 @@
 	const client = useConvexClient();
 
 	async function handleRemoveFromFavorites(modelId: ModelId) {
-		await client.mutation(api.userSettings.removeFavoriteModel, {
+		await client.mutation(api.users.removeFavoriteModel, {
 			modelId
 		});
 	}
 
 	async function handleAddToFavorites(modelId: ModelId) {
-		await client.mutation(api.userSettings.addFavoriteModel, {
+		await client.mutation(api.users.addFavoriteModel, {
 			modelId
 		});
 	}
 
 	async function handleToggleFavorite(modelId: ModelId) {
-		if (chatLayoutState.userSettings?.favoriteModelIds?.includes(modelId)) {
+		if (chatLayoutState.user?.settings?.favoriteModelIds?.includes(modelId)) {
 			await handleRemoveFromFavorites(modelId);
 		} else {
 			await handleAddToFavorites(modelId);
@@ -196,7 +196,7 @@
 				<Command.Empty>No models found.</Command.Empty>
 				{#if !gridMode}
 					<Command.Group>
-						{#each sortedModels.filter( (model) => chatLayoutState.userSettings?.favoriteModelIds?.includes(model.id) ) as model (model.id)}
+						{#each sortedModels.filter( (model) => chatLayoutState.user?.settings?.favoriteModelIds?.includes(model.id) ) as model (model.id)}
 							<Command.Item
 								class="flex items-center justify-between gap-4"
 								value={model.id}
@@ -233,7 +233,7 @@
 							)}
 						>
 							{#each models as model (model.id)}
-								{@const isFavorite = chatLayoutState.userSettings?.favoriteModelIds?.includes(
+								{@const isFavorite = chatLayoutState.user?.settings?.favoriteModelIds?.includes(
 									model.id
 								)}
 								<Command.Item
@@ -303,7 +303,7 @@
 			{#if gridMode}
 				<div class="flex items-center gap-2">
 					{#if activeModel}
-						{@const isFavorite = chatLayoutState.userSettings?.favoriteModelIds?.includes(
+						{@const isFavorite = chatLayoutState.user?.settings?.favoriteModelIds?.includes(
 							activeModel.id
 						)}
 						<Button variant="ghost" size="sm" onclick={() => handleToggleFavorite(activeModel.id)}>

@@ -82,8 +82,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 					href="/chat"
 					class={cn(
 						buttonVariants({ variant: 'default' }),
-						chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced' &&
-							'flex items-center justify-between'
+						chatLayoutState.isAdvancedMode && 'flex items-center justify-between'
 					)}
 					{...props}
 				>
@@ -91,7 +90,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 						<PlusIcon class="size-4!" />
 						New Chat
 					</span>
-					{#if chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+					{#if chatLayoutState.isAdvancedMode}
 						<Kbd.Group
 							class="**:data-[slot=kbd]:bg-transparent **:data-[slot=kbd]:text-foreground gap-0"
 						>

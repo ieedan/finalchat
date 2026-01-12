@@ -50,14 +50,16 @@
 		return chatViewState.chat?.messages.findLast((message) => message.role === 'assistant');
 	});
 
-	const isChatOwner = $derived(chatViewState.chatQuery.data?.userId === chatLayoutState.user?.id);
+	const isChatOwner = $derived(
+		chatViewState.chatQuery.data?.workosUserId === chatLayoutState.user?.workosUserId
+	);
 
-	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
+	const submitOnEnter = $derived(chatLayoutState.user?.settings?.submitOnEnter ?? false);
 
 	const mobileModels = $derived(
-		chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'
+		chatLayoutState.isAdvancedMode
 			? chatLayoutState.models.filter((model) =>
-					chatLayoutState.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
+					chatLayoutState.user?.settings?.favoriteModelIds?.includes(model.id)
 				)
 			: BASIC_MODELS
 	);
@@ -114,7 +116,7 @@
 						<ChatMessage
 							{message}
 							apiKey={chatLayoutState.apiKey}
-							systemPrompt={chatLayoutState.userSettingsQuery.data?.systemPrompt ?? null}
+							systemPrompt={chatLayoutState.user?.settings?.systemPrompt ?? null}
 							bind:createdMessages={chatLayoutState.createdMessages}
 						/>
 					{/each}

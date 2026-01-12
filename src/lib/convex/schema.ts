@@ -4,7 +4,7 @@ import { type Infer, v } from 'convex/values';
 import type { Id } from './_generated/dataModel';
 
 export const ChatMessageUser = v.object({
-	userId: v.string(),
+	workosUserId: v.string(),
 	chatId: v.id('chats'),
 	role: v.literal('user'),
 	content: v.string(),
@@ -48,19 +48,29 @@ export type ChatMessageAssistant = Infer<typeof ChatMessageAssistant> & {
 export const ChatMessage = v.union(ChatMessageUser, ChatMessageAssistant);
 
 export default defineSchema({
-	userSettings: defineTable({
-		userId: v.string(),
-		onboarding: v.optional(
+	users: defineTable({
+		workosUserId: v.string(),
+		firstName: v.union(v.string(), v.null()),
+		lastName: v.union(v.string(), v.null()),
+		email: v.string(),
+		profilePictureUrl: v.union(v.string(), v.null()),
+		settings: v.optional(
 			v.object({
-				mode: v.optional(v.union(v.literal('basic'), v.literal('advanced'))),
-				setupApiKey: v.optional(v.boolean()),
-				completed: v.optional(v.boolean())
+				onboarding: v.optional(
+					v.object({
+						mode: v.optional(v.union(v.literal('basic'), v.literal('advanced'))),
+						setupApiKey: v.optional(v.boolean()),
+						completed: v.optional(v.boolean())
+					})
+				),
+				favoriteModelIds: v.array(v.string()),
+				systemPrompt: v.optional(v.string()),
+				submitOnEnter: v.optional(v.boolean())
 			})
-		),
-		favoriteModelIds: v.array(v.string()),
-		systemPrompt: v.optional(v.string()),
-		submitOnEnter: v.optional(v.boolean())
-	}).index('by_user', ['userId']),
+		)
+	})
+		.index('by_workos_user', ['workosUserId'])
+		.index('by_email', ['email']),
 	groups: defineTable({
 		workosGroupId: v.string(),
 		name: v.string(),
@@ -73,12 +83,12 @@ export default defineSchema({
 	groupMembers: defineTable({
 		workosGroupId: v.string(),
 		workosMembershipId: v.string(),
-		userId: v.string(),
+		workosUserId: v.string(),
 		role: v.string()
 	})
 		.index('by_workos_group', ['workosGroupId'])
 		.index('by_workos_membership', ['workosMembershipId'])
-		.index('by_user', ['userId']),
+		.index('by_workos_user', ['workosUserId']),
 	invitations: defineTable({
 		workosInvitationId: v.string(),
 		invitedEmail: v.string(),
@@ -89,11 +99,11 @@ export default defineSchema({
 			v.literal('expired')
 		),
 		organization: v.object({
-			id: v.string(),
+			workosOrganizationId: v.string(),
 			name: v.string()
 		}),
 		invitedBy: v.object({
-			id: v.string(),
+			workosUserId: v.string(),
 			name: v.string(),
 			email: v.string()
 		}),
@@ -101,20 +111,23 @@ export default defineSchema({
 	})
 		.index('by_workos_invitation', ['workosInvitationId'])
 		.index('by_invited', ['invitedEmail'])
-		.index('by_organization', ['organization.id']),
+		.index('by_organization', ['organization.workosOrganizationId']),
 	apiKeys: defineTable({
-		userId: v.optional(v.string()),
-		groupId: v.optional(v.string()),
+		workosUserId: v.optional(v.string()),
+		workosGroupId: v.optional(v.string()),
 		name: v.optional(v.string()),
 		provider: v.union(v.literal('OpenRouter')),
 		key: v.string(),
 		encryptionMode: v.union(v.literal('RSA'))
-	}).index('by_user', ['userId']),
+	})
+		.index('by_workos_user', ['workosUserId'])
+		.index('by_workos_group', ['workosGroupId']),
 	chats: defineTable({
 		generating: v.boolean(),
 		generatingTitle: v.optional(v.boolean()),
-		userId: v.string(),
-		groupId: v.optional(v.string()),
+		workosUserId: v.string(),
+		workosGroupId: v.optional(v.string()),
+		groupId: v.optional(v.id('groups')),
 		title: v.string(),
 		updatedAt: v.number(),
 		pinned: v.boolean(),
@@ -125,10 +138,12 @@ export default defineSchema({
 			})
 		),
 		public: v.optional(v.boolean())
-	}).index('by_user', ['userId']),
+	})
+		.index('by_workos_user', ['workosUserId'])
+		.index('by_workos_group', ['workosGroupId']),
 	chatAttachments: defineTable({
-		userId: v.string(),
-		groupId: v.optional(v.string()),
+		workosUserId: v.optional(v.string()),
+		workosGroupId: v.optional(v.string()),
 		chatId: v.id('chats'),
 		messageId: v.id('messages'),
 		key: v.string(),
@@ -137,6 +152,7 @@ export default defineSchema({
 		.index('by_chat', ['chatId'])
 		.index('by_message', ['messageId'])
 		.index('by_key', ['key'])
-		.index('by_user', ['userId']),
+		.index('by_workos_user', ['workosUserId'])
+		.index('by_workos_group', ['workosGroupId']),
 	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
 });

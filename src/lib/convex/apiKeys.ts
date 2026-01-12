@@ -9,7 +9,7 @@ export const get = query({
 
 		return await ctx.db
 			.query('apiKeys')
-			.withIndex('by_user', (q) => q.eq('userId', user.subject))
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', user.subject))
 			.first();
 	}
 });
@@ -24,11 +24,11 @@ export const createOrUpdate = mutation({
 
 		const apiKey = await ctx.db
 			.query('apiKeys')
-			.withIndex('by_user', (q) => q.eq('userId', user.subject))
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', user.subject))
 			.first();
 		if (!apiKey) {
 			await ctx.db.insert('apiKeys', {
-				userId: user.subject,
+				workosUserId: user.subject,
 				provider: 'OpenRouter',
 				key: args.key,
 				encryptionMode: 'RSA'
@@ -53,7 +53,7 @@ export const remove = mutation({
 		const apiKey = await ctx.db.get(args.id);
 		if (!apiKey) return;
 
-		if (apiKey.userId !== user.subject) return;
+		if (apiKey.workosUserId !== user.subject) return;
 
 		await ctx.db.delete(args.id);
 	}

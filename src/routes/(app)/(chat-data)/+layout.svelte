@@ -8,7 +8,6 @@
 	// svelte-ignore state_referenced_locally
 	setupChatLayout({
 		user: data.user,
-		userSettings: data.userSettings,
 		chats: data.chats,
 		apiKey: data.apiKey,
 		models: data.models

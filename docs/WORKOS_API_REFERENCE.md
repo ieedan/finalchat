@@ -64,7 +64,7 @@ WorkOS Dashboard
 
 ## Secure your API Keys
 
-API keys can perform any API request to WorkOS. They should be kept secure and private! Be sure to prevent API keys from being made publicly accessible, such as in client-side code, GitHub, unsecured S3 buckets, and so forth. API keys are prefixed with sk_.
+API keys can perform any API request to WorkOS. They should be kept secure and private! Be sure to prevent API keys from being made publicly accessible, such as in client-side code, GitHub, unsecured S3 buckets, and so forth. API keys are prefixed with sk\_.
 
 ## In Staging
 
@@ -111,13 +111,13 @@ let connections = list.data;
 let after = list.listMetadata.after;
 
 while (after) {
-  list = await workos.sso.listConnections({
-    limit: 100,
-    after: after,
-    order: 'desc',
-  });
-  connections = connections.concat(list.data);
-  after = list.listMetadata.after;
+	list = await workos.sso.listConnections({
+		limit: 100,
+		after: after,
+		order: 'desc'
+	});
+	connections = connections.concat(list.data);
+	after = list.listMetadata.after;
 }
 ```
 
@@ -137,53 +137,53 @@ WorkOS APIs are rate limited to ensure that they are fast for everyone. If you f
 
 ## General
 
-| Name | Path | Limit |
-|---|---|---|
-| All requests | * | 6,000 requests per 60 seconds per IP address |
+| Name         | Path | Limit                                        |
+| ------------ | ---- | -------------------------------------------- |
+| All requests | \*   | 6,000 requests per 60 seconds per IP address |
 
 This rate limits applies to all environments, staging and production. Exceptions to the general rate limit are listed below.
 
 # Single Sign-On
 
-| Name | Path | Limit |
-|---|---|---|
+| Name                  | Path           | Limit                                        |
+| --------------------- | -------------- | -------------------------------------------- |
 | Get Authorization URL | /sso/authorize | 1,000 requests per 60 seconds per connection |
 
 # Directory Sync
 
-| Name | Path | Limit |
-|---|---|---|
+| Name            | Path             | Limit                               |
+| --------------- | ---------------- | ----------------------------------- |
 | Directory Users | /directory_users | 4 requests per second per directory |
 
 # Organizations
 
-| Name | Path | Limit |
-|---|---|---|
-| Delete Organization | /organizations/* | 50 requests per 60 seconds per API key |
+| Name                | Path              | Limit                                  |
+| ------------------- | ----------------- | -------------------------------------- |
+| Delete Organization | /organizations/\* | 50 requests per 60 seconds per API key |
 
 # AuthKit
 
 Rate limiting for AuthKit APIs are enforced on a per environment basis.
 
-| Name | Path | Limit |
-|---|---|---|
-| Reads | /user_management/* | 1,000 requests per 10 seconds |
-| Writes | /user_management/* | 500 requests per 10 seconds |
-| Authentication | /user_management/authenticate | 10 requests per 60 seconds per email or challenge ID |
-| Magic Auth | /user_management/magic_auth/send | 3 requests per 60 seconds per email |
-| Email verification | /user_management/:id/email_verification/send | 3 requests per 60 seconds per user |
-| Password reset | /user_management/password_reset/send | 3 requests per 60 seconds per email |
+| Name               | Path                                         | Limit                                                |
+| ------------------ | -------------------------------------------- | ---------------------------------------------------- |
+| Reads              | /user_management/\*                          | 1,000 requests per 10 seconds                        |
+| Writes             | /user_management/\*                          | 500 requests per 10 seconds                          |
+| Authentication     | /user_management/authenticate                | 10 requests per 60 seconds per email or challenge ID |
+| Magic Auth         | /user_management/magic_auth/send             | 3 requests per 60 seconds per email                  |
+| Email verification | /user_management/:id/email_verification/send | 3 requests per 60 seconds per user                   |
+| Password reset     | /user_management/password_reset/send         | 3 requests per 60 seconds per email                  |
 
 ## Hosted AuthKit
 
-| Name | Limits |
-|---|---|
-| Reads | 1,000 requests per 10 seconds |
-| Writes | 500 requests per 10 seconds |
-| SSO sign-ins | 3 requests per 60 seconds per IP address |
-| Email sign-ins | 10 requests per 60 seconds per email and IP address |
-| Magic Auth sign-ins | 10 requests per 60 seconds per IP address and challenge ID |
-| Magic Auth code requests | 3 requests per 60 seconds per IP address and email |
+| Name                     | Limits                                                     |
+| ------------------------ | ---------------------------------------------------------- |
+| Reads                    | 1,000 requests per 10 seconds                              |
+| Writes                   | 500 requests per 10 seconds                                |
+| SSO sign-ins             | 3 requests per 60 seconds per IP address                   |
+| Email sign-ins           | 10 requests per 60 seconds per email and IP address        |
+| Magic Auth sign-ins      | 10 requests per 60 seconds per IP address and challenge ID |
+| Magic Auth code requests | 3 requests per 60 seconds per IP address and email         |
 
 # Admin Portal
 
@@ -209,8 +209,8 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { link } = await workos.portal.generateLink({
-  organization: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
-  intent: 'sso',
+	organization: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	intent: 'sso'
 });
 ```
 
@@ -252,21 +252,14 @@ To use an icon in your project, you can reference the CDN link directly. You can
 
 ```html
 <picture>
-  <source
-    srcset="https://cdn.workos.com/provider-icons/dark/okta.svg"
-    media="(prefers-color-scheme: dark)"
-  />
-  <img
-    src="https://cdn.workos.com/provider-icons/light/okta.svg"
-    alt="Okta icon"
-  />
+	<source
+		srcset="https://cdn.workos.com/provider-icons/dark/okta.svg"
+		media="(prefers-color-scheme: dark)"
+	/>
+	<img src="https://cdn.workos.com/provider-icons/light/okta.svg" alt="Okta icon" />
 </picture>
-You can change the icons to grayscale by adding the filter CSS property.
-
-Grayscale style
-img {
-  filter: grayscale(100%);
-}
+You can change the icons to grayscale by adding the filter CSS property. Grayscale style img {
+filter: grayscale(100%); }
 ```
 
 # Audit Logs
@@ -293,44 +286,44 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.auditLogs.createEvent(
-  'org_01EHWNCE74X7JSDV0X3SZ3KJNY',
-  {
-    action: 'user.signed_in',
-    occurredAt: new Date(),
-    version: 1,
-    actor: {
-      type: 'user',
-      id: 'user_TF4C5938',
-      name: 'Jon Smith',
-      metadata: {
-        role: 'admin',
-      },
-    },
-    targets: [
-      {
-        type: 'user',
-        id: 'user_98432YHF',
-        name: 'Jon Smith',
-      },
-      {
-        type: 'team',
-        id: 'team_J8YASKA2',
-        metadata: {
-          owner: 'user_01GBTCQ2',
-        },
-      },
-    ],
-    context: {
-      location: '1.1.1.1',
-      userAgent: 'Chrome/104.0.0.0',
-    },
-    metadata: {
-      extra: 'data',
-    },
-  },
-  {
-    idempotencyKey: '884793cd-bef4-46cf-8790-ed49257a09c6',
-  },
+	'org_01EHWNCE74X7JSDV0X3SZ3KJNY',
+	{
+		action: 'user.signed_in',
+		occurredAt: new Date(),
+		version: 1,
+		actor: {
+			type: 'user',
+			id: 'user_TF4C5938',
+			name: 'Jon Smith',
+			metadata: {
+				role: 'admin'
+			}
+		},
+		targets: [
+			{
+				type: 'user',
+				id: 'user_98432YHF',
+				name: 'Jon Smith'
+			},
+			{
+				type: 'team',
+				id: 'team_J8YASKA2',
+				metadata: {
+					owner: 'user_01GBTCQ2'
+				}
+			}
+		],
+		context: {
+			location: '1.1.1.1',
+			userAgent: 'Chrome/104.0.0.0'
+		},
+		metadata: {
+			extra: 'data'
+		}
+	},
+	{
+		idempotencyKey: '884793cd-bef4-46cf-8790-ed49257a09c6'
+	}
 );
 ```
 
@@ -388,12 +381,12 @@ An object representing an Audit Log Schema.
 
 ```javascript
 const auditLogSchema = {
-  object: 'audit_log_schema',
-  version: 1,
-  targets: [{ type: 'user', metadata: {} }],
-  actor: { metadata: {} },
-  metadata: {},
-  createdAt: '2024-10-14T15:09:44.537Z',
+	object: 'audit_log_schema',
+	version: 1,
+	targets: [{ type: 'user', metadata: {} }],
+	actor: { metadata: {} },
+	metadata: {},
+	createdAt: '2024-10-14T15:09:44.537Z'
 };
 ```
 
@@ -421,23 +414,23 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const schema = await workos.auditLogs.createSchema({
-  action: 'user.viewed_invoice',
-  actor: {
-    metadata: {
-      role: 'string',
-    },
-  },
-  targets: [
-    {
-      type: 'user',
-      metadata: {
-        status: 'string',
-      },
-    },
-  ],
-  metadata: {
-    invoice_id: 'string',
-  },
+	action: 'user.viewed_invoice',
+	actor: {
+		metadata: {
+			role: 'string'
+		}
+	},
+	targets: [
+		{
+			type: 'user',
+			metadata: {
+				status: 'string'
+			}
+		}
+	],
+	metadata: {
+		invoice_id: 'string'
+	}
 });
 ```
 
@@ -531,12 +524,12 @@ An object representing an Audit Log Export.
 
 ```javascript
 const auditLogExport = {
-  object: 'audit_log_export',
-  id: 'audit_log_export_01GBZK5MP7TD1YCFQHFR22180V',
-  state: 'ready',
-  url: 'https://exports.audit-logs.com/audit-log-exports/export.csv',
-  created_at: '2022-09-02T17:14:57.094Z',
-  updated_at: '2022-09-02T17:14:57.094Z',
+	object: 'audit_log_export',
+	id: 'audit_log_export_01GBZK5MP7TD1YCFQHFR22180V',
+	state: 'ready',
+	url: 'https://exports.audit-logs.com/audit-log-exports/export.csv',
+	created_at: '2022-09-02T17:14:57.094Z',
+	updated_at: '2022-09-02T17:14:57.094Z'
 };
 ```
 
@@ -564,12 +557,12 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const auditLogExport = await workos.auditLogs.createExport({
-  organizationId: 'org_01EHWNCE74X7JSDV0X3SZ3KJNY',
-  rangeStart: new Date('2022-07-02T18:09:06.996Z'),
-  rangeEnd: new Date('2022-09-02T18:09:06.996Z'),
-  actions: ['user.signed_in'],
-  actors: ['Jon Smith'],
-  targets: ['team'],
+	organizationId: 'org_01EHWNCE74X7JSDV0X3SZ3KJNY',
+	rangeStart: new Date('2022-07-02T18:09:06.996Z'),
+	rangeEnd: new Date('2022-09-02T18:09:06.996Z'),
+	actions: ['user.signed_in'],
+	actors: ['Jon Smith'],
+	targets: ['team']
 });
 ```
 
@@ -605,7 +598,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const auditLogExport = await workos.auditLogs.getExport(
-  'audit_log_export_01GBZK5MP7TD1YCFQHFR22180V',
+	'audit_log_export_01GBZK5MP7TD1YCFQHFR22180V'
 );
 ```
 
@@ -715,20 +708,20 @@ See the events reference documentation for the user events.
 
 ```javascript
 const user = {
-  object: 'user',
-  id: 'user_01E4ZCR3C56J083X43JQXF3JK5',
-  email: 'marcelina.davis@example.com',
-  firstName: 'Marcelina',
-  lastName: 'Davis',
-  emailVerified: true,
-  profilePictureUrl: 'https://workoscdn.com/images/v1/123abc',
-  lastSignInAt: '2021-06-25T19:07:33.155Z',
-  externalId: 'f1ffa2b2-c20b-4d39-be5c-212726e11222',
-  metadata: {
-    timezone: 'America/New_York',
-  },
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
+	object: 'user',
+	id: 'user_01E4ZCR3C56J083X43JQXF3JK5',
+	email: 'marcelina.davis@example.com',
+	firstName: 'Marcelina',
+	lastName: 'Davis',
+	emailVerified: true,
+	profilePictureUrl: 'https://workoscdn.com/images/v1/123abc',
+	lastSignInAt: '2021-06-25T19:07:33.155Z',
+	externalId: 'f1ffa2b2-c20b-4d39-be5c-212726e11222',
+	metadata: {
+		timezone: 'America/New_York'
+	},
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z'
 };
 ```
 
@@ -767,9 +760,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const user = await workos.userManagement.getUser(
-  'user_01E4ZCR3C56J083X43JQXF3JK5',
-);
+const user = await workos.userManagement.getUser('user_01E4ZCR3C56J083X43JQXF3JK5');
 ```
 
 ### userManagement.getUser()
@@ -792,7 +783,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const user = await workos.userManagement.getUserByExternalId(
-  'f1ffa2b2-c20b-4d39-be5c-212726e11222',
+	'f1ffa2b2-c20b-4d39-be5c-212726e11222'
 );
 ```
 
@@ -852,10 +843,10 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const user = await workos.userManagement.createUser({
-  email: 'marcelina@example.com',
-  password: 'i8uv6g34kd490s',
-  firstName: 'Marcelina',
-  lastName: 'Davis',
+	email: 'marcelina@example.com',
+	password: 'i8uv6g34kd490s',
+	firstName: 'Marcelina',
+	lastName: 'Davis'
 });
 ```
 
@@ -895,14 +886,14 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const user = await workos.userManagement.updateUser({
-  userId: 'user_01EHQ7ZGZ2CZVQJGZ5ZJZ1ZJGZ',
-  firstName: 'Marcelina',
-  lastName: 'Davis',
-  emailVerified: true,
-  externalId: '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191',
-  metadata: {
-    timezone: 'America/New_York',
-  },
+	userId: 'user_01EHQ7ZGZ2CZVQJGZ5ZJZ1ZJGZ',
+	firstName: 'Marcelina',
+	lastName: 'Davis',
+	emailVerified: true,
+	externalId: '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191',
+	metadata: {
+		timezone: 'America/New_York'
+	}
 });
 ```
 
@@ -985,9 +976,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const identities = await workos.userManagement.getUserIdentities(
-  'user_01E4ZCR3C56J083X43JQXF3JK5',
-);
+const identities = await workos.userManagement.getUserIdentities('user_01E4ZCR3C56J083X43JQXF3JK5');
 ```
 
 ### userManagement.getUserIdentities()
@@ -1014,10 +1003,10 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const authorizationUrl = workos.userManagement.getAuthorizationUrl({
-  connectionId: 'conn_01E4ZCR3C56J083X43JQXF3JK5',
-  clientId: 'client_123456789',
-  redirectUri: 'https://your-app.com/callback',
-  state: 'dj1kUXc0dzlXZ1hjUQ==',
+	connectionId: 'conn_01E4ZCR3C56J083X43JQXF3JK5',
+	clientId: 'client_123456789',
+	redirectUri: 'https://your-app.com/callback',
+	state: 'dj1kUXc0dzlXZ1hjUQ=='
 });
 ```
 
@@ -1079,7 +1068,7 @@ The sole exception is the use of `http://127.0.0.1` in production environments t
 
 ## Wildcards
 
-WorkOS supports using wildcard characters in Redirect URIs. The * symbol can be used as a wildcard for subdomains; however, it must be used in accordance with the following rules in order to properly function.
+WorkOS supports using wildcard characters in Redirect URIs. The \* symbol can be used as a wildcard for subdomains; however, it must be used in accordance with the following rules in order to properly function.
 
 The wildcard must be located in a subdomain within the hostname component. For example, `http://*.com` will not work.
 The wildcard must be located in the subdomain which is furthest from the root domain. For example, `https://sub.*.example.com` will not work.
@@ -1089,7 +1078,7 @@ A URL with a valid wildcard will not match a URL more than one subdomain level i
 In production environments, wildcards cannot be used with
 public suffix domains
 . For example, `https://*.ngrok-free.app` will not work.
-The wildcard will match a sequence of letters (A through Z, and a through z ); digits (0 through 9), hyphens (-), and underscores (_). For example, `https://user:secret@foo.example.com` will not work with `https://*.example.com.`
+The wildcard will match a sequence of letters (A through Z, and a through z ); digits (0 through 9), hyphens (-), and underscores (\_). For example, `https://user:secret@foo.example.com` will not work with `https://*.example.com.`
 A URL with a wildcard cannot be set as the default redirect URI.
 
 ## PKCE
@@ -1108,17 +1097,17 @@ Redirect URI with an error code
 `https://your-app.com/callback?error=organization_invalid&error_description=No%20connection%20associated%20with%20organization&state=123456789`
 Possible error codes and the corresponding descriptions are listed below.
 
-| Error code | Description |
-|---|---|
-| access_denied | The identity provider denied user access to the client application or the user denied an OAuth authorization request at the identity provider. |
+| Error code                    | Description                                                                                                                                                                                                                                                                                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| access_denied                 | The identity provider denied user access to the client application or the user denied an OAuth authorization request at the identity provider.                                                                                                                                                                                     |
 | ambiguous_connection_selector | A connection could not be uniquely identified using the provided connection selector (e.g., organization). This can occur when there are multiple SSO connections under the same organization. If you need multiple SSO connections for an organization, use the connection parameter to identify which connection to use for SSO. |
-| connection_invalid | There is no connection for the provided ID. |
-| connection_strategy_invalid | The provider has multiple strategies associated per environment. |
-| connection_unlinked | The connection associated with the request is unlinked. |
-| invalid_connection_selector | A valid connection selector query parameter must be provided in order to correctly determine the proper connection to return an authorization URL for. Valid connection selectors are either connection, organization, or provider. |
-| organization_invalid | There is no organization matching the provided ID. |
-| oauth_failed | An OAuth authorization request failed for a user. |
-| server_error | The SSO authentication failed for the user. More detailed errors and steps to resolve are available in the Sessions tab on the connection page in the WorkOS Dashboard. |
+| connection_invalid            | There is no connection for the provided ID.                                                                                                                                                                                                                                                                                        |
+| connection_strategy_invalid   | The provider has multiple strategies associated per environment.                                                                                                                                                                                                                                                                   |
+| connection_unlinked           | The connection associated with the request is unlinked.                                                                                                                                                                                                                                                                            |
+| invalid_connection_selector   | A valid connection selector query parameter must be provided in order to correctly determine the proper connection to return an authorization URL for. Valid connection selectors are either connection, organization, or provider.                                                                                                |
+| organization_invalid          | There is no organization matching the provided ID.                                                                                                                                                                                                                                                                                 |
+| oauth_failed                  | An OAuth authorization request failed for a user.                                                                                                                                                                                                                                                                                  |
+| server_error                  | The SSO authentication failed for the user. More detailed errors and steps to resolve are available in the Sessions tab on the connection page in the WorkOS Dashboard.                                                                                                                                                            |
 
 ## Authenticate with code
 
@@ -1132,11 +1121,11 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { user } = await workos.userManagement.authenticateWithCode({
-  clientId: 'client_123456789',
-  code: '01E2RJ4C05B52KKZ8FSRDAP23J',
-  ipAddress: '192.0.2.1',
-  userAgent:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+	clientId: 'client_123456789',
+	code: '01E2RJ4C05B52KKZ8FSRDAP23J',
+	ipAddress: '192.0.2.1',
+	userAgent:
+		'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
 });
 ```
 
@@ -1186,12 +1175,12 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { user } = await workos.userManagement.authenticateWithPassword({
-  clientId: 'client_123456789',
-  email: 'marcelina@example.com',
-  password: 'i8uv6g34kd490s',
-  ipAddress: '192.0.2.1',
-  userAgent:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+	clientId: 'client_123456789',
+	email: 'marcelina@example.com',
+	password: 'i8uv6g34kd490s',
+	ipAddress: '192.0.2.1',
+	userAgent:
+		'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
 });
 ```
 
@@ -1233,12 +1222,12 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { user } = await workos.userManagement.authenticateWithMagicAuth({
-  clientId: 'client_123456789',
-  code: '123456',
-  email: 'marcelina.davis@example.com',
-  ipAddress: '192.0.2.1',
-  userAgent:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+	clientId: 'client_123456789',
+	code: '123456',
+	email: 'marcelina.davis@example.com',
+	ipAddress: '192.0.2.1',
+	userAgent:
+		'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
 });
 ```
 
@@ -1279,14 +1268,12 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_test_123');
 
-const { refreshToken } =
-  await workos.userManagement.authenticateWithRefreshToken({
-    clientId: 'client_123456789',
-    refreshToken: 'Xw0NsCVXMBf7svAoIoKBmkpEK',
-    ipAddress: '192.0.2.1',
-    userAgent:
-      'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0',
-  });
+const { refreshToken } = await workos.userManagement.authenticateWithRefreshToken({
+	clientId: 'client_123456789',
+	refreshToken: 'Xw0NsCVXMBf7svAoIoKBmkpEK',
+	ipAddress: '192.0.2.1',
+	userAgent: 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
+});
 ```
 
 ### userManagement.authenticateWithRefreshToken()
@@ -1335,12 +1322,12 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { user } = await workos.userManagement.authenticateWithEmailVerification({
-  clientId: 'client_123456789',
-  code: '123456',
-  pendingAuthenticationToken: 'ql1AJgNoLN1tb9llaQ8jyC2dn',
-  ipAddress: '192.0.2.1',
-  userAgent:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+	clientId: 'client_123456789',
+	code: '123456',
+	pendingAuthenticationToken: 'ql1AJgNoLN1tb9llaQ8jyC2dn',
+	ipAddress: '192.0.2.1',
+	userAgent:
+		'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
 });
 ```
 
@@ -1387,13 +1374,13 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { user } = await workos.userManagement.authenticateWithTotp({
-  clientId: 'client_123456789',
-  code: '123456',
-  pendingAuthenticationToken: 'ql1AJgNoLN1tb9llaQ8jyC2dn',
-  authenticationChallengeId: 'auth_challenge_01FVYZWQTZQ5VB6BC5MPG2EYC5',
-  ipAddress: '192.0.2.1',
-  userAgent:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+	clientId: 'client_123456789',
+	code: '123456',
+	pendingAuthenticationToken: 'ql1AJgNoLN1tb9llaQ8jyC2dn',
+	authenticationChallengeId: 'auth_challenge_01FVYZWQTZQ5VB6BC5MPG2EYC5',
+	ipAddress: '192.0.2.1',
+	userAgent:
+		'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
 });
 ```
 
@@ -1438,15 +1425,14 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const { user } =
-  await workos.userManagement.authenticateWithOrganizationSelection({
-    clientId: 'client_123456789',
-    organizationId: 'org_01H945H0YD4F97JN9MATX7BYAG',
-    pendingAuthenticationToken: 'ql1AJgNoLN1tb9llaQ8jyC2dn',
-    ipAddress: '192.0.2.1',
-    userAgent:
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-  });
+const { user } = await workos.userManagement.authenticateWithOrganizationSelection({
+	clientId: 'client_123456789',
+	organizationId: 'org_01H945H0YD4F97JN9MATX7BYAG',
+	pendingAuthenticationToken: 'ql1AJgNoLN1tb9llaQ8jyC2dn',
+	ipAddress: '192.0.2.1',
+	userAgent:
+		'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
+});
 ```
 
 ### userManagement.authenticateWithOrganizationSelection()
@@ -1480,36 +1466,29 @@ const { user } =
 Authenticates a user using an AuthKit session cookie. This method does not make a network call, but simply unseals an existing session cookie and decodes the JWT claims from the access token.
 
 ```javascript
-import {
-  AuthenticateWithSessionCookieFailureReason,
-  WorkOS,
-} from '@workos-inc/node';
+import { AuthenticateWithSessionCookieFailureReason, WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789', {
-  // clientId is required to be passed in to use the authenticateWithSessionCookie method
-  clientId: 'client_123456789',
+	// clientId is required to be passed in to use the authenticateWithSessionCookie method
+	clientId: 'client_123456789'
 });
 
 const { authenticated, ...restOfAuthenticationResponse } =
-  await workos.userManagement.authenticateWithSessionCookie({
-    sessionData: 'sealed_session_cookie_data',
-    cookiePassword: 'password_previously_used_to_seal_session_cookie',
-  });
+	await workos.userManagement.authenticateWithSessionCookie({
+		sessionData: 'sealed_session_cookie_data',
+		cookiePassword: 'password_previously_used_to_seal_session_cookie'
+	});
 
 if (authenticated) {
-  // User is authenticated and session data can be utilized
-  const { sessionId, organizationId, role, permissions } =
-    restOfAuthenticationResponse;
+	// User is authenticated and session data can be utilized
+	const { sessionId, organizationId, role, permissions } = restOfAuthenticationResponse;
 } else {
-  const { reason } = restOfAuthenticationResponse;
+	const { reason } = restOfAuthenticationResponse;
 
-  // Can use AuthenticateWithSessionCookieFailureReason to handle failure reasons
-  if (
-    reason ===
-    AuthenticateWithSessionCookieFailureReason.NO_SESSION_COOKIE_PROVIDED
-  ) {
-    // Redirect the user to the login page
-  }
+	// Can use AuthenticateWithSessionCookieFailureReason to handle failure reasons
+	if (reason === AuthenticateWithSessionCookieFailureReason.NO_SESSION_COOKIE_PROVIDED) {
+		// Redirect the user to the login page
+	}
 }
 ```
 
@@ -1542,35 +1521,30 @@ if (authenticated) {
 Unseals the provided session data from a user’s session cookie, authenticates with the existing refresh token, and returns the sealed data for the refreshed session.
 
 ```javascript
-import {
-  RefreshAndSealSessionDataFailureReason,
-  WorkOS,
-} from '@workos-inc/node';
+import { RefreshAndSealSessionDataFailureReason, WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789', {
-  // clientId is required to be passed in to use the refreshAndSealSessionData method
-  clientId: 'client_123456789',
+	// clientId is required to be passed in to use the refreshAndSealSessionData method
+	clientId: 'client_123456789'
 });
 
 const { authenticated, ...restOfRefreshResponse } =
-  await workos.userManagement.refreshAndSealSessionData({
-    sessionData: 'sealed_session_cookie_data',
-    cookiePassword: 'password_previously_used_to_seal_session_cookie',
-  });
+	await workos.userManagement.refreshAndSealSessionData({
+		sessionData: 'sealed_session_cookie_data',
+		cookiePassword: 'password_previously_used_to_seal_session_cookie'
+	});
 
 if (authenticated) {
-  const { sealedSession } = restOfRefreshResponse;
+	const { sealedSession } = restOfRefreshResponse;
 
-  // Set the sealed session in a cookie
+	// Set the sealed session in a cookie
 } else {
-  const { reason } = restOfRefreshResponse;
+	const { reason } = restOfRefreshResponse;
 
-  // Can use RefreshAndSealSessionDataFailureReason to handle failure reasons
-  if (
-    reason === RefreshAndSealSessionDataFailureReason.NO_SESSION_COOKIE_PROVIDED
-  ) {
-    // Redirect the user to the login page
-  }
+	// Can use RefreshAndSealSessionDataFailureReason to handle failure reasons
+	if (reason === RefreshAndSealSessionDataFailureReason.NO_SESSION_COOKIE_PROVIDED) {
+		// Redirect the user to the login page
+	}
 }
 ```
 
@@ -1726,7 +1700,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.userManagement.revokeSession({
-  sessionId: 'session_01E4ZCR3C56J083X43JQXF3JK5',
+	sessionId: 'session_01E4ZCR3C56J083X43JQXF3JK5'
 });
 ```
 
@@ -1750,12 +1724,12 @@ Load the session by providing the sealed session and the cookie password.
 import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789', {
-  clientId: 'client_123456789',
+	clientId: 'client_123456789'
 });
 
 const session = await workos.userManagement.loadSealedSession({
-  sessionData: 'sealed_session_cookie_data',
-  cookiePassword: 'password_previously_used_to_seal_session_cookie',
+	sessionData: 'sealed_session_cookie_data',
+	cookiePassword: 'password_previously_used_to_seal_session_cookie'
 });
 ```
 
@@ -1784,23 +1758,23 @@ Authenticate
 import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789', {
-  clientId: 'client_123456789',
+	clientId: 'client_123456789'
 });
 
 const session = await workos.userManagement.loadSealedSession({
-  sessionData: 'sealed_session_cookie_data',
-  cookiePassword: 'password_previously_used_to_seal_session_cookie',
+	sessionData: 'sealed_session_cookie_data',
+	cookiePassword: 'password_previously_used_to_seal_session_cookie'
 });
 
 const authResponse = await session.authenticate();
 
 if (authResponse.authenticated) {
-  // User is authenticated and session data can be used
-  const { sessionId, organizationId, role, permissions, user } = authResponse;
+	// User is authenticated and session data can be used
+	const { sessionId, organizationId, role, permissions, user } = authResponse;
 } else {
-  if (authResponse.reason === 'no_session_cookie_provided') {
-    // Redirect the user to the login page
-  }
+	if (authResponse.reason === 'no_session_cookie_provided') {
+		// Redirect the user to the login page
+	}
 }
 ```
 
@@ -1841,29 +1815,29 @@ Refresh
 import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789', {
-  clientId: 'client_123456789',
+	clientId: 'client_123456789'
 });
 
 const session = await workos.userManagement.loadSealedSession({
-  sessionData: 'sealed_session_cookie_data',
-  cookiePassword: 'password_previously_used_to_seal_session_cookie',
+	sessionData: 'sealed_session_cookie_data',
+	cookiePassword: 'password_previously_used_to_seal_session_cookie'
 });
 
 const refreshResult = await session.refresh();
 
 if (!refreshResult.authenticated) {
-  // Redirect the user to the login page
+	// Redirect the user to the login page
 }
 
 const {
-  session: userSession,
-  sealedSession,
-  user,
-  organizationId,
-  role,
-  permissions,
-  entitlements,
-  impersonator,
+	session: userSession,
+	sealedSession,
+	user,
+	organizationId,
+	role,
+	permissions,
+	entitlements,
+	impersonator
 } = refreshResult;
 
 // Use claims and userSession for further business logic
@@ -1917,12 +1891,12 @@ End a user’s session. The user’s browser should be redirected to this URL. F
 import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789', {
-  clientId: 'client_123456789',
+	clientId: 'client_123456789'
 });
 
 const session = await workos.userManagement.loadSealedSession({
-  sessionData: 'sealed_session_cookie_data',
-  cookiePassword: 'password_previously_used_to_seal_session_cookie',
+	sessionData: 'sealed_session_cookie_data',
+	cookiePassword: 'password_previously_used_to_seal_session_cookie'
 });
 
 const logOutUrl = await session.getLogOutUrl();
@@ -2159,14 +2133,14 @@ Magic Auth is a passwordless authentication method that allows users to sign in 
 
 ```javascript
 const magicAuth = {
-  object: 'magic_auth',
-  id: 'magic_auth_01E4ZCR3C56J083X43JQXF3JK5',
-  userId: 'user_01HWWYEH2NPT48X82ZT23K5AX4',
-  email: 'marcelina.davis@example.com',
-  expiresAt: '2021-07-01T19:07:33.155Z',
-  code: '123456',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
+	object: 'magic_auth',
+	id: 'magic_auth_01E4ZCR3C56J083X43JQXF3JK5',
+	userId: 'user_01HWWYEH2NPT48X82ZT23K5AX4',
+	email: 'marcelina.davis@example.com',
+	expiresAt: '2021-07-01T19:07:33.155Z',
+	code: '123456',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z'
 };
 ```
 
@@ -2197,9 +2171,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const magicAuth = await workos.userManagement.getMagicAuth(
-  'magic_auth_01E4ZCR3C56J083X43JQXF3JK5',
-);
+const magicAuth = await workos.userManagement.getMagicAuth('magic_auth_01E4ZCR3C56J083X43JQXF3JK5');
 ```
 
 ### userManagement.getMagicAuth()
@@ -2252,19 +2224,19 @@ Authentication factor
 
 ```javascript
 const factor = {
-  object: 'authentication_factor',
-  id: 'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ',
-  createdAt: '2022-02-15T15:14:19.392Z',
-  updatedAt: '2022-02-15T15:14:19.392Z',
-  type: 'totp',
-  totp: {
-    issuer: 'Foo Corp',
-    user: 'alan.turing@example.com',
-    qrCode: 'data:image/png;base64,{base64EncodedPng}',
-    secret: 'NAGCCFS3EYRB422HNAKAKY3XDUORMSRF',
-    uri: 'otpauth://totp/FooCorp:alan.turing@example.com?secret=NAGCCFS3EYRB422HNAKAKY3XDUORMSRF&issuer=FooCorp',
-  },
-  userId: 'user_01FVYZ5QM8N98T9ME5BCB2BBMJ',
+	object: 'authentication_factor',
+	id: 'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ',
+	createdAt: '2022-02-15T15:14:19.392Z',
+	updatedAt: '2022-02-15T15:14:19.392Z',
+	type: 'totp',
+	totp: {
+		issuer: 'Foo Corp',
+		user: 'alan.turing@example.com',
+		qrCode: 'data:image/png;base64,{base64EncodedPng}',
+		secret: 'NAGCCFS3EYRB422HNAKAKY3XDUORMSRF',
+		uri: 'otpauth://totp/FooCorp:alan.turing@example.com?secret=NAGCCFS3EYRB422HNAKAKY3XDUORMSRF&issuer=FooCorp'
+	},
+	userId: 'user_01FVYZ5QM8N98T9ME5BCB2BBMJ'
 };
 ```
 
@@ -2301,12 +2273,12 @@ Authentication challenge
 
 ```javascript
 const challenge = {
-  object: 'authentication_challenge',
-  id: 'auth_challenge_01FVYZWQTZQ5VB6BC5MPG2EYC5',
-  createdAt: '2022-02-15T15:26:53.274Z',
-  updatedAt: '2022-02-15T15:26:53.274Z',
-  expiresAt: '2022-02-15T15:36:53.279Z',
-  authenticationFactorId: 'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ',
+	object: 'authentication_challenge',
+	id: 'auth_challenge_01FVYZWQTZQ5VB6BC5MPG2EYC5',
+	createdAt: '2022-02-15T15:26:53.274Z',
+	updatedAt: '2022-02-15T15:26:53.274Z',
+	expiresAt: '2022-02-15T15:36:53.279Z',
+	authenticationFactorId: 'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ'
 };
 ```
 
@@ -2336,12 +2308,12 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { authenticationFactor, authenticationChallenge } =
-  await workos.userManagement.enrollAuthFactor({
-    userId: 'user_01E4ZCR3C56J083X43JQXF3JK5',
-    type: 'totp',
-    totpIssuer: 'WorkOS',
-    totpUser: 'bob@example.com',
-  });
+	await workos.userManagement.enrollAuthFactor({
+		userId: 'user_01E4ZCR3C56J083X43JQXF3JK5',
+		type: 'totp',
+		totpIssuer: 'WorkOS',
+		totpUser: 'bob@example.com'
+	});
 ```
 
 ### userManagement.enrollAuthFactor()
@@ -2376,7 +2348,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const authFactors = await workos.userManagement.listAuthFactors({
-  userId: 'user_01E4ZCR3C56J083X43JQXF3JK5',
+	userId: 'user_01E4ZCR3C56J083X43JQXF3JK5'
 });
 
 console.log(authFactors.data);
@@ -2412,14 +2384,14 @@ Users signing in with Magic Auth, Google OAuth, Apple OAuth, or SSO are automati
 
 ```javascript
 const emailVerification = {
-  object: 'email_verification',
-  id: 'email_verification_01HYGGEB6FYMWQNWF3XDZG7VV3',
-  userId: 'user_01HWWYEH2NPT48X82ZT23K5AX4',
-  email: 'marcelina.davis@example.com',
-  expiresAt: '2021-07-01T19:07:33.155Z',
-  code: '123456',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
+	object: 'email_verification',
+	id: 'email_verification_01HYGGEB6FYMWQNWF3XDZG7VV3',
+	userId: 'user_01HWWYEH2NPT48X82ZT23K5AX4',
+	email: 'marcelina.davis@example.com',
+	expiresAt: '2021-07-01T19:07:33.155Z',
+	code: '123456',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z'
 };
 ```
 
@@ -2451,7 +2423,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const emailVerification = await workos.userManagement.getEmailVerification(
-  'email_verification_01HYGGEB6FYMWQNWF3XDZG7VV3',
+	'email_verification_01HYGGEB6FYMWQNWF3XDZG7VV3'
 );
 ```
 
@@ -2475,15 +2447,14 @@ When a user’s password is reset, all of their active sessions are revoked.
 
 ```javascript
 const passwordReset = {
-  object: 'password_reset',
-  id: 'password_reset_01HYGDNK5G7FZ4YJFXYXPB5JRW',
-  userId: 'user_01HWWYEH2NPT48X82ZT23K5AX4',
-  email: 'marcelina.davis@example.com',
-  passwordResetToken: 'Z1uX3RbwcIl5fIGJJJCXXisdI',
-  passwordResetUrl:
-    'https://your-app.com/reset-password?token=Z1uX3RbwcIl5fIGJJJCXXisdI',
-  expiresAt: '2025-07-14T18:00:54.578Z',
-  createdAt: '2025-07-14T17:45:54.578Z',
+	object: 'password_reset',
+	id: 'password_reset_01HYGDNK5G7FZ4YJFXYXPB5JRW',
+	userId: 'user_01HWWYEH2NPT48X82ZT23K5AX4',
+	email: 'marcelina.davis@example.com',
+	passwordResetToken: 'Z1uX3RbwcIl5fIGJJJCXXisdI',
+	passwordResetUrl: 'https://your-app.com/reset-password?token=Z1uX3RbwcIl5fIGJJJCXXisdI',
+	expiresAt: '2025-07-14T18:00:54.578Z',
+	createdAt: '2025-07-14T17:45:54.578Z'
 };
 ```
 
@@ -2515,7 +2486,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const passwordReset = await workos.userManagement.getPasswordReset(
-  'password_reset_01HYGDNK5G7FZ4YJFXYXPB5JRW',
+	'password_reset_01HYGDNK5G7FZ4YJFXYXPB5JRW'
 );
 ```
 
@@ -2566,8 +2537,8 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { user } = await workos.userManagement.resetPassword({
-  token: 'stpIJ48IFJt0HhSIqjf8eppe0',
-  newPassword: 'i8uv6g34kd490s',
+	token: 'stpIJ48IFJt0HhSIqjf8eppe0',
+	newPassword: 'i8uv6g34kd490s'
 });
 ```
 
@@ -2593,22 +2564,22 @@ See the events reference documentation for the organization membership events.
 
 ```javascript
 const organizationMembership = {
-  object: 'organization_membership',
-  id: 'om_01E4ZCR3C56J083X43JQXF3JK5',
-  userId: 'user_01E4ZCR3C5A4QZ2Z2JQXGKZJ9E',
-  organizationId: 'org_01E4ZCR3C56J083X43JQXF3JK5',
-  organizationName: 'Foo Corp',
-  role: {
-    slug: 'admin',
-  },
-  roles: [
-    {
-      slug: 'admin',
-    },
-  ],
-  status: 'active',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
+	object: 'organization_membership',
+	id: 'om_01E4ZCR3C56J083X43JQXF3JK5',
+	userId: 'user_01E4ZCR3C5A4QZ2Z2JQXGKZJ9E',
+	organizationId: 'org_01E4ZCR3C56J083X43JQXF3JK5',
+	organizationName: 'Foo Corp',
+	role: {
+		slug: 'admin'
+	},
+	roles: [
+		{
+			slug: 'admin'
+		}
+	],
+	status: 'active',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z'
 };
 ```
 
@@ -2643,10 +2614,9 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const organizationMembership =
-  await workos.userManagement.getOrganizationMembership(
-    'om_01E4ZCR3C56J083X43JQXF3JK5',
-  );
+const organizationMembership = await workos.userManagement.getOrganizationMembership(
+	'om_01E4ZCR3C56J083X43JQXF3JK5'
+);
 ```
 
 ### userManagement.getOrganizationMembership()
@@ -2668,10 +2638,9 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const organizationMemberships =
-  await workos.userManagement.listOrganizationMemberships({
-    userId: 'user_01E4ZCR3C5A4QZ2Z2JQXGKZJ9E',
-  });
+const organizationMemberships = await workos.userManagement.listOrganizationMemberships({
+	userId: 'user_01E4ZCR3C5A4QZ2Z2JQXGKZJ9E'
+});
 
 console.log(organizationMemberships.data);
 ```
@@ -2711,12 +2680,11 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const organizationMembership =
-  await workos.userManagement.createOrganizationMembership({
-    organizationId: 'org_01E4ZCR3C56J083X43JQXF3JK5',
-    userId: 'user_01E4ZCR3C5A4QZ2Z2JQXGKZJ9E',
-    roleSlug: 'admin',
-  });
+const organizationMembership = await workos.userManagement.createOrganizationMembership({
+	organizationId: 'org_01E4ZCR3C56J083X43JQXF3JK5',
+	userId: 'user_01E4ZCR3C5A4QZ2Z2JQXGKZJ9E',
+	roleSlug: 'admin'
+});
 ```
 
 ### userManagement.createOrganizationMembership()
@@ -2744,13 +2712,12 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const organizationMembership =
-  await workos.userManagement.updateOrganizationMembership(
-    'om_01E4ZCR3C56J083X43JQXF3JK5',
-    {
-      roleSlug: 'admin',
-    },
-  );
+const organizationMembership = await workos.userManagement.updateOrganizationMembership(
+	'om_01E4ZCR3C56J083X43JQXF3JK5',
+	{
+		roleSlug: 'admin'
+	}
+);
 ```
 
 ### userManagement.updateOrganizationMembership()
@@ -2778,9 +2745,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-await workos.userManagement.deleteOrganizationMembership(
-  'om_01E4ZCR3C56J083X43JQXF3JK5',
-);
+await workos.userManagement.deleteOrganizationMembership('om_01E4ZCR3C56J083X43JQXF3JK5');
 ```
 
 ### userManagement.deleteOrganizationMembership()
@@ -2802,10 +2767,9 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const organizationMembership =
-  await workos.userManagement.deactivateOrganizationMembership(
-    'om_01E4ZCR3C56J083X43JQXF3JK5',
-  );
+const organizationMembership = await workos.userManagement.deactivateOrganizationMembership(
+	'om_01E4ZCR3C56J083X43JQXF3JK5'
+);
 ```
 
 ### userManagement.deactivateOrganizationMembership()
@@ -2831,10 +2795,9 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const organizationMembership =
-  await workos.userManagement.reactivateOrganizationMembership(
-    'om_01E4ZCR3C56J083X43JQXF3JK5',
-  );
+const organizationMembership = await workos.userManagement.reactivateOrganizationMembership(
+	'om_01E4ZCR3C56J083X43JQXF3JK5'
+);
 ```
 
 ### userManagement.reactivateOrganizationMembership()
@@ -2857,20 +2820,19 @@ Users may be invited to your app without joining an organization, or they may be
 
 ```javascript
 const invitation = {
-  object: 'invitation',
-  id: 'invitation_01E4ZCR3C56J083X43JQXF3JK5',
-  email: 'marcelina.davis@example.com',
-  state: 'pending',
-  acceptedAt: null,
-  revokedAt: null,
-  expiresAt: '2021-07-01T19:07:33.155Z',
-  token: 'Z1uX3RbwcIl5fIGJJJCXXisdI',
-  acceptInvitationUrl:
-    'https://your-app.com/invite?invitation_token=Z1uX3RbwcIl5fIGJJJCXXisdI',
-  organizationId: 'org_01E4ZCR3C56J083X43JQXF3JK5',
-  inviterUserId: 'user_01HYGBX8ZGD19949T3BM4FW1C3',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
+	object: 'invitation',
+	id: 'invitation_01E4ZCR3C56J083X43JQXF3JK5',
+	email: 'marcelina.davis@example.com',
+	state: 'pending',
+	acceptedAt: null,
+	revokedAt: null,
+	expiresAt: '2021-07-01T19:07:33.155Z',
+	token: 'Z1uX3RbwcIl5fIGJJJCXXisdI',
+	acceptInvitationUrl: 'https://your-app.com/invite?invitation_token=Z1uX3RbwcIl5fIGJJJCXXisdI',
+	organizationId: 'org_01E4ZCR3C56J083X43JQXF3JK5',
+	inviterUserId: 'user_01HYGBX8ZGD19949T3BM4FW1C3',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z'
 };
 ```
 
@@ -2912,7 +2874,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const invitation = await workos.userManagement.getInvitation(
-  'invitation_01EHZNVPK3SFK441A1RGBFSHRT',
+	'invitation_01EHZNVPK3SFK441A1RGBFSHRT'
 );
 ```
 
@@ -2935,9 +2897,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const invitation = await workos.userManagement.findInvitationByToken(
-  'Z1uX3RbwcIl5fIGJJJCXXisdI',
-);
+const invitation = await workos.userManagement.findInvitationByToken('Z1uX3RbwcIl5fIGJJJCXXisdI');
 ```
 
 ### userManagement.findInvitationByToken()
@@ -2960,7 +2920,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const invitation = await workos.userManagement.listInvitations({
-  organizationId: 'org_123456789',
+	organizationId: 'org_123456789'
 });
 
 console.log(invitation.data);
@@ -3061,11 +3021,11 @@ Your application should verify that the invitation is intended for the user acce
 import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789', {
-  clientId: 'client_123456789',
+	clientId: 'client_123456789'
 });
 
 const invitation = await workos.userManagement.acceptInvitation(
-  'invitation_01E4ZCR3C56J083X43JQXF3JK5',
+	'invitation_01E4ZCR3C56J083X43JQXF3JK5'
 );
 ```
 
@@ -3089,7 +3049,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const invitation = await workos.userManagement.revokeInvitation(
-  'invitation_01E4ZCR3C56J083X43JQXF3JK5',
+	'invitation_01E4ZCR3C56J083X43JQXF3JK5'
 );
 ```
 
@@ -3115,8 +3075,8 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_test_123');
 
 const logoutUrl = workos.userManagement.getLogoutUrl({
-  sessionId: 'session_01HQAG1HENBZMAZD82YRXDFC0B',
-  returnTo: 'https://your-app.com/signed-out',
+	sessionId: 'session_01HQAG1HENBZMAZD82YRXDFC0B',
+	returnTo: 'https://your-app.com/signed-out'
 });
 ```
 
@@ -3142,8 +3102,8 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_test_123');
 
 const logoutUrl = workos.userManagement.getLogoutUrlFromSessionCookie({
-  sessionData: 'sealed_session_cookie_data',
-  cookiePassword: 'password_previously_used_to_seal_session_cookie',
+	sessionData: 'sealed_session_cookie_data',
+	cookiePassword: 'password_previously_used_to_seal_session_cookie'
 });
 ```
 
@@ -3244,16 +3204,16 @@ When polling the device code endpoint, you may receive various error responses b
 
 Possible error codes and the corresponding descriptions are listed below.
 
-| Error code | Description |
-|---|---|
-| authorization_pending | The authorization request is still pending as the user hasn’t yet completed the user interaction flow. Continue polling at the specified interval. |
-| slow_down | The client is polling too frequently and should slow down. Increase your polling interval by at least 5 seconds and continue polling. |
-| access_denied | The user declined the authorization request. Stop polling and inform the user that authorization was denied. |
-| expired_token | The device code has expired (typically after 5 minutes). Stop polling and restart the authorization flow if needed. |
-| invalid_request | The request is missing a required parameter or includes an invalid parameter value. Check that grant_type, device_code, and client_id are provided and correct. |
-| invalid_client | Client authentication failed (e.g., unknown client, client authentication not included, or unsupported authentication method). |
-| invalid_grant | The provided device code is invalid, malformed, or has already been used. |
-| unsupported_grant_type | The grant type is not supported. Ensure you’re using urn:ietf:params:oauth:grant-type:device_code. |
+| Error code             | Description                                                                                                                                                     |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| authorization_pending  | The authorization request is still pending as the user hasn’t yet completed the user interaction flow. Continue polling at the specified interval.              |
+| slow_down              | The client is polling too frequently and should slow down. Increase your polling interval by at least 5 seconds and continue polling.                           |
+| access_denied          | The user declined the authorization request. Stop polling and inform the user that authorization was denied.                                                    |
+| expired_token          | The device code has expired (typically after 5 minutes). Stop polling and restart the authorization flow if needed.                                             |
+| invalid_request        | The request is missing a required parameter or includes an invalid parameter value. Check that grant_type, device_code, and client_id are provided and correct. |
+| invalid_client         | Client authentication failed (e.g., unknown client, client authentication not included, or unsupported authentication method).                                  |
+| invalid_grant          | The provided device code is invalid, malformed, or has already been used.                                                                                       |
+| unsupported_grant_type | The grant type is not supported. Ensure you’re using urn:ietf:params:oauth:grant-type:device_code.                                                              |
 
 Error response format
 All error responses are returned with a `400` status code and follow the OAuth 2.0 error response format. For example:
@@ -3379,7 +3339,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const result = await workos.apiKeys.validateApiKey({
-  value: 'sk_abcdefghijklmnop123456',
+	value: 'sk_abcdefghijklmnop123456'
 });
 ```
 
@@ -3403,15 +3363,15 @@ Directory providers vary in implementation details and may require different set
 
 ```javascript
 const directory = {
-  object: 'directory',
-  id: 'directory_01ECAZ4NV9QMV47GW873HDCX74',
-  domain: 'foo-corp.com',
-  name: 'Foo Corp',
-  organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
-  state: 'inactive',
-  type: 'gsuite directory',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
+	object: 'directory',
+	id: 'directory_01ECAZ4NV9QMV47GW873HDCX74',
+	domain: 'foo-corp.com',
+	name: 'Foo Corp',
+	organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	state: 'inactive',
+	type: 'gsuite directory',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z'
 };
 ```
 
@@ -3446,9 +3406,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const directory = await workos.directorySync.getDirectory(
-  'directory_01ECAZ4NV9QMV47GW873HDCX74',
-);
+const directory = await workos.directorySync.getDirectory('directory_01ECAZ4NV9QMV47GW873HDCX74');
 ```
 
 ### directorySync.getDirectory()
@@ -3508,9 +3466,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-await workos.directorySync.deleteDirectory(
-  'directory_01ECAZ4NV9QMV47GW873HDCX74',
-);
+await workos.directorySync.deleteDirectory('directory_01ECAZ4NV9QMV47GW873HDCX74');
 ```
 
 ### directorySync.deleteDirectory()
@@ -3529,38 +3485,38 @@ Developers can receive Webhooks as employees are added, updated or removed, allo
 
 ```javascript
 const user = {
-  id: 'directory_user_01E1JG7J09H96KYP8HM9B0G5SJ',
-  idpId: '2836',
-  directoryId: 'directory_01ECAZ4NV9QMV47GW873HDCX74',
-  organizationId: 'org_01EZTR6WYX1A0DSE2CYMGXQ24Y',
-  firstName: 'Marcelina',
-  lastName: 'Davis',
-  emails: [
-    {
-      primary: true,
-      type: 'work',
-      value: 'marcelina@example.com',
-    },
-  ],
-  username: 'marcelina@example.com',
-  groups: [
-    {
-      id: 'directory_group_01E64QTDNS0EGJ0FMCVY9BWGZT',
-      name: 'Engineering',
-      createdAt: '2021-06-25T19:07:33.155Z',
-      updatedAt: '2021-06-25T19:07:33.155Z',
-      rawAttributes: {},
-    },
-  ],
-  state: 'active',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
-  customAttributes: {
-    department: 'Engineering',
-    jobTitle: 'Software Engineer',
-  },
-  rawAttributes: {},
-  role: { slug: 'member' },
+	id: 'directory_user_01E1JG7J09H96KYP8HM9B0G5SJ',
+	idpId: '2836',
+	directoryId: 'directory_01ECAZ4NV9QMV47GW873HDCX74',
+	organizationId: 'org_01EZTR6WYX1A0DSE2CYMGXQ24Y',
+	firstName: 'Marcelina',
+	lastName: 'Davis',
+	emails: [
+		{
+			primary: true,
+			type: 'work',
+			value: 'marcelina@example.com'
+		}
+	],
+	username: 'marcelina@example.com',
+	groups: [
+		{
+			id: 'directory_group_01E64QTDNS0EGJ0FMCVY9BWGZT',
+			name: 'Engineering',
+			createdAt: '2021-06-25T19:07:33.155Z',
+			updatedAt: '2021-06-25T19:07:33.155Z',
+			rawAttributes: {}
+		}
+	],
+	state: 'active',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z',
+	customAttributes: {
+		department: 'Engineering',
+		jobTitle: 'Software Engineer'
+	},
+	rawAttributes: {},
+	role: { slug: 'member' }
 };
 ```
 
@@ -3599,9 +3555,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const user = await workos.directorySync.getUser(
-  'directory_user_01E64QS50EAY48S0XJ1AA4WX4D',
-);
+const user = await workos.directorySync.getUser('directory_user_01E64QS50EAY48S0XJ1AA4WX4D');
 ```
 
 ### directorySync.getUser()
@@ -3624,7 +3578,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const users = await workos.directorySync.listUsers({
-  directory: 'directory_01ECAZ4NV9QMV47GW873HDCX74',
+	directory: 'directory_01ECAZ4NV9QMV47GW873HDCX74'
 });
 
 console.log(users.data);
@@ -3660,14 +3614,14 @@ A directory group represents an organizational unit of users in a directory prov
 
 ```javascript
 const group = {
-  id: 'directory_group_01E64QTDNS0EGJ0FMCVY9BWGZT',
-  idpId: '02grqrue4294w24',
-  directoryId: 'directory_01ECAZ4NV9QMV47GW873HDCX74',
-  organizationId: 'org_01EZTR6WYX1A0DSE2CYMGXQ24Y',
-  name: 'Developers',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
-  rawAttributes: {},
+	id: 'directory_group_01E64QTDNS0EGJ0FMCVY9BWGZT',
+	idpId: '02grqrue4294w24',
+	directoryId: 'directory_01ECAZ4NV9QMV47GW873HDCX74',
+	organizationId: 'org_01EZTR6WYX1A0DSE2CYMGXQ24Y',
+	name: 'Developers',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z',
+	rawAttributes: {}
 };
 ```
 
@@ -3698,9 +3652,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const group = await workos.directorySync.getGroup(
-  'directory_group_01E64QTDNS0EGJ0FMCVY9BWGZT',
-);
+const group = await workos.directorySync.getGroup('directory_group_01E64QTDNS0EGJ0FMCVY9BWGZT');
 ```
 
 ### directorySync.getGroup()
@@ -3723,7 +3675,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const groups = await workos.directorySync.listGroups({
-  directory: 'directory_01ECAZ4NV9QMV47GW873HDCX74',
+	directory: 'directory_01ECAZ4NV9QMV47GW873HDCX74'
 });
 
 console.log(groups.data);
@@ -3760,13 +3712,13 @@ To automatically respond to changes in the organization domains, use organizatio
 
 ```javascript
 const organization_domain = {
-  object: 'organization_domain',
-  id: 'org_domain_01HE8GSH9BC1T08J2A9K6TDERK',
-  organizationId: 'org_01HE8GSH8FQPASKSY27THRKRBP',
-  domain: 'foo-corp.com',
-  state: 'verified',
-  verificationStrategy: 'dns',
-  verificationToken: 'm5Oztg3jdK4NJLgs8uIlIprMw',
+	object: 'organization_domain',
+	id: 'org_domain_01HE8GSH9BC1T08J2A9K6TDERK',
+	organizationId: 'org_01HE8GSH8FQPASKSY27THRKRBP',
+	domain: 'foo-corp.com',
+	state: 'verified',
+	verificationStrategy: 'dns',
+	verificationToken: 'm5Oztg3jdK4NJLgs8uIlIprMw'
 };
 ```
 
@@ -3795,9 +3747,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const organization = await workos.organizationDomains.get(
-  'org_domain_01HEJXJSTVEDT7T58BM70FMFET',
-);
+const organization = await workos.organizationDomains.get('org_domain_01HEJXJSTVEDT7T58BM70FMFET');
 ```
 
 ### organizationDomains.get()
@@ -3820,8 +3770,8 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const organization = await workos.organizationDomains.create({
-  organizationId: 'org_01EHT88Z8J8795GZNQ4ZP1J81T',
-  domain: 'foo-corp.com',
+	organizationId: 'org_01EHT88Z8J8795GZNQ4ZP1J81T',
+	domain: 'foo-corp.com'
 });
 ```
 
@@ -3847,7 +3797,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const organization = await workos.organizationDomains.verify(
-  'org_domain_01HEJXJSTVEDT7T58BM70FMFET',
+	'org_domain_01HEJXJSTVEDT7T58BM70FMFET'
 );
 ```
 
@@ -3877,13 +3827,13 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS(process.env.WORKOS_API_KEY);
 
 const listOfEvents = await workos.events.listEvents({
-  events: [
-    'dsync.activated',
-    'dsync.deleted',
-    'dsync.user.created',
-    'dsync.user.updated',
-    'dsync.user.deleted',
-  ],
+	events: [
+		'dsync.activated',
+		'dsync.deleted',
+		'dsync.user.created',
+		'dsync.user.updated',
+		'dsync.user.deleted'
+	]
 });
 ```
 
@@ -3917,13 +3867,13 @@ Feature flags allow you to control feature availability for organizations in you
 
 ```javascript
 const featureFlag = {
-  object: 'feature_flag',
-  id: 'flag_01EHZNVPK3SFK441A1RGBFSHRT',
-  name: 'Advanced Analytics',
-  slug: 'advanced-analytics',
-  description: 'Enable advanced analytics dashboard feature',
-  createdAt: '2025-08-04T19:07:33.155Z',
-  updatedAt: '2025-08-04T19:07:33.155Z',
+	object: 'feature_flag',
+	id: 'flag_01EHZNVPK3SFK441A1RGBFSHRT',
+	name: 'Advanced Analytics',
+	slug: 'advanced-analytics',
+	description: 'Enable advanced analytics dashboard feature',
+	createdAt: '2025-08-04T19:07:33.155Z',
+	updatedAt: '2025-08-04T19:07:33.155Z'
 };
 ```
 
@@ -4003,7 +3953,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const featureFlags = await workos.organizations.listOrganizationFeatureFlags({
-  organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT'
 });
 
 console.log(featureFlags.data);
@@ -4039,7 +3989,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const featureFlags = await workos.userManagement.listUserFeatureFlags({
-  userId: 'user_01EHZNVPK3SFK441A1RGBFSHRT',
+	userId: 'user_01EHZNVPK3SFK441A1RGBFSHRT'
 });
 
 console.log(featureFlags.data);
@@ -4161,16 +4111,16 @@ An object representing an Authentication Factor.
 
 ```javascript
 const factor = {
-  object: 'authentication_factor',
-  id: 'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ',
-  createdAt: '2022-02-15T15:14:19.392Z',
-  updatedAt: '2022-02-15T15:14:19.392Z',
-  type: 'totp',
-  totp: {
-    qrCode: 'data:image/png;base64,{base64EncodedPng}',
-    secret: 'NAGCCFS3EYRB422HNAKAKY3XDUORMSRF',
-    uri: 'otpauth://totp/FooCorp:alan.turing@example.com?secret=NAGCCFS3EYRB422HNAKAKY3XDUORMSRF&issuer=FooCorp',
-  },
+	object: 'authentication_factor',
+	id: 'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ',
+	createdAt: '2022-02-15T15:14:19.392Z',
+	updatedAt: '2022-02-15T15:14:19.392Z',
+	type: 'totp',
+	totp: {
+		qrCode: 'data:image/png;base64,{base64EncodedPng}',
+		secret: 'NAGCCFS3EYRB422HNAKAKY3XDUORMSRF',
+		uri: 'otpauth://totp/FooCorp:alan.turing@example.com?secret=NAGCCFS3EYRB422HNAKAKY3XDUORMSRF&issuer=FooCorp'
+	}
 };
 ```
 
@@ -4208,12 +4158,12 @@ An object representing a Challenge of an Authentication Factor.
 
 ```javascript
 const challenge = {
-  object: 'authentication_challenge',
-  id: 'auth_challenge_01FVYZWQTZQ5VB6BC5MPG2EYC5',
-  createdAt: '2022-02-15T15:26:53.274Z',
-  updatedAt: '2022-02-15T15:26:53.274Z',
-  expiresAt: '2022-02-15T15:36:53.279Z',
-  authenticationFactorId: 'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ',
+	object: 'authentication_challenge',
+	id: 'auth_challenge_01FVYZWQTZQ5VB6BC5MPG2EYC5',
+	createdAt: '2022-02-15T15:26:53.274Z',
+	updatedAt: '2022-02-15T15:26:53.274Z',
+	expiresAt: '2022-02-15T15:36:53.279Z',
+	authenticationFactorId: 'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ'
 };
 ```
 
@@ -4241,9 +4191,9 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const factor = await workos.mfa.enrollFactor({
-  type: 'totp',
-  issuer: 'Foo Corp',
-  user: 'alan.turing@example.com',
+	type: 'totp',
+	issuer: 'Foo Corp',
+	user: 'alan.turing@example.com'
 });
 ```
 
@@ -4273,8 +4223,8 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const challenge = await workos.mfa.challengeFactor({
-  authenticationFactorId: 'auth_factor_01FZ4TS14D1PHFNZ9GF6YD8M1F',
-  smsTemplate: 'Your code is {{code}}',
+	authenticationFactorId: 'auth_factor_01FZ4TS14D1PHFNZ9GF6YD8M1F',
+	smsTemplate: 'Your code is {{code}}'
 });
 ```
 
@@ -4300,8 +4250,8 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { challenge, valid } = await workos.mfa.verifyChallenge({
-  authenticationChallengeId: 'auth_challenge_01FVYZWQTZQ5VB6BC5MPG2EYC5',
-  code: '123456',
+	authenticationChallengeId: 'auth_challenge_01FVYZWQTZQ5VB6BC5MPG2EYC5',
+	code: '123456'
 });
 ```
 
@@ -4328,9 +4278,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const factor = await workos.mfa.getFactor(
-  'auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ',
-);
+const factor = await workos.mfa.getFactor('auth_factor_01FVYZ5QM8N98T9ME5BCB2BBMJ');
 ```
 
 ### mfa.getFactor()
@@ -4371,20 +4319,20 @@ An Organization is a top-level resource in WorkOS. Each Connection, Directory, a
 
 ```javascript
 const organization = {
-  object: 'organization',
-  id: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
-  name: 'Foo Corp',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
-  domains: [
-    {
-      id: 'org_domain_01EHZNVPK2QXHMVWCEDQEKY69A',
-      object: 'organization_domain',
-      domain: 'foo-corp.com',
-    },
-  ],
-  stripeCustomerId: 'cus_R9qWAGMQ6nGE7V',
-  externalId: '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191',
+	object: 'organization',
+	id: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	name: 'Foo Corp',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z',
+	domains: [
+		{
+			id: 'org_domain_01EHZNVPK2QXHMVWCEDQEKY69A',
+			object: 'organization_domain',
+			domain: 'foo-corp.com'
+		}
+	],
+	stripeCustomerId: 'cus_R9qWAGMQ6nGE7V',
+	externalId: '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191'
 };
 ```
 
@@ -4417,9 +4365,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const organization = await workos.organizations.getOrganization(
-  'org_01EHZNVPK3SFK441A1RGBFSHRT',
-);
+const organization = await workos.organizations.getOrganization('org_01EHZNVPK3SFK441A1RGBFSHRT');
 ```
 
 ### organizations.getOrganization()
@@ -4442,7 +4388,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const organization = await workos.organizations.getOrganizationByExternalId(
-  '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191',
+	'2fe01467-f7ea-4dd2-8b79-c2b4f56d0191'
 );
 ```
 
@@ -4466,7 +4412,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const organizations = await workos.organizations.listOrganizations({
-  domains: ['foo-corp.com'],
+	domains: ['foo-corp.com']
 });
 
 console.log(organizations.data);
@@ -4504,17 +4450,17 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const organization = await workos.organizations.createOrganization({
-  name: 'Foo Corp',
-  domainData: [
-    {
-      domain: 'foo-corp.com',
-      state: 'pending',
-    },
-  ],
-  externalId: '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191',
-  metadata: {
-    tier: 'diamond',
-  },
+	name: 'Foo Corp',
+	domainData: [
+		{
+			domain: 'foo-corp.com',
+			state: 'pending'
+		}
+	],
+	externalId: '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191',
+	metadata: {
+		tier: 'diamond'
+	}
 });
 ```
 
@@ -4546,19 +4492,19 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const organization = await workos.organizations.updateOrganization({
-  organization: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
-  name: 'Foo Corp',
-  domainData: [
-    {
-      domain: 'foo-corp.com',
-      state: 'verified',
-    },
-  ],
-  externalId: '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191',
-  metadata: {
-    tier: 'diamond',
-  },
-  stripeCustomerId: 'cus_R9qWAGMQ6nGE7V',
+	organization: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	name: 'Foo Corp',
+	domainData: [
+		{
+			domain: 'foo-corp.com',
+			state: 'verified'
+		}
+	],
+	externalId: '2fe01467-f7ea-4dd2-8b79-c2b4f56d0191',
+	metadata: {
+		tier: 'diamond'
+	},
+	stripeCustomerId: 'cus_R9qWAGMQ6nGE7V'
 });
 ```
 
@@ -4614,13 +4560,13 @@ Organization domains can be verified manually (through the API or the Dashboard)
 
 ```javascript
 const organizationDomain = {
-  object: 'organization_domain',
-  id: 'org_01EHZNVPK3SFK441A1RGBFSVCT',
-  organizationId: 'org_01HE8GSH8FQPASKSY27THRKRBP',
-  domain: 'foo-corp.com',
-  state: 'verified',
-  verificationStrategy: 'dns',
-  verificationToken: 'm5Oztg3jdK4NJLgs8uIlIprMw',
+	object: 'organization_domain',
+	id: 'org_01EHZNVPK3SFK441A1RGBFSVCT',
+	organizationId: 'org_01HE8GSH8FQPASKSY27THRKRBP',
+	domain: 'foo-corp.com',
+	state: 'verified',
+	verificationStrategy: 'dns',
+	verificationToken: 'm5Oztg3jdK4NJLgs8uIlIprMw'
 };
 ```
 
@@ -4648,9 +4594,9 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const token = await workos.pipes.getAccessToken({
-  userId: 'user_01EHZNVPK3SFK441A1RGBFSHRT',
-  organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
-  provider: 'github',
+	userId: 'user_01EHZNVPK3SFK441A1RGBFSHRT',
+	organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	provider: 'github'
 });
 ```
 
@@ -4816,15 +4762,15 @@ A role is an access control resource that can be assigned to organization member
 
 ```javascript
 const role = {
-  object: 'role',
-  id: 'role_01EHZNVPK3SFK441A1RGBFSHRT',
-  name: 'Member',
-  slug: 'member',
-  description: 'Access to basic resources',
-  permissions: ['posts:read', 'posts:write'],
-  type: 'EnvironmentRole',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
+	object: 'role',
+	id: 'role_01EHZNVPK3SFK441A1RGBFSHRT',
+	name: 'Member',
+	slug: 'member',
+	description: 'Access to basic resources',
+	permissions: ['posts:read', 'posts:write'],
+	type: 'EnvironmentRole',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z'
 };
 ```
 
@@ -4858,7 +4804,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const roles = await workos.organizations.listOrganizationRoles({
-  organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT'
 });
 
 console.log(roles.data);
@@ -4886,10 +4832,10 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const authorizationUrl = workos.sso.getAuthorizationUrl({
-  connection: 'conn_01E4ZCR3C56J083X43JQXF3JK5',
-  clientId: 'client_123456789',
-  redirectUri: 'https://your-app.com/callback',
-  state: 'dj1kUXc0dzlXZ1hjUQ==',
+	connection: 'conn_01E4ZCR3C56J083X43JQXF3JK5',
+	clientId: 'client_123456789',
+	redirectUri: 'https://your-app.com/callback',
+	state: 'dj1kUXc0dzlXZ1hjUQ=='
 });
 ```
 
@@ -4943,7 +4889,7 @@ Wildcard characters are not allowed in production environments
 
 ## Wildcards
 
-WorkOS supports using wildcard characters in Redirect URIs. The * symbol can be used as a wildcard for subdomains; however, it must be used in accordance with the following rules in order to properly function.
+WorkOS supports using wildcard characters in Redirect URIs. The \* symbol can be used as a wildcard for subdomains; however, it must be used in accordance with the following rules in order to properly function.
 
 The wildcard must be located in a subdomain within the hostname component. For example, `http://*.com` will not work.
 The wildcard must be located in the subdomain which is furthest from the root domain. For example, `https://sub.*.example.com` will not work.
@@ -4953,7 +4899,7 @@ A URL with a valid wildcard will not match a URL more than one subdomain level i
 In production environments, wildcards cannot be used with
 public suffix domains
 . For example, `https://*.ngrok-free.app` will not work.
-The wildcard will match a sequence of letters (A through Z, and a through z ); digits (0 through 9), hyphens (-), and underscores (_). For example, `https://user:secret@foo.example.com` will not work with `https://*.example.com.`
+The wildcard will match a sequence of letters (A through Z, and a through z ); digits (0 through 9), hyphens (-), and underscores (\_). For example, `https://user:secret@foo.example.com` will not work with `https://*.example.com.`
 A URL with a wildcard cannot be set as the default redirect URI.
 
 ## Error codes
@@ -4964,22 +4910,22 @@ Redirect URI with an error code
 `https://your-app.com/callback?error=organization_invalid&error_description=No%20connection%20associated%20with%20organization&state=123456789`
 Possible error codes and the corresponding descriptions are listed below.
 
-| Error code | Description |
-|---|---|
-| access_denied | The identity provider denied the user’s access to the client application, or the user declined the OAuth authorization request at the identity provider. |
-| ambiguous_connection_selector | A connection could not be uniquely identified using the provided connection selector (e.g., organization). This can occur when there are multiple SSO connections under the same organization. If you need multiple SSO connections for an organization, use the connection parameter to identify which connection to use for SSO. |
-| connection_domain_invalid | There is no connection for the provided domain. |
-| connection_invalid | There is no connection for the provided ID. |
-| connection_strategy_invalid | The provider has multiple strategies associated per environment. |
-| connection_unlinked | The connection associated with the request is unlinked. |
-| domain_connection_selector_not_allowed | This is a legacy error code that only applies if using the deprecated “domain” query parameter which is no longer valid for this endpoint. Use the “organization” or “connection” query parameters to target a connection instead. |
-| idp_initiated_sso_disabled | IdP-initiated SSO is disabled for the connection (see Disable IdP-initiated SSO). |
-| invalid_connection_selector | A valid connection selector query parameter must be provided in order to correctly determine the proper connection to return an authorization URL for. Valid connection selectors are either connection, organization, or provider. |
-| organization_invalid | There is no organization matching the provided ID. |
-| oauth_failed | An OAuth authorization request failed for a user. |
-| profile_not_allowed_outside_organization | A profile was received that has an email that is outside the organization’s domain and the organization does not allow this. To resolve this, add the missing domain to the organization’s Domains. You can read about other options in the SSO Domains guide. |
-| server_error | The SSO authentication failed for the user. More detailed errors and steps to resolve are available in the Sessions tab on the connection page in the WorkOS Dashboard. |
-| signin_consent_denied | The user rejected the sign-in consent screen. This screen prompts the user to verify the email provided by the identity provider to confirm the legitimacy of the sign-in attempt. |
+| Error code                               | Description                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| access_denied                            | The identity provider denied the user’s access to the client application, or the user declined the OAuth authorization request at the identity provider.                                                                                                                                                                           |
+| ambiguous_connection_selector            | A connection could not be uniquely identified using the provided connection selector (e.g., organization). This can occur when there are multiple SSO connections under the same organization. If you need multiple SSO connections for an organization, use the connection parameter to identify which connection to use for SSO. |
+| connection_domain_invalid                | There is no connection for the provided domain.                                                                                                                                                                                                                                                                                    |
+| connection_invalid                       | There is no connection for the provided ID.                                                                                                                                                                                                                                                                                        |
+| connection_strategy_invalid              | The provider has multiple strategies associated per environment.                                                                                                                                                                                                                                                                   |
+| connection_unlinked                      | The connection associated with the request is unlinked.                                                                                                                                                                                                                                                                            |
+| domain_connection_selector_not_allowed   | This is a legacy error code that only applies if using the deprecated “domain” query parameter which is no longer valid for this endpoint. Use the “organization” or “connection” query parameters to target a connection instead.                                                                                                 |
+| idp_initiated_sso_disabled               | IdP-initiated SSO is disabled for the connection (see Disable IdP-initiated SSO).                                                                                                                                                                                                                                                  |
+| invalid_connection_selector              | A valid connection selector query parameter must be provided in order to correctly determine the proper connection to return an authorization URL for. Valid connection selectors are either connection, organization, or provider.                                                                                                |
+| organization_invalid                     | There is no organization matching the provided ID.                                                                                                                                                                                                                                                                                 |
+| oauth_failed                             | An OAuth authorization request failed for a user.                                                                                                                                                                                                                                                                                  |
+| profile_not_allowed_outside_organization | A profile was received that has an email that is outside the organization’s domain and the organization does not allow this. To resolve this, add the missing domain to the organization’s Domains. You can read about other options in the SSO Domains guide.                                                                     |
+| server_error                             | The SSO authentication failed for the user. More detailed errors and steps to resolve are available in the Sessions tab on the connection page in the WorkOS Dashboard.                                                                                                                                                            |
+| signin_consent_denied                    | The user rejected the sign-in consent screen. This screen prompts the user to verify the email provided by the identity provider to confirm the legitimacy of the sign-in attempt.                                                                                                                                                 |
 
 # Profile
 
@@ -4993,21 +4939,21 @@ To surface additional attributes on the Profile, refer to the SSO custom attribu
 
 ```javascript
 const profile = {
-  id: 'prof_01DMC79VCBZ0NY2099737PSVF1',
-  connectionId: 'conn_01E4ZCR3C56J083X43JQXF3JK5',
-  organizationId: 'org_01EHWNCE74X7JSDV0X3SZ3KJNY',
-  connectionType: 'OktaSAML',
-  email: 'todd@example.com',
-  firstName: 'Todd',
-  idpId: '00u1a0ufowBJlzPlk357',
-  lastName: 'Rundgren',
-  role: { slug: 'admin' },
-  customAttributes: {
-    department: 'Engineering',
-    jobTitle: 'Software Engineer',
-  },
-  object: 'profile',
-  rawAttributes: {},
+	id: 'prof_01DMC79VCBZ0NY2099737PSVF1',
+	connectionId: 'conn_01E4ZCR3C56J083X43JQXF3JK5',
+	organizationId: 'org_01EHWNCE74X7JSDV0X3SZ3KJNY',
+	connectionType: 'OktaSAML',
+	email: 'todd@example.com',
+	firstName: 'Todd',
+	idpId: '00u1a0ufowBJlzPlk357',
+	lastName: 'Rundgren',
+	role: { slug: 'admin' },
+	customAttributes: {
+		department: 'Engineering',
+		jobTitle: 'Software Engineer'
+	},
+	object: 'profile',
+	rawAttributes: {}
 };
 ```
 
@@ -5044,11 +4990,10 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const { access_token, profile, oauth_tokens } =
-  await workos.sso.getProfileAndToken({
-    code: '01DMEK0J53CVMC32CK5SE0KZ8Q',
-    clientId: 'client_123456789',
-  });
+const { access_token, profile, oauth_tokens } = await workos.sso.getProfileAndToken({
+	code: '01DMEK0J53CVMC32CK5SE0KZ8Q',
+	clientId: 'client_123456789'
+});
 ```
 
 ### sso.getProfileAndToken()
@@ -5077,7 +5022,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const profile = await workos.sso.getProfile({
-  accessToken: '01DMEK0J53CVMC32CK5SE0KZ8Q',
+	accessToken: '01DMEK0J53CVMC32CK5SE0KZ8Q'
 });
 ```
 
@@ -5101,20 +5046,20 @@ See the events reference documentation for the connection events.
 
 ```javascript
 const connection = {
-  id: 'conn_01E4ZCR3C56J083X43JQXF3JK5',
-  organizationId: 'org_01EHWNCE74X7JSDV0X3SZ3KJNY',
-  type: 'OktaSAML',
-  name: 'Foo Corp',
-  state: 'active',
-  createdAt: '2021-06-25T19:07:33.155Z',
-  updatedAt: '2021-06-25T19:07:33.155Z',
-  domains: [
-    {
-      id: 'org_domain_01EHZNVPK2QXHMVWCEDQEKY69A',
-      object: 'connection_domain',
-      domain: 'foo-corp.com',
-    },
-  ],
+	id: 'conn_01E4ZCR3C56J083X43JQXF3JK5',
+	organizationId: 'org_01EHWNCE74X7JSDV0X3SZ3KJNY',
+	type: 'OktaSAML',
+	name: 'Foo Corp',
+	state: 'active',
+	createdAt: '2021-06-25T19:07:33.155Z',
+	updatedAt: '2021-06-25T19:07:33.155Z',
+	domains: [
+		{
+			id: 'org_domain_01EHZNVPK2QXHMVWCEDQEKY69A',
+			object: 'connection_domain',
+			domain: 'foo-corp.com'
+		}
+	]
 };
 ```
 
@@ -5145,9 +5090,7 @@ import { WorkOS } from '@workos-inc/node';
 
 const workos = new WorkOS('sk_example_123456789');
 
-const connection = await workos.sso.getConnection(
-  'conn_01E4ZCR3C56J083X43JQXF3JK5',
-);
+const connection = await workos.sso.getConnection('conn_01E4ZCR3C56J083X43JQXF3JK5');
 ```
 
 ### sso.getConnection()
@@ -5279,23 +5222,23 @@ Object
 
 ```javascript
 const object = {
-  id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
-  metadata: {
-    id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
-    environmentId: 'environment_example_23456789',
-    context: {
-      organization_id: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
-    },
-    keyId: 'e2084ada-50c1-5f9a-b1c7-fa868d506e5a',
-    updatedAt: '2025-02-21T12:04:09.165291Z',
-    updatedBy: {
-      id: 'user_01E4ZCR3C56J083X43JQXF3JK5',
-      name: 'Marcelina Davis',
-    },
-    versionId: 'Wq49AmJIR7QI0kSwfY9BZ6vNsOq6AO_X',
-  },
-  name: 'secret-name',
-  value: 'my secret value',
+	id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
+	metadata: {
+		id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
+		environmentId: 'environment_example_23456789',
+		context: {
+			organization_id: 'org_01EHZNVPK3SFK441A1RGBFSHRT'
+		},
+		keyId: 'e2084ada-50c1-5f9a-b1c7-fa868d506e5a',
+		updatedAt: '2025-02-21T12:04:09.165291Z',
+		updatedBy: {
+			id: 'user_01E4ZCR3C56J083X43JQXF3JK5',
+			name: 'Marcelina Davis'
+		},
+		versionId: 'Wq49AmJIR7QI0kSwfY9BZ6vNsOq6AO_X'
+	},
+	name: 'secret-name',
+	value: 'my secret value'
 };
 ```
 
@@ -5337,9 +5280,9 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.createObject({
-  name: 'secret-name',
-  value: 'my secret value',
-  context: { organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT' },
+	name: 'secret-name',
+	value: 'my secret value',
+	context: { organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT' }
 });
 ```
 
@@ -5385,7 +5328,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.readObject({
-  id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
+	id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC'
 });
 ```
 
@@ -5431,9 +5374,9 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.updateObject({
-  id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
-  value: 'new value',
-  versionCheck: 'Wq49AmJIR7QI0kSwfY9BZ6vNsOq6AO_X',
+	id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
+	value: 'new value',
+	versionCheck: 'Wq49AmJIR7QI0kSwfY9BZ6vNsOq6AO_X'
 });
 ```
 
@@ -5459,7 +5402,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.describeObject({
-  id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
+	id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC'
 });
 ```
 
@@ -5511,7 +5454,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.deleteObject({
-  id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC',
+	id: 'secret_51B0AC67C2FB4247AC5ABDDD3C701BDC'
 });
 ```
 
@@ -5583,7 +5526,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.createDataKey({
-  context: { organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT' },
+	context: { organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT' }
 });
 ```
 
@@ -5610,7 +5553,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.decryptDataKey({
-  keys: 'V09TLkVLTS52MQBiZjUxY2NlYy03OGI0LTUyMDAtYjM4My0zNTczMGU3MWVmNjEBATEBJDU2OWYyNDdjLTFkY2QtNDQzMC04MjRmLWQ3N2MxZDNhZmU1NgF0NTY5ZjI0N2MtMWRjZC00NDMwLTgyNGYtZDc3YzFkM2FmZTU2pWvKMbiudRtpyjYexZCX/K9ggOEioUw2c0B62kEh+oj68uuAJQWNfPKTC+mapgJPxdnMKniKxzI7a6zmHgXTK7dSOmAzJBDhDgtEiaqyKTM=',
+	keys: 'V09TLkVLTS52MQBiZjUxY2NlYy03OGI0LTUyMDAtYjM4My0zNTczMGU3MWVmNjEBATEBJDU2OWYyNDdjLTFkY2QtNDQzMC04MjRmLWQ3N2MxZDNhZmU1NgF0NTY5ZjI0N2MtMWRjZC00NDMwLTgyNGYtZDc3YzFkM2FmZTU2pWvKMbiudRtpyjYexZCX/K9ggOEioUw2c0B62kEh+oj68uuAJQWNfPKTC+mapgJPxdnMKniKxzI7a6zmHgXTK7dSOmAzJBDhDgtEiaqyKTM='
 });
 ```
 
@@ -5635,7 +5578,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.encrypt('keep it secret, keep it safe', {
-  organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT'
 });
 ```
 
@@ -5662,7 +5605,7 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 await workos.vault.decrypt(
-  'J/HGPfUVMxY1GGvViE3MDe31fOU9BuIUja0/ekDOraRaA3v13YRnwLvDWbnSPjWjzgFXT1MuRUtNLnYxAGQ0ZWNkYjkwLTMwZmMtNTYwYS04MGM0LWExYWQ2N2IyYjUzYwEBMQEkMDIxOTlmM2EtMjE4NS00ODg4LTkzNzgtZTA0ODAxOGRkN2M1AXQwMjE5OWYzYS0yMTg1LTQ4ODgtOTM3OC1lMDQ4MDE4ZGQ3YzWdnLz+Zc8ySzyfZYOVKmuz2k3rNFa6MAihjl9+5u6fiXOjmavMBUcSg0wLFDxznK0UToroLyHDaPOnpN8MTlKO8lN1Qz4KSCpQWawThmSIZ2wwwiR1jY3AOo9P/YygzE5v',
+	'J/HGPfUVMxY1GGvViE3MDe31fOU9BuIUja0/ekDOraRaA3v13YRnwLvDWbnSPjWjzgFXT1MuRUtNLnYxAGQ0ZWNkYjkwLTMwZmMtNTYwYS04MGM0LWExYWQ2N2IyYjUzYwEBMQEkMDIxOTlmM2EtMjE4NS00ODg4LTkzNzgtZTA0ODAxOGRkN2M1AXQwMjE5OWYzYS0yMTg1LTQ4ODgtOTM3OC1lMDQ4MDE4ZGQ3YzWdnLz+Zc8ySzyfZYOVKmuz2k3rNFa6MAihjl9+5u6fiXOjmavMBUcSg0wLFDxznK0UToroLyHDaPOnpN8MTlKO8lN1Qz4KSCpQWawThmSIZ2wwwiR1jY3AOo9P/YygzE5v'
 );
 ```
 
@@ -5692,9 +5635,9 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const { token } = await workos.widgets.getToken({
-  organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
-  userId: 'user_01EHZNVPK3SFK441A1RGBFSHRT',
-  scopes: ['widgets:users-table:manage'],
+	organizationId: 'org_01EHZNVPK3SFK441A1RGBFSHRT',
+	userId: 'user_01EHZNVPK3SFK441A1RGBFSHRT',
+	scopes: ['widgets:users-table:manage']
 });
 ```
 
@@ -6708,11 +6651,11 @@ An object representing a passwordless authentication session.
 
 ```javascript
 const passwordlessSession = {
-  object: 'passwordless_session',
-  id: 'passwordless_session_01EHDAK2BFGWCSZXP9HGZ3VK8C',
-  email: 'marcelina@example.com',
-  expiresAt: '2020-08-13T05:50:00.000Z',
-  link: 'https://auth.workos.com/passwordless/4TeRexuejWCKs9rrFOIuLRYEr/confirm',
+	object: 'passwordless_session',
+	id: 'passwordless_session_01EHDAK2BFGWCSZXP9HGZ3VK8C',
+	email: 'marcelina@example.com',
+	expiresAt: '2020-08-13T05:50:00.000Z',
+	link: 'https://auth.workos.com/passwordless/4TeRexuejWCKs9rrFOIuLRYEr/confirm'
 };
 ```
 
@@ -6736,8 +6679,8 @@ import { WorkOS } from '@workos-inc/node';
 const workos = new WorkOS('sk_example_123456789');
 
 const session = await workos.passwordless.createSession({
-  email: 'marcelina@example.com',
-  type: 'MagicLink',
+	email: 'marcelina@example.com',
+	type: 'MagicLink'
 });
 ```
 

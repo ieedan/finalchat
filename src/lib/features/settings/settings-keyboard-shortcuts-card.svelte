@@ -6,7 +6,7 @@
 
 	const chatLayoutState = useChatLayout();
 
-	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
+	const submitOnEnter = $derived(chatLayoutState.user?.settings?.submitOnEnter ?? false);
 
 	const shortcuts = $derived([
 		{

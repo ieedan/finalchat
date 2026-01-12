@@ -1,6 +1,5 @@
 # Users and Organizations
 
-
 ## Users
 
 The [User object](/docs/reference/authkit/user) represents an identity that has access or owns artifacts in your application. A User object may not uniquely identify an individual person, since a person may present themselves as having multiple identities in the same system.

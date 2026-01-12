@@ -19,12 +19,12 @@
 
 	const groupQuery = useCachedQuery(api.groups.getGroup, {
 		get groupId() {
-			return chatLayoutState.userSettings?.membership?.workosGroupId;
+			return chatLayoutState.user?.membership?.workosGroupId;
 		}
 	});
-	const invitationsQuery = useCachedQuery(api.user.getGroupInvites, {});
+	const invitationsQuery = useCachedQuery(api.users.getGroupInvites, {});
 
-	const isPartOfAGroup = $derived(Boolean(chatLayoutState.userSettings?.membership?.workosGroupId));
+	const isPartOfAGroup = $derived(Boolean(chatLayoutState.user?.membership?.workosGroupId));
 
 	const client = useConvexClient();
 
@@ -52,7 +52,7 @@
 								<span class="font-medium">
 									{groupQuery.data?.name}
 								</span>
-								{#if chatLayoutState.userSettings?.membership?.role === 'admin'}
+								{#if chatLayoutState.user?.membership?.role === 'admin'}
 									<Badge variant="default">Admin</Badge>
 								{/if}
 							</div>
@@ -93,7 +93,7 @@
 								{:else}
 									<Checkbox
 										readonly
-										checked={groupQuery.data?.options.canViewMembersChats}
+										checked={groupQuery.data?.options?.canViewMembersChats}
 										class="border-border"
 									/>
 								{/if}
@@ -105,7 +105,7 @@
 								{:else}
 									<Checkbox
 										readonly
-										checked={groupQuery.data?.options.allowPublicChats}
+										checked={groupQuery.data?.options?.allowPublicChats}
 										class="border-border"
 									/>
 								{/if}
@@ -117,28 +117,48 @@
 			</Card.Content>
 		{/if}
 	</Card.Root>
-	{#if (invitationsQuery.data?.length ?? 0) > 0}
+	{#if isPartOfAGroup}
 		<Card.Root>
 			<Card.Header>
-				<Card.Title>Invitations</Card.Title>
-				<Card.Description>
-					{isPartOfAGroup
-						? 'Joining a group will cause you to leave your current group'
-						: 'Join a group to get started'}
-				</Card.Description>
+				<Card.Title>Members</Card.Title>
+				<Card.Description>Manage the group members.</Card.Description>
 			</Card.Header>
 			<Card.Content>
-				<div class="border border-border rounded-lg bg-background">
-					<Table.Root>
-						<Table.Header>
-							<Table.Row>
-								<Table.Head>Organization</Table.Head>
-								<Table.Head>Invited By</Table.Head>
-								<Table.Head>Expires At</Table.Head>
-							</Table.Row>
-						</Table.Header>
-						<Table.Body>
-							{#each invitationsQuery.data as invitation}
+				<Table.Root>
+					<Table.Header>
+						<Table.Row>
+							<Table.Head>Member</Table.Head>
+							<Table.Head>Role</Table.Head>
+							<Table.Head></Table.Head>
+						</Table.Row>
+					</Table.Header>
+					<Table.Body></Table.Body>
+				</Table.Root>
+			</Card.Content>
+		</Card.Root>
+	{/if}
+	<Card.Root>
+		<Card.Header>
+			<Card.Title>Invitations</Card.Title>
+			<Card.Description>
+				{isPartOfAGroup
+					? 'Joining a group will cause you to leave your current group'
+					: 'Join a group to get started'}
+			</Card.Description>
+		</Card.Header>
+		<Card.Content>
+			<div class="border border-border rounded-lg bg-background">
+				<Table.Root>
+					<Table.Header>
+						<Table.Row>
+							<Table.Head>Group</Table.Head>
+							<Table.Head>Invited By</Table.Head>
+							<Table.Head>Expires At</Table.Head>
+						</Table.Row>
+					</Table.Header>
+					<Table.Body>
+						{#if (invitationsQuery.data?.length ?? 0) > 0}
+							{#each invitationsQuery.data as invitation (invitation.workosInvitationId)}
 								<Table.Row>
 									<Table.Cell>{invitation.organization.name}</Table.Cell>
 									<Table.Cell>{invitation.invitedBy.name}</Table.Cell>
@@ -147,11 +167,15 @@
 									</Table.Cell>
 								</Table.Row>
 							{/each}
-						</Table.Body>
-					</Table.Root>
-				</div>
-				<!-- TODO: group invitations display -->
-			</Card.Content>
-		</Card.Root>
-	{/if}
+						{:else}
+							<Table.Row>
+								<Table.Cell colspan={3} class="h-24 text-center">No invitations found.</Table.Cell>
+							</Table.Row>
+						{/if}
+					</Table.Body>
+				</Table.Root>
+			</div>
+			<!-- TODO: group invitations display -->
+		</Card.Content>
+	</Card.Root>
 </AccountSettings.Page>

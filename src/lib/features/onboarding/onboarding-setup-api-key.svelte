@@ -20,7 +20,7 @@
 	const convex = useConvexClient();
 
 	// async function skip() {
-	// 	await convex.mutation(api.userSettings.completeSetupApiKey, {});
+	// 	await convex.mutation(api.users.completeSetupApiKey, {});
 	// }
 
 	const canSubmit = $derived(Boolean(apiKey));
@@ -37,7 +37,7 @@
 			localApiKey.current = null;
 		}
 
-		await convex.mutation(api.userSettings.completeSetupApiKey, {});
+		await convex.mutation(api.users.completeSetupApiKey, {});
 		submitting = false;
 	}
 </script>

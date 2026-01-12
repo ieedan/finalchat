@@ -17,7 +17,7 @@ export async function updateUserMembership(
 ) {
 	const membership = await ctx.db
 		.query('groupMembers')
-		.withIndex('by_user', (q) => q.eq('userId', userId))
+		.withIndex('by_workos_user', (q) => q.eq('workosUserId', userId))
 		.first();
 	if (membership) {
 		if (organizationId === null || role === null) {
@@ -37,7 +37,7 @@ export async function updateUserMembership(
 		await ctx.db.insert('groupMembers', {
 			workosGroupId: organizationId,
 			workosMembershipId: membershipId,
-			userId,
+			workosUserId: userId,
 			role
 		});
 	}

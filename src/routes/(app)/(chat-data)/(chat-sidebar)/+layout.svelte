@@ -16,7 +16,4 @@
 	</Sidebar.Inset>
 </Sidebar.Provider>
 
-<OnboardingDialog
-	user={chatLayoutState.user}
-	userSettings={chatLayoutState.userSettingsQuery.data}
-/>
+<OnboardingDialog user={chatLayoutState.user} />
