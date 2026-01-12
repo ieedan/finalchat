@@ -56,16 +56,17 @@ export default defineSchema({
 		profilePictureUrl: v.union(v.string(), v.null()),
 		settings: v.optional(
 			v.object({
-				onboarding: v.optional(
-					v.object({
-						mode: v.optional(v.union(v.literal('basic'), v.literal('advanced'))),
-						setupApiKey: v.optional(v.boolean()),
-						completed: v.optional(v.boolean())
-					})
-				),
+				mode: v.union(v.literal('basic'), v.literal('advanced')),
 				favoriteModelIds: v.array(v.string()),
 				systemPrompt: v.optional(v.string()),
-				submitOnEnter: v.optional(v.boolean())
+				submitOnEnter: v.boolean()
+			})
+		),
+		onboarding: v.optional(
+			v.object({
+				setupMode: v.optional(v.boolean()),
+				setupApiKey: v.optional(v.boolean()),
+				completed: v.optional(v.boolean())
 			})
 		)
 	})

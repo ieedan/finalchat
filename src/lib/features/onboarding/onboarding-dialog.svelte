@@ -11,16 +11,16 @@
 	let { user }: Props = $props();
 </script>
 
-{#if user && !user?.settings?.onboarding?.completed}
+{#if user && !user?.onboarding?.completed}
 	<Modal.Root open={true}>
 		<Modal.Content
 			escapeKeydownBehavior="ignore"
 			interactOutsideBehavior="ignore"
 			class="md:max-w-2xl w-full"
 		>
-			{#if user?.settings?.onboarding?.mode === undefined}
+			{#if !user?.onboarding?.setupMode}
 				<OnboardingChooseModeView />
-			{:else if !user.settings?.onboarding?.setupApiKey}
+			{:else if !user.onboarding?.setupApiKey}
 				<OnboardingSetupApiKey />
 			{/if}
 		</Modal.Content>

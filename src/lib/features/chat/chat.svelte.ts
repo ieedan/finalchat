@@ -56,7 +56,7 @@ class ChatLayoutState {
 	}
 
 	get isAdvancedMode() {
-		return this.userQuery.data?.settings?.onboarding?.mode === 'advanced';
+		return this.userQuery.data?.settings?.mode === 'advanced';
 	}
 
 	get models() {
@@ -74,7 +74,7 @@ class ChatLayoutState {
 	}
 
 	get hasOnboarded() {
-		return this.userQuery.data?.settings?.onboarding?.completed;
+		return this.userQuery.data?.onboarding?.completed;
 	}
 
 	get chatId() {

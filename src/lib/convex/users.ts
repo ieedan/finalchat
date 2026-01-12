@@ -5,6 +5,12 @@ import merge from 'deepmerge';
 import { v } from 'convex/values';
 import { DEFAULT_ENABLED_MODEL_IDS } from '../ai.js';
 
+const DEFAULT_SETTINGS = {
+	mode: 'basic',
+	submitOnEnter: true,
+	favoriteModelIds: DEFAULT_ENABLED_MODEL_IDS
+} as const;
+
 export const getGroupInvites = query({
 	args: {},
 	handler: async (ctx) => {
@@ -39,45 +45,41 @@ export const updateMode = mutation({
 		if (!workosUser) return;
 
 		const user = await getUser(ctx, workosUser);
-		if (!user) {
-			await ctx.db.insert('users', {
-				workosUserId: workosUser.subject,
-				firstName: workosUser.firstName as string,
-				lastName: workosUser.lastName as string,
-				profilePictureUrl: workosUser.profilePictureUrl as string,
-				email: workosUser.email!,
+		if (!user) return;
+
+		if (user.settings) {
+			await ctx.db.patch(user?._id, {
 				settings: {
-					onboarding: {
-						mode: args.mode
-					},
-					// in basic mode users probably would just prefer to submit on Enter
-					submitOnEnter: args.mode === 'basic',
-					favoriteModelIds: DEFAULT_ENABLED_MODEL_IDS
+					...user.settings,
+					mode: args.mode
 				}
 			});
 			return;
 		}
 
-		await ctx.db.patch(user?._id, {
-			settings: merge(user?.settings ?? {}, {
-				onboarding: {
-					mode: args.mode
-				}
-			})
+		await ctx.db.patch(user._id, {
+			settings: {
+				mode: args.mode,
+				favoriteModelIds: DEFAULT_ENABLED_MODEL_IDS,
+				submitOnEnter: args.mode === 'basic'
+			},
+			onboarding: {
+				setupMode: true
+			}
 		});
 	}
 });
 
 export const completeSetupApiKey = mutation({
 	handler: async (ctx): Promise<void> => {
-		const user = await ctx.auth.getUserIdentity();
+		const workosUser = await ctx.auth.getUserIdentity();
+		if (!workosUser) return;
+
+		const user = await getUser(ctx, workosUser);
 		if (!user) return;
 
-		const userSettings = await getUser(ctx, user);
-		if (!userSettings) return;
-
-		await ctx.db.patch(userSettings?._id, {
-			settings: merge(userSettings.settings ?? {}, {
+		await ctx.db.patch(user._id, {
+			onboarding: merge(user.onboarding ?? {}, {
 				setupApiKey: true,
 				completed: true
 			})
@@ -99,10 +101,11 @@ export const addFavoriteModel = mutation({
 		const modelIdsSet = new Set(user.settings?.favoriteModelIds ?? []);
 		modelIdsSet.add(args.modelId);
 
-		await ctx.db.patch(user?._id, {
-			settings: merge(user.settings ?? {}, {
+		await ctx.db.patch(user._id, {
+			settings: {
+				...(user.settings ?? DEFAULT_SETTINGS),
 				favoriteModelIds: Array.from(modelIdsSet)
-			})
+			}
 		});
 	}
 });
@@ -121,10 +124,11 @@ export const removeFavoriteModel = mutation({
 		const modelIdsSet = new Set(user.settings?.favoriteModelIds ?? []);
 		modelIdsSet.delete(args.modelId);
 
-		await ctx.db.patch(user?._id, {
-			settings: merge(user.settings ?? {}, {
+		await ctx.db.patch(user._id, {
+			settings: {
+				...(user.settings ?? DEFAULT_SETTINGS),
 				favoriteModelIds: Array.from(modelIdsSet)
-			})
+			}
 		});
 	}
 });
@@ -141,10 +145,10 @@ export const updateSystemPrompt = mutation({
 		if (!user) return;
 
 		await ctx.db.patch(user?._id, {
-			settings: merge(user.settings ?? {}, {
-				...user.settings,
+			settings: {
+				...(user.settings ?? DEFAULT_SETTINGS),
 				systemPrompt: args.systemPrompt
-			})
+			}
 		});
 	}
 });
@@ -161,10 +165,10 @@ export const updateSubmitOnEnter = mutation({
 		if (!user) return;
 
 		await ctx.db.patch(user?._id, {
-			settings: merge(user.settings ?? {}, {
-				...user.settings,
+			settings: {
+				...(user.settings ?? DEFAULT_SETTINGS),
 				submitOnEnter: args.submitOnEnter
-			})
+			}
 		});
 	}
 });

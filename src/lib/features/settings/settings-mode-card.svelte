@@ -36,7 +36,7 @@
 		toast.success('Mode updated!');
 	}
 
-	const modeHasChanged = $derived(mode !== chatLayoutState.user?.settings?.onboarding?.mode);
+	const modeHasChanged = $derived(mode !== chatLayoutState.user?.settings?.mode);
 </script>
 
 <Card.Root>
