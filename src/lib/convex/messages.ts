@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { httpAction, internalAction, internalQuery, query } from './_generated/server';
-import { mutation, internalMutation } from './functions';
+import { internalMutation, authMutation } from './functions';
 import { api, internal } from './_generated/api';
 import { type StreamId, StreamIdValidator } from '@convex-dev/persistent-text-streaming';
 import type { Doc, Id } from './_generated/dataModel';
@@ -44,7 +44,7 @@ export const Prompt = v.object({
 	outputModalities: v.array(v.string())
 });
 
-export const create = mutation({
+export const create = authMutation({
 	args: {
 		chatId: v.optional(v.id('chats')),
 		prompt: Prompt,
@@ -57,14 +57,12 @@ export const create = mutation({
 		chatId: Id<'chats'>;
 		assistantMessageId: Id<'messages'>;
 	}> => {
-		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
-
 		let isChatOwner: boolean;
 		let chatId: Id<'chats'>;
 		if (!args.chatId) {
 			chatId = await ctx.db.insert('chats', {
-				workosUserId: user.subject,
+				workosUserId: ctx.auth.user.workosUserId,
+				workosGroupId: ctx.auth.user.membership?.workosGroupId,
 				title: 'Untitled Chat',
 				generating: false,
 				updatedAt: Date.now(),
@@ -84,7 +82,7 @@ export const create = mutation({
 			});
 
 			const chat = await ctx.runQuery(internal.chats.internalGet, { chatId });
-			isChatOwner = chat?.workosUserId === user.subject;
+			isChatOwner = chat?.workosUserId === ctx.auth.user.workosUserId;
 
 			if (!isChatOwner) {
 				const lastMessages = getLastUserAndAssistantMessages(chat.messages);
@@ -112,7 +110,7 @@ export const create = mutation({
 		}
 
 		const userMessageId = await ctx.db.insert('messages', {
-			workosUserId: user.subject,
+			workosUserId: ctx.auth.user.workosUserId,
 			chatId,
 			role: 'user',
 			content: args.prompt.input,
@@ -132,7 +130,8 @@ export const create = mutation({
 						chatId,
 						messageId: userMessageId,
 						key: attachment.key,
-						userId: user.subject,
+						workosUserId: ctx.auth.user.workosUserId,
+						workosGroupId: ctx.auth.user.membership?.workosGroupId,
 						mediaType: attachment.mediaType
 					});
 				})
@@ -401,7 +400,8 @@ ${systemPrompt}
 										chatId,
 										messageId: last.assistantMessage._id,
 										key,
-										userId: chat.workosUserId,
+										workosUserId: chat.workosUserId,
+										workosGroupId: chat.workosGroupId,
 										mediaType: file.mediaType
 									});
 								})()

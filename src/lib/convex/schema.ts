@@ -143,7 +143,7 @@ export default defineSchema({
 		.index('by_workos_user', ['workosUserId'])
 		.index('by_workos_group', ['workosGroupId']),
 	chatAttachments: defineTable({
-		workosUserId: v.optional(v.string()),
+		workosUserId: v.string(),
 		workosGroupId: v.optional(v.string()),
 		chatId: v.id('chats'),
 		messageId: v.id('messages'),

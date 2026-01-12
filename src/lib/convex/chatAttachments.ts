@@ -89,9 +89,10 @@ export const syncRemoval = internalMutation({
 export const create = internalMutation({
 	args: {
 		chatId: v.id('chats'),
+		workosGroupId: v.optional(v.string()),
+		workosUserId: v.string(),
 		messageId: v.id('messages'),
 		key: v.string(),
-		userId: v.string(),
 		mediaType: v.string()
 	},
 	handler: async (ctx, args) => {
@@ -99,7 +100,8 @@ export const create = internalMutation({
 			chatId: args.chatId,
 			messageId: args.messageId,
 			key: args.key,
-			workosUserId: args.userId,
+			workosUserId: args.workosUserId,
+			workosGroupId: args.workosGroupId,
 			mediaType: args.mediaType
 		});
 	}

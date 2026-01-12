@@ -1,11 +1,11 @@
 <script lang="ts">
 	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import * as Card from '$lib/components/ui/card';
-	import { Button } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { useCachedQuery } from '$lib/cache/cached-query.svelte';
 	import { api } from '$lib/convex/_generated/api';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte.js';
-	import { DoorOpenIcon } from '@lucide/svelte';
+	import { DoorOpenIcon, EllipsisIcon } from '@lucide/svelte';
 	import * as Table from '$lib/components/ui/table';
 	import GroupsCreateDialog from '$lib/features/groups/components/groups-create-dialog.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
@@ -14,6 +14,8 @@
 	import { toast } from 'svelte-sonner';
 	import * as Field from '$lib/components/ui/field';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import * as Avatar from '$lib/components/ui/avatar';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 
 	const chatLayoutState = useChatLayout();
 
@@ -124,16 +126,58 @@
 				<Card.Description>Manage the group members.</Card.Description>
 			</Card.Header>
 			<Card.Content>
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head>Member</Table.Head>
-							<Table.Head>Role</Table.Head>
-							<Table.Head></Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body></Table.Body>
-				</Table.Root>
+				<div class="border border-border rounded-lg bg-background">
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.Head>Member</Table.Head>
+								<Table.Head>Role</Table.Head>
+								<Table.Head></Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each groupQuery.data?.members ?? [] as member (member.workosUserId)}
+								<Table.Row>
+									<Table.Cell>
+										<div class="flex items-center gap-2">
+											<Avatar.Root class="size-7">
+												<Avatar.Image src={member.profilePictureUrl} />
+												<Avatar.Fallback>
+													{member.firstName?.charAt(0)}
+												</Avatar.Fallback>
+											</Avatar.Root>
+											<div class="flex flex-col">
+												<p class="font-medium text-xs">{member.firstName} {member.lastName}</p>
+												<p class="text-xs text-muted-foreground">{member.email}</p>
+											</div>
+										</div>
+									</Table.Cell>
+									<Table.Cell>{member.role}</Table.Cell>
+									<Table.Cell>
+										<div class="flex justify-end">
+											<DropdownMenu.Root>
+												<DropdownMenu.Trigger
+													class={buttonVariants({ variant: 'ghost', size: 'icon' })}
+												>
+													<EllipsisIcon />
+												</DropdownMenu.Trigger>
+												<DropdownMenu.Content align="end" side="bottom">
+													<DropdownMenu.Item
+														variant="destructive"
+														disabled={chatLayoutState.user?.membership?.role !== 'admin' ||
+															member.workosUserId === chatLayoutState.user?.workosUserId}
+													>
+														Remove from group
+													</DropdownMenu.Item>
+												</DropdownMenu.Content>
+											</DropdownMenu.Root>
+										</div>
+									</Table.Cell>
+								</Table.Row>
+							{/each}
+						</Table.Body>
+					</Table.Root>
+				</div>
 			</Card.Content>
 		</Card.Root>
 	{/if}

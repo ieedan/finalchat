@@ -1,9 +1,10 @@
 import { query } from './_generated/server.js';
-import { mutation } from './functions.js';
+import { authMutation } from './functions.js';
 import { getUser, type User } from './users.utils.js';
 import merge from 'deepmerge';
 import { v } from 'convex/values';
 import { DEFAULT_ENABLED_MODEL_IDS } from '../ai.js';
+import { authKit } from './auth';
 
 const DEFAULT_SETTINGS = {
 	mode: 'basic',
@@ -14,7 +15,7 @@ const DEFAULT_SETTINGS = {
 export const getGroupInvites = query({
 	args: {},
 	handler: async (ctx) => {
-		const user = await ctx.auth.getUserIdentity();
+		const user = await authKit.getAuthUser(ctx);
 		if (!user) return null;
 
 		const invitations = await ctx.db
@@ -29,35 +30,29 @@ export const getGroupInvites = query({
 export const get = query({
 	args: {},
 	handler: async (ctx): Promise<User | null> => {
-		const user = await ctx.auth.getUserIdentity();
+		const user = await authKit.getAuthUser(ctx);
 		if (!user) return null;
 
 		return getUser(ctx, user);
 	}
 });
 
-export const updateMode = mutation({
+export const updateMode = authMutation({
 	args: {
 		mode: v.union(v.literal('basic'), v.literal('advanced'))
 	},
 	handler: async (ctx, args): Promise<void> => {
-		const workosUser = await ctx.auth.getUserIdentity();
-		if (!workosUser) return;
-
-		const user = await getUser(ctx, workosUser);
-		if (!user) return;
-
-		if (user.settings) {
-			await ctx.db.patch(user?._id, {
+		if (ctx.auth.user.settings) {
+			await ctx.db.patch(ctx.auth.user._id, {
 				settings: {
-					...user.settings,
+					...ctx.auth.user.settings,
 					mode: args.mode
 				}
 			});
 			return;
 		}
 
-		await ctx.db.patch(user._id, {
+		await ctx.db.patch(ctx.auth.user._id, {
 			settings: {
 				mode: args.mode,
 				favoriteModelIds: DEFAULT_ENABLED_MODEL_IDS,
@@ -70,16 +65,10 @@ export const updateMode = mutation({
 	}
 });
 
-export const completeSetupApiKey = mutation({
+export const completeSetupApiKey = authMutation({
 	handler: async (ctx): Promise<void> => {
-		const workosUser = await ctx.auth.getUserIdentity();
-		if (!workosUser) return;
-
-		const user = await getUser(ctx, workosUser);
-		if (!user) return;
-
-		await ctx.db.patch(user._id, {
-			onboarding: merge(user.onboarding ?? {}, {
+		await ctx.db.patch(ctx.auth.user._id, {
+			onboarding: merge(ctx.auth.user.onboarding ?? {}, {
 				setupApiKey: true,
 				completed: true
 			})
@@ -87,86 +76,62 @@ export const completeSetupApiKey = mutation({
 	}
 });
 
-export const addFavoriteModel = mutation({
+export const addFavoriteModel = authMutation({
 	args: {
 		modelId: v.string()
 	},
 	handler: async (ctx, args): Promise<void> => {
-		const workosUser = await ctx.auth.getUserIdentity();
-		if (!workosUser) return;
-
-		const user = await getUser(ctx, workosUser);
-		if (!user) return;
-
-		const modelIdsSet = new Set(user.settings?.favoriteModelIds ?? []);
+		const modelIdsSet = new Set(ctx.auth.user.settings?.favoriteModelIds ?? []);
 		modelIdsSet.add(args.modelId);
 
-		await ctx.db.patch(user._id, {
+		await ctx.db.patch(ctx.auth.user._id, {
 			settings: {
-				...(user.settings ?? DEFAULT_SETTINGS),
+				...(ctx.auth.user.settings ?? DEFAULT_SETTINGS),
 				favoriteModelIds: Array.from(modelIdsSet)
 			}
 		});
 	}
 });
 
-export const removeFavoriteModel = mutation({
+export const removeFavoriteModel = authMutation({
 	args: {
 		modelId: v.string()
 	},
 	handler: async (ctx, args): Promise<void> => {
-		const workosUser = await ctx.auth.getUserIdentity();
-		if (!workosUser) return;
-
-		const user = await getUser(ctx, workosUser);
-		if (!user) return;
-
-		const modelIdsSet = new Set(user.settings?.favoriteModelIds ?? []);
+		const modelIdsSet = new Set(ctx.auth.user.settings?.favoriteModelIds ?? []);
 		modelIdsSet.delete(args.modelId);
 
-		await ctx.db.patch(user._id, {
+		await ctx.db.patch(ctx.auth.user._id, {
 			settings: {
-				...(user.settings ?? DEFAULT_SETTINGS),
+				...(ctx.auth.user.settings ?? DEFAULT_SETTINGS),
 				favoriteModelIds: Array.from(modelIdsSet)
 			}
 		});
 	}
 });
 
-export const updateSystemPrompt = mutation({
+export const updateSystemPrompt = authMutation({
 	args: {
 		systemPrompt: v.string()
 	},
 	handler: async (ctx, args): Promise<void> => {
-		const workosUser = await ctx.auth.getUserIdentity();
-		if (!workosUser) return;
-
-		const user = await getUser(ctx, workosUser);
-		if (!user) return;
-
-		await ctx.db.patch(user?._id, {
+		await ctx.db.patch(ctx.auth.user._id, {
 			settings: {
-				...(user.settings ?? DEFAULT_SETTINGS),
+				...(ctx.auth.user.settings ?? DEFAULT_SETTINGS),
 				systemPrompt: args.systemPrompt
 			}
 		});
 	}
 });
 
-export const updateSubmitOnEnter = mutation({
+export const updateSubmitOnEnter = authMutation({
 	args: {
 		submitOnEnter: v.boolean()
 	},
 	handler: async (ctx, args): Promise<void> => {
-		const workosUser = await ctx.auth.getUserIdentity();
-		if (!workosUser) return;
-
-		const user = await getUser(ctx, workosUser);
-		if (!user) return;
-
-		await ctx.db.patch(user?._id, {
+		await ctx.db.patch(ctx.auth.user._id, {
 			settings: {
-				...(user.settings ?? DEFAULT_SETTINGS),
+				...(ctx.auth.user.settings ?? DEFAULT_SETTINGS),
 				submitOnEnter: args.submitOnEnter
 			}
 		});

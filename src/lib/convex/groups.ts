@@ -1,9 +1,9 @@
 import { v } from 'convex/values';
-import { action, query } from './_generated/server';
-import { internalMutation } from './functions';
+import { query } from './_generated/server';
+import { authAction, internalMutation } from './functions';
 import { authKit } from './auth';
 import { updateUserMembership } from './auth.utils';
-import { api, internal } from './_generated/api';
+import { internal } from './_generated/api';
 import { asyncMap } from 'convex-helpers';
 
 export const getGroup = query({
@@ -12,7 +12,7 @@ export const getGroup = query({
 	},
 	handler: async (ctx, args) => {
 		if (!args.groupId) return null;
-		const user = await ctx.auth.getUserIdentity();
+		const user = await authKit.getAuthUser(ctx);
 		if (!user) return null;
 
 		const [group, groupMembers] = await Promise.all([
@@ -25,11 +25,17 @@ export const getGroup = query({
 					.query('groupMembers')
 					.withIndex('by_workos_group', (q) => q.eq('workosGroupId', args.groupId ?? ''))
 					.collect(),
-				(member) =>
-					ctx.db
+				async (member) => {
+					const user = await ctx.db
 						.query('users')
 						.withIndex('by_workos_user', (q) => q.eq('workosUserId', member.workosUserId))
-						.first()
+						.first();
+					if (!user) return null;
+					return {
+						...user,
+						role: member.role
+					};
+				}
 			)
 		]);
 
@@ -40,7 +46,7 @@ export const getGroup = query({
 	}
 });
 
-export const createGroup = action({
+export const createGroup = authAction({
 	args: {
 		name: v.string(),
 		description: v.optional(v.string()),
@@ -48,13 +54,7 @@ export const createGroup = action({
 		allowPublicChats: v.boolean()
 	},
 	handler: async (ctx, args) => {
-		const workosUser = await ctx.auth.getUserIdentity();
-		if (!workosUser) throw new Error('Unauthorized');
-
-		const user = await ctx.runQuery(api.users.get, {});
-		if (!user) throw new Error('User not found');
-
-		if (user.membership) throw new Error('User already belongs to a group');
+		if (!ctx.auth.user.membership) throw new Error('User already belongs to a group');
 
 		const workosGroup = await authKit.workos.organizations.createOrganization({
 			name: args.name,
@@ -66,7 +66,7 @@ export const createGroup = action({
 		});
 		const membership = await authKit.workos.userManagement.createOrganizationMembership({
 			organizationId: workosGroup.id,
-			userId: user.workosUserId,
+			userId: ctx.auth.user.workosUserId,
 			roleSlug: 'admin'
 		});
 
@@ -80,7 +80,7 @@ export const createGroup = action({
 				allowPublicChats: args.allowPublicChats
 			}),
 			ctx.runMutation(internal.groups.internalUpdateUserMembership, {
-				userId: user.workosUserId,
+				userId: ctx.auth.user.workosUserId,
 				organizationId: workosGroup.id,
 				membershipId: membership.id,
 				role: 'admin'
@@ -89,24 +89,18 @@ export const createGroup = action({
 	}
 });
 
-export const leaveGroup = action({
+export const leaveGroup = authAction({
 	handler: async (ctx) => {
-		const workosUser = await ctx.auth.getUserIdentity();
-		if (!workosUser) throw new Error('Unauthorized');
-
-		const user = await ctx.runQuery(api.users.get, {});
-		if (!user) throw new Error('User settings not found');
-
-		if (!user.membership) throw new Error('User is not a member of a group');
+		if (!ctx.auth.user.membership) throw new Error('User is not a member of a group');
 
 		// TODO: handle how to deal with the group if an admin user leaves
 
 		await authKit.workos.userManagement.deleteOrganizationMembership(
-			user.membership.workosMembershipId
+			ctx.auth.user.membership.workosMembershipId
 		);
 
 		const orgMembers = await authKit.workos.userManagement.listOrganizationMemberships({
-			organizationId: user.membership.workosGroupId
+			organizationId: ctx.auth.user.membership.workosGroupId
 		});
 
 		let organizationDeletionPromise: Promise<void> | null = null;
@@ -116,13 +110,13 @@ export const leaveGroup = action({
 		) {
 			// if there are no more admin users, delete the group
 			organizationDeletionPromise = authKit.workos.organizations.deleteOrganization(
-				user.membership.workosGroupId
+				ctx.auth.user.membership.workosGroupId
 			);
 		}
 
 		await ctx.runMutation(internal.groups.internalUpdateUserMembership, {
-			userId: user.workosUserId,
-			membershipId: user.membership.workosMembershipId,
+			userId: ctx.auth.user.workosUserId,
+			membershipId: ctx.auth.user.membership.workosMembershipId,
 			organizationId: null,
 			role: null
 		});

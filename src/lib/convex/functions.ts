@@ -1,11 +1,22 @@
 import {
 	mutation as rawMutation,
-	internalMutation as rawInternalMutation
+	internalMutation as rawInternalMutation,
+	query,
+	action
 } from './_generated/server';
 import type { DataModel } from './_generated/dataModel';
 import { Triggers } from 'convex-helpers/server/triggers';
-import { customCtx, customMutation } from 'convex-helpers/server/customFunctions';
+import {
+	customAction,
+	customCtx,
+	customMutation,
+	customQuery
+} from 'convex-helpers/server/customFunctions';
 import { r2 } from './r2';
+import { authKit } from './auth';
+import { getUser, type User } from './users.utils';
+import type { GenericMutationCtx, GenericQueryCtx } from 'convex/server';
+import { api } from './_generated/api';
 
 const triggers = new Triggers<DataModel>();
 
@@ -36,3 +47,42 @@ triggers.register('chats', async (ctx, change) => {
 
 export const mutation = customMutation(rawMutation, customCtx(triggers.wrapDB));
 export const internalMutation = customMutation(rawInternalMutation, customCtx(triggers.wrapDB));
+
+async function authWrapper(ctx: GenericMutationCtx<DataModel> | GenericQueryCtx<DataModel>) {
+	const workosUser = await authKit.getAuthUser(ctx);
+	if (!workosUser) throw new Error('Unauthorized');
+
+	const user = await getUser(ctx, workosUser);
+	if (!user) throw new Error('User not found');
+
+	return {
+		ctx: { auth: { user } },
+		args: {}
+	};
+}
+
+export const authQuery = customQuery(query, {
+	args: {},
+	input: authWrapper
+});
+
+export const authMutation = customMutation(mutation, {
+	args: {},
+	input: authWrapper
+});
+
+export const authAction = customAction(action, {
+	args: {},
+	input: async (ctx): Promise<{ ctx: { auth: { user: User } }; args: object }> => {
+		const workosUser = await authKit.getAuthUser(ctx);
+		if (!workosUser) throw new Error('Unauthorized');
+
+		const user = await ctx.runQuery(api.users.get, {});
+		if (!user) throw new Error('User not found');
+
+		return {
+			ctx: { auth: { user } },
+			args: {}
+		};
+	}
+});
