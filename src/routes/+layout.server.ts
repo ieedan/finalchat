@@ -16,6 +16,7 @@ export async function load(event) {
 	return {
 		...baseMetaTags,
 		accessToken: event.locals.auth.accessToken,
+		organizationId: event.locals.auth.organizationId,
 		user: event.locals.auth.user,
 		fontPreset
 	};

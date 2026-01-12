@@ -23,6 +23,7 @@
 	"devDependencies": {
 		"@convex-dev/persistent-text-streaming": "^0.3.0",
 		"@convex-dev/r2": "^0.8.1",
+		"@convex-dev/workos-authkit": "^0.1.4",
 		"@dotenvx/dotenvx": "^1.51.1",
 		"@eslint/compat": "^2.0.0",
 		"@eslint/js": "^9.39.1",
@@ -78,6 +79,7 @@
 		"svelte-sonner": "^1.0.7",
 		"svelte-streamdown": "^3.0.0",
 		"svelte-toolbelt": "^0.10.6",
+		"sveltekit-superforms": "^2.29.1",
 		"tailwind-merge": "^3.4.0",
 		"tailwind-variants": "^3.2.2",
 		"tailwindcss": "^4.1.17",

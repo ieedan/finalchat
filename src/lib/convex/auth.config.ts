@@ -1,6 +1,6 @@
 import { env } from '../env.convex';
 
-const clientId = env.PUBLIC_WORKOS_CLIENT_ID;
+const clientId = env.WORKOS_CLIENT_ID;
 
 const authConfig = {
 	providers: [

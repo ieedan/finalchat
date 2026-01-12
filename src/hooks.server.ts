@@ -10,7 +10,7 @@ const redirectUri =
 	env.VERCEL_ENV === 'production' ? `https://finalchat.app/auth/callback` : previewRedirectUri;
 
 const authKitConfig = {
-	clientId: env.PUBLIC_WORKOS_CLIENT_ID,
+	clientId: env.WORKOS_CLIENT_ID,
 	apiKey: env.WORKOS_API_KEY,
 	redirectUri,
 	cookiePassword: env.WORKOS_COOKIE_PASSWORD

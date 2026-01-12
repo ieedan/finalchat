@@ -2,8 +2,11 @@ import { httpRouter } from 'convex/server';
 import { streamMessage } from './messages';
 import { httpAction } from './_generated/server';
 import { downloadFile } from './chatAttachments';
+import { authKit } from './auth';
 
 const http = httpRouter();
+
+authKit.registerRoutes(http);
 
 http.route({
 	path: '/messages/stream',

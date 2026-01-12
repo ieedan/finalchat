@@ -4,7 +4,6 @@ import { z } from 'zod';
 const _env = createEnv({
 	client: {
 		PUBLIC_CONVEX_URL: z.url(),
-		PUBLIC_WORKOS_CLIENT_ID: z.string()
 	},
 	emptyStringAsUndefined: true,
 	clientPrefix: 'PUBLIC_',

@@ -62,16 +62,49 @@ export default defineSchema({
 		submitOnEnter: v.optional(v.boolean())
 	}).index('by_user', ['userId']),
 	groups: defineTable({
+		workosGroupId: v.string(),
 		name: v.string(),
 		description: v.optional(v.string()),
 		options: v.object({
 			canViewMembersChats: v.optional(v.boolean()),
 			allowPublicChats: v.optional(v.boolean())
 		})
-	}),
+	}).index('by_group', ['workosGroupId']),
+	groupMembers: defineTable({
+		workosGroupId: v.string(),
+		workosMembershipId: v.string(),
+		userId: v.string(),
+		role: v.string()
+	})
+		.index('by_workos_group', ['workosGroupId'])
+		.index('by_workos_membership', ['workosMembershipId'])
+		.index('by_user', ['userId']),
+	invitations: defineTable({
+		workosInvitationId: v.string(),
+		invitedEmail: v.string(),
+		status: v.union(
+			v.literal('pending'),
+			v.literal('accepted'),
+			v.literal('revoked'),
+			v.literal('expired')
+		),
+		organization: v.object({
+			id: v.string(),
+			name: v.string()
+		}),
+		invitedBy: v.object({
+			id: v.string(),
+			name: v.string(),
+			email: v.string()
+		}),
+		expiresAt: v.number()
+	})
+		.index('by_workos_invitation', ['workosInvitationId'])
+		.index('by_invited', ['invitedEmail'])
+		.index('by_organization', ['organization.id']),
 	apiKeys: defineTable({
 		userId: v.optional(v.string()),
-		groupId: v.optional(v.id('groups')),
+		groupId: v.optional(v.string()),
 		name: v.optional(v.string()),
 		provider: v.union(v.literal('OpenRouter')),
 		key: v.string(),
@@ -81,7 +114,7 @@ export default defineSchema({
 		generating: v.boolean(),
 		generatingTitle: v.optional(v.boolean()),
 		userId: v.string(),
-		groupId: v.optional(v.id('groups')),
+		groupId: v.optional(v.string()),
 		title: v.string(),
 		updatedAt: v.number(),
 		pinned: v.boolean(),
@@ -95,7 +128,7 @@ export default defineSchema({
 	}).index('by_user', ['userId']),
 	chatAttachments: defineTable({
 		userId: v.string(),
-		groupId: v.optional(v.id('groups')),
+		groupId: v.optional(v.string()),
 		chatId: v.id('chats'),
 		messageId: v.id('messages'),
 		key: v.string(),

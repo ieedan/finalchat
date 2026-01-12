@@ -9,12 +9,15 @@
  */
 
 import type * as apiKeys from "../apiKeys.js";
+import type * as auth from "../auth.js";
 import type * as chatAttachments from "../chatAttachments.js";
 import type * as chats from "../chats.js";
 import type * as functions from "../functions.js";
+import type * as groups from "../groups.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as r2 from "../r2.js";
+import type * as user from "../user.js";
 import type * as userSettings from "../userSettings.js";
 
 import type {
@@ -25,12 +28,15 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
+  auth: typeof auth;
   chatAttachments: typeof chatAttachments;
   chats: typeof chats;
   functions: typeof functions;
+  groups: typeof groups;
   http: typeof http;
   messages: typeof messages;
   r2: typeof r2;
+  user: typeof user;
   userSettings: typeof userSettings;
 }>;
 
@@ -217,6 +223,43 @@ export declare const components: {
           size?: number;
         },
         { isNew: boolean }
+      >;
+    };
+  };
+  workOSAuthKit: {
+    lib: {
+      enqueueWebhookEvent: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          apiKey: string;
+          event: string;
+          eventId: string;
+          eventTypes?: Array<string>;
+          logLevel?: "DEBUG";
+          onEventHandle?: string;
+          updatedAt?: string;
+        },
+        any
+      >;
+      getAuthUser: FunctionReference<
+        "query",
+        "internal",
+        { id: string },
+        {
+          createdAt: string;
+          email: string;
+          emailVerified: boolean;
+          externalId?: null | string;
+          firstName?: null | string;
+          id: string;
+          lastName?: null | string;
+          lastSignInAt?: null | string;
+          locale?: null | string;
+          metadata: Record<string, any>;
+          profilePictureUrl?: null | string;
+          updatedAt: string;
+        } | null
       >;
     };
   };

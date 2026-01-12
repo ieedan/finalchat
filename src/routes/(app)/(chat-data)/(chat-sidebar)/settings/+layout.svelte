@@ -37,6 +37,9 @@
 						<AccountSettings.SidebarButton href="/settings/attachments">
 							Attachments
 						</AccountSettings.SidebarButton>
+						<AccountSettings.SidebarButton href="/settings/group">
+							Group
+						</AccountSettings.SidebarButton>
 					</AccountSettings.SidebarGroup>
 				</AccountSettings.Sidebar>
 				<AccountSettings.Content>

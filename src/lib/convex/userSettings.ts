@@ -1,14 +1,13 @@
 import { query } from './_generated/server';
 import { mutation } from './functions';
-import type { Doc } from './_generated/dataModel';
-import { getUserSettings } from './userSettings.utils';
+import { getUserSettings, type UserSettings } from './userSettings.utils';
 import merge from 'deepmerge';
 import { v } from 'convex/values';
 import { DEFAULT_ENABLED_MODEL_IDS } from '../ai.js';
 
 export const get = query({
 	args: {},
-	handler: async (ctx): Promise<Doc<'userSettings'> | null> => {
+	handler: async (ctx): Promise<UserSettings | null> => {
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) return null;
 

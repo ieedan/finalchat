@@ -16,10 +16,11 @@ import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte
 import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
+import type { UserSettings } from '$lib/convex/userSettings.utils.js';
 
 type ChatLayoutOptions = {
 	user: User | null;
-	userSettings: Doc<'userSettings'> | null;
+	userSettings: UserSettings | null;
 	chats: Doc<'chats'>[];
 	apiKey: Doc<'apiKeys'> | null;
 	models: (OpenRouter.Model & { lab: string | null })[];

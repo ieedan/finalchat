@@ -3,7 +3,9 @@ import { z } from 'zod';
 
 export const env = createEnv({
 	server: {
-		PUBLIC_WORKOS_CLIENT_ID: z.string(),
+		WORKOS_CLIENT_ID: z.string(),
+		WORKOS_API_KEY: z.string(),
+		WORKOS_WEBHOOK_SECRET: z.string(),
 		R2_TOKEN: z.string(),
 		R2_ACCESS_KEY_ID: z.string(),
 		R2_SECRET_ACCESS_KEY: z.string(),
