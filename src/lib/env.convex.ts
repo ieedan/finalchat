@@ -12,13 +12,9 @@ export const env = createEnv({
 		R2_ENDPOINT: z.url(),
 		R2_BUCKET: z.string(),
 		GITHUB_TOKEN: z.optional(z.string()),
-		CONVEX_ENVIRONMENT: z
-			.enum(['production', 'development'])
-			.default(
-				process.env.CONVEX_CLOUD_URL === 'https://rightful-grouse-394.convex.cloud'
-					? 'production'
-					: 'development'
-			)
+		// system environment variables https://docs.convex.dev/production/environment-variables#system-environment-variables
+		CONVEX_CLOUD_URL: z.string(),
+		CONVEX_SITE_URL: z.string()
 	},
 	emptyStringAsUndefined: true,
 	runtimeEnv: process.env

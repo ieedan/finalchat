@@ -473,22 +473,23 @@ export const processOrganizationUpdated = internalMutation({
  */
 export const pollEvents = internalAction(async (ctx) => {
 	// Get current cursor
-	const cursorDoc = await ctx.runQuery(internal.workos.getCursor);
+	const cursor = await ctx.runQuery(internal.workos.getCursor);
 
 	// don't start polling events until data sync has been completed in pre-production environments
-	// this will prevent issues where we have conflicting updates
-	if (cursorDoc === null && env.CONVEX_ENVIRONMENT === 'development') {
+	// this will prevent issues where we have conflicting updates because it will wait to start polling until the data sync has completed and updated the cursor
+	const isProduction = env.CONVEX_CLOUD_URL === 'https://rightful-grouse-394.convex.cloud';
+	if (isProduction && cursor === null) {
 		return;
 	}
 
 	let after: string | undefined = undefined;
 	let rangeStart: string | undefined = undefined;
 
-	if (cursorDoc?.cursor) {
-		after = cursorDoc.cursor;
-	} else if (cursorDoc?.lastProcessedAt) {
+	if (cursor?.cursor) {
+		after = cursor.cursor;
+	} else if (cursor?.lastProcessedAt) {
 		// Use timestamp if we have one but no cursor
-		rangeStart = new Date(cursorDoc.lastProcessedAt).toISOString();
+		rangeStart = new Date(cursor.lastProcessedAt).toISOString();
 	}
 
 	try {
@@ -498,8 +499,8 @@ export const pollEvents = internalAction(async (ctx) => {
 			rangeStart
 		});
 
-		let latestCursor: string | null = cursorDoc?.cursor || null;
-		let latestProcessedAt = cursorDoc?.lastProcessedAt || Date.now();
+		let latestCursor: string | null = cursor?.cursor || null;
+		let latestProcessedAt = cursor?.lastProcessedAt || Date.now();
 
 		// Process each event sequentially
 		for (const event of response.data) {
