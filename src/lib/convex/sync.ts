@@ -34,19 +34,19 @@ export const workos = internalAction(async (ctx) => {
 			canViewMembersChats: workosGroup.metadata?.canViewMembersChats === 'true',
 			allowPublicChats: workosGroup.metadata?.allowPublicChats === 'true'
 		});
-	}
 
-	const workosGroupMemberships = await authKit.workos.userManagement.listOrganizationMemberships(
-		{}
-	);
-
-	for (const workosGroupMembership of workosGroupMemberships.data) {
-		await ctx.runMutation(internal.sync.syncWorkosGroupMembership, {
-			workosGroupId: workosGroupMembership.organizationId,
-			workosMembershipId: workosGroupMembership.id,
-			workosUserId: workosGroupMembership.userId,
-			role: workosGroupMembership.role.slug
+		const workosGroupMemberships = await authKit.workos.userManagement.listOrganizationMemberships({
+			organizationId: workosGroup.id
 		});
+
+		for (const workosGroupMembership of workosGroupMemberships.data) {
+			await ctx.runMutation(internal.sync.syncWorkosGroupMembership, {
+				workosGroupId: workosGroupMembership.organizationId,
+				workosMembershipId: workosGroupMembership.id,
+				workosUserId: workosGroupMembership.userId,
+				role: workosGroupMembership.role.slug
+			});
+		}
 	}
 
 	const workosInvitations = await authKit.workos.userManagement.listInvitations({});
