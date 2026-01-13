@@ -18,6 +18,7 @@ import type * as groups from "../groups.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as r2 from "../r2.js";
+import type * as sync from "../sync.js";
 import type * as users from "../users.js";
 import type * as workos from "../workos.js";
 
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   messages: typeof messages;
   r2: typeof r2;
+  sync: typeof sync;
   users: typeof users;
   workos: typeof workos;
 }>;

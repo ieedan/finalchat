@@ -11,7 +11,7 @@
 		"build": "vite build",
 		"build:local": "dotenvx run -f .env.local -- pnpm build",
 		"preview": "vite preview",
-		"vercel:deploy": "CONVEX_VERBOSE=1 convex deploy --cmd-url-env-var-name PUBLIC_CONVEX_URL --cmd='sed -i.bak \"s|{{DEFAULT_CONVEX_URL_HERE}}|${PUBLIC_CONVEX_URL}|\" src/lib/env.server.ts && rm -f src/lib/env.server.ts.bak && pnpm build'",
+		"vercel:deploy": "CONVEX_VERBOSE=1 convex deploy --cmd-url-env-var-name PUBLIC_CONVEX_URL --preview-run 'sync:workos' --cmd='sed -i.bak \"s|{{DEFAULT_CONVEX_URL_HERE}}|${PUBLIC_CONVEX_URL}|\" src/lib/env.server.ts && rm -f src/lib/env.server.ts.bak && pnpm build'",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

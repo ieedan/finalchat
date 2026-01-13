@@ -36,6 +36,10 @@ export const get = query({
 	}
 });
 
+/**
+ * This is here to handle the case where a user created in workos has not yet been synced to the database before the user has been redirected to the app.
+ * This will create the new user so that there isn't any delay in the signup process.
+ */
 export const getOrSetup = mutation({
 	handler: async (ctx): Promise<User | null> => {
 		const workosUser = await authKit.getAuthUser(ctx);
