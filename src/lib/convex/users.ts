@@ -1,5 +1,5 @@
 import { query } from './_generated/server.js';
-import { authMutation } from './functions.js';
+import { authMutation, mutation } from './functions.js';
 import { getUser, type User } from './users.utils.js';
 import merge from 'deepmerge';
 import { v } from 'convex/values';
@@ -28,12 +28,31 @@ export const getGroupInvites = query({
 });
 
 export const get = query({
-	args: {},
 	handler: async (ctx): Promise<User | null> => {
 		const user = await authKit.getAuthUser(ctx);
 		if (!user) return null;
 
 		return getUser(ctx, user);
+	}
+});
+
+export const getOrSetup = mutation({
+	handler: async (ctx): Promise<User | null> => {
+		const workosUser = await authKit.getAuthUser(ctx);
+		if (!workosUser) return null;
+
+		const existingUser = await getUser(ctx, workosUser);
+		if (existingUser) return existingUser;
+
+		await ctx.db.insert('users', {
+			workosUserId: workosUser.id,
+			firstName: workosUser.firstName ?? null,
+			lastName: workosUser.lastName ?? null,
+			email: workosUser.email,
+			profilePictureUrl: workosUser.profilePictureUrl ?? null
+		});
+
+		return await getUser(ctx, workosUser);
 	}
 });
 

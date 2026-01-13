@@ -47,13 +47,26 @@ export const processEvent = internalMutation(
 	) => {
 		switch (event.event) {
 			case 'user.created': {
-				await ctx.db.insert('users', {
-					workosUserId: event.data.id,
-					firstName: event.data.firstName,
-					lastName: event.data.lastName,
-					email: event.data.email,
-					profilePictureUrl: event.data.profilePictureUrl
-				});
+				const user = await ctx.db
+					.query('users')
+					.withIndex('by_workos_user', (q) => q.eq('workosUserId', event.data.id))
+					.first();
+				if (user) {
+					await ctx.db.patch(user._id, {
+						firstName: event.data.firstName,
+						lastName: event.data.lastName,
+						email: event.data.email,
+						profilePictureUrl: event.data.profilePictureUrl
+					});
+				} else {
+					await ctx.db.insert('users', {
+						workosUserId: event.data.id,
+						firstName: event.data.firstName,
+						lastName: event.data.lastName,
+						email: event.data.email,
+						profilePictureUrl: event.data.profilePictureUrl
+					});
+				}
 				break;
 			}
 
