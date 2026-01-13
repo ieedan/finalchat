@@ -19,7 +19,7 @@ import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as r2 from "../r2.js";
 import type * as users from "../users.js";
-import type * as workosEvents from "../workosEvents.js";
+import type * as workos from "../workos.js";
 
 import type {
   ApiFromModules,
@@ -39,7 +39,7 @@ declare const fullApi: ApiFromModules<{
   messages: typeof messages;
   r2: typeof r2;
   users: typeof users;
-  workosEvents: typeof workosEvents;
+  workos: typeof workos;
 }>;
 
 /**

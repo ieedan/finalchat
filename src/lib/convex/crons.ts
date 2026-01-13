@@ -8,7 +8,7 @@ crons.interval(
 	{
 		seconds: 5
 	},
-	internal.workosEvents.pollEvents
+	internal.workos.pollEvents
 );
 
 export default crons;

@@ -244,12 +244,11 @@ export const processEvent = internalMutation(
  */
 export const pollEvents = internalAction(async (ctx) => {
 	// Get current cursor
-	const cursorDoc = await ctx.runQuery(internal.workosEvents.getCursor);
+	const cursorDoc = await ctx.runQuery(internal.workos.getCursor);
 
 	let after: string | undefined = undefined;
 	let rangeStart: string | undefined = undefined;
 
-	// Use cursor if available, otherwise use timestamp from last 30 days
 	if (cursorDoc?.cursor) {
 		after = cursorDoc.cursor;
 	} else if (cursorDoc?.lastProcessedAt) {
@@ -270,7 +269,7 @@ export const pollEvents = internalAction(async (ctx) => {
 		// Process each event sequentially
 		for (const event of response.data) {
 			// Process event
-			await ctx.runMutation(internal.workosEvents.processEvent, { event });
+			await ctx.runMutation(internal.workos.processEvent, { event });
 
 			// Update cursor to this event's ID
 			latestCursor = event.id;
@@ -279,7 +278,7 @@ export const pollEvents = internalAction(async (ctx) => {
 
 		// Update cursor after processing all events
 		if (response.data.length > 0) {
-			await ctx.runMutation(internal.workosEvents.updateCursor, {
+			await ctx.runMutation(internal.workos.updateCursor, {
 				cursor: latestCursor,
 				lastProcessedAt: latestProcessedAt
 			});
