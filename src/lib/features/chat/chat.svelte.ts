@@ -78,6 +78,10 @@ class ChatLayoutState {
 		return page.params.chatId as Id<'chats'> | undefined;
 	}
 
+	get isPartOfAGroup() {
+		return Boolean(this.user?.membership?.workosGroupId);
+	}
+
 	get isChatOwner() {
 		return this.chatId
 			? this.chatsQuery.data?.find((c) => c._id === this.chatId)?.workosUserId ===
@@ -153,3 +157,5 @@ export function setupChatView(opts: ChatViewOptions) {
 export function useChatView() {
 	return ChatViewCtx.get();
 }
+
+export { type ChatLayoutState, type ChatViewState };

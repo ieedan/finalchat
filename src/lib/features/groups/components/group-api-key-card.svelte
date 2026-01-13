@@ -10,54 +10,30 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as Field from '$lib/components/ui/field';
 	import ApiKeyInput from '$lib/features/api-keys/api-key-input.svelte';
-	import { encryptApiKey } from '$lib/features/api-keys/api-keys.remote';
 	import { superForm, defaults } from 'sveltekit-superforms';
 	import { zod4 } from 'sveltekit-superforms/adapters';
-	import { useConvexClient } from 'convex-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
-	import { toast } from 'svelte-sonner';
-	import { api } from '$lib/convex/_generated/api';
 	import { resource } from 'runed';
 	import type { ApiKey } from '$lib/features/models/openrouter';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { useGroupSettings } from '../group.svelte';
 
 	const chatLayoutState = useChatLayout();
-
-	const client = useConvexClient();
-
+	const groupSettingsState = useGroupSettings();
 	const uid = $props.id();
 
-	const form = superForm(
-		defaults(
-			{
-				get apiKey() {
-					return chatLayoutState.apiKey ?? '';
-				}
-			},
-			zod4(UpdateGroupApiKeySchema)
-		),
-		{
-			id: uid,
-			validators: zod4(UpdateGroupApiKeySchema),
-			onUpdate: async ({ form }) => {
-				if (!form.valid) return;
+	const form = superForm(defaults(zod4(UpdateGroupApiKeySchema)), {
+		id: uid,
+		validators: zod4(UpdateGroupApiKeySchema),
+		onUpdate: async ({ form }) => {
+			if (!form.valid) return;
 
-				try {
-					const encryptedApiKey = await encryptApiKey({ key: form.data.apiKey });
-					await client.mutation(api.groups.updateGroupApiKey, {
-						apiKey: encryptedApiKey
-					});
-				} catch (error) {
-					toast.error('Failed to save API key', {
-						description: error instanceof Error ? error.message : 'Unknown error'
-					});
-				}
-			},
-			SPA: true,
-			dataType: 'json'
-		}
-	);
+			await groupSettingsState.updateApiKey(form.data.apiKey);
+		},
+		SPA: true,
+		dataType: 'json'
+	});
 
 	const { form: fd, enhance, submitting } = form;
 
@@ -80,8 +56,18 @@
 			const { data } = await res.json();
 
 			return data as ApiKey;
+		},
+		{
+			debounce: 100
 		}
 	);
+
+	// if someone sees this and wants to fix it please do
+	// this is a hack to get the api key to update when the user submits the form
+	$effect(() => {
+		if ($submitting) return;
+		$fd.apiKey = chatLayoutState.apiKey ?? '';
+	});
 </script>
 
 <Card.Root class="gap-3">
@@ -121,7 +107,14 @@
 			</Field.Group>
 		</Card.Content>
 		<Card.Footer class="flex items-center justify-end">
-			<Button type="submit" variant="default" loading={$submitting}>Save</Button>
+			<Button
+				type="submit"
+				variant="default"
+				loading={$submitting}
+				disabled={$fd.apiKey === chatLayoutState.apiKey}
+			>
+				Save
+			</Button>
 		</Card.Footer>
 	</form>
 </Card.Root>

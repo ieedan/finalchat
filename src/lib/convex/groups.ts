@@ -3,10 +3,10 @@ import { query } from './_generated/server';
 import { authAction, authMutation, internalMutation } from './functions';
 import { authKit } from './auth';
 import { updateUserMembership } from './auth.utils';
-import { internal } from './_generated/api';
+import { api, internal } from './_generated/api';
 import { asyncMap } from 'convex-helpers';
 
-export const getGroup = query({
+export const get = query({
 	args: {
 		groupId: v.optional(v.string())
 	},
@@ -143,6 +143,69 @@ export const updateGroupApiKey = authMutation({
 
 		await ctx.db.patch(group._id, {
 			key: args.apiKey
+		});
+	}
+});
+
+export const getMemberByWorkosUserId = query({
+	args: {
+		workosUserId: v.string()
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db
+			.query('groupMembers')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', args.workosUserId))
+			.first();
+	}
+});
+
+export const removeMemberFromGroup = authAction({
+	args: {
+		workosUserId: v.string()
+	},
+	handler: async (ctx, args) => {
+		if (!ctx.auth.user.membership) throw new Error('User is not a member of a group');
+		if (ctx.auth.user.membership.role !== 'admin') throw new Error('User is not an admin');
+		if (args.workosUserId === ctx.auth.user.workosUserId) {
+			throw new Error('Cannot remove yourself from the group. Use leave group instead.');
+		}
+
+		const memberToRemove = await ctx.runQuery(api.groups.getMemberByWorkosUserId, {
+			workosUserId: args.workosUserId
+		});
+
+		if (!memberToRemove) throw new Error('Member not found');
+		if (memberToRemove.workosGroupId !== ctx.auth.user.membership.workosGroupId) {
+			throw new Error('Member is not in the same group');
+		}
+
+		await authKit.workos.userManagement.deleteOrganizationMembership(
+			memberToRemove.workosMembershipId
+		);
+
+		await ctx.runMutation(internal.groups.internalUpdateUserMembership, {
+			userId: args.workosUserId,
+			membershipId: memberToRemove.workosMembershipId,
+			organizationId: null,
+			role: null
+		});
+	}
+});
+
+export const inviteMemberToGroup = authAction({
+	args: {
+		email: v.string(),
+		role: v.union(v.literal('admin'), v.literal('member'))
+	},
+	handler: async (ctx, args) => {
+		if (!ctx.auth.user.membership) throw new Error('User is not a member of a group');
+		if (ctx.auth.user.membership.role !== 'admin') throw new Error('User is not an admin');
+
+		await authKit.workos.userManagement.sendInvitation({
+			email: args.email,
+			organizationId: ctx.auth.user.membership.workosGroupId,
+			roleSlug: args.role,
+			inviterUserId: ctx.auth.user.workosUserId
 		});
 	}
 });

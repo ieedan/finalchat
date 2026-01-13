@@ -1,114 +1,89 @@
 <script lang="ts">
 	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import * as Card from '$lib/components/ui/card';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import { useCachedQuery } from '$lib/cache/cached-query.svelte';
-	import { api } from '$lib/convex/_generated/api';
+	import * as Item from '$lib/components/ui/item';
+	import { Button } from '$lib/components/ui/button';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte.js';
-	import { DoorOpenIcon, EllipsisIcon } from '@lucide/svelte';
-	import * as Table from '$lib/components/ui/table';
+	import { DoorOpenIcon } from '@lucide/svelte';
 	import GroupsCreateDialog from '$lib/features/groups/components/groups-create-dialog.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { useConvexClient } from 'convex-svelte';
-	import { toast } from 'svelte-sonner';
 	import * as Field from '$lib/components/ui/field';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
-	import * as Avatar from '$lib/components/ui/avatar';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import GroupApiKeyCard from '$lib/features/groups/components/group-api-key-card.svelte';
+	import GroupMembersCard from '$lib/features/groups/components/group-members-card.svelte';
+	import { setupGroupSettings } from '$lib/features/groups/group.svelte';
+	import { useCachedQuery } from '$lib/cache/cached-query.svelte';
+	import { api } from '$lib/convex/_generated/api';
+	import * as Table from '$lib/components/ui/table';
 
 	const chatLayoutState = useChatLayout();
 
-	const groupQuery = useCachedQuery(api.groups.getGroup, {
-		get groupId() {
-			return chatLayoutState.user?.membership?.workosGroupId;
-		}
-	});
+	const groupSettingsState = setupGroupSettings();
+
 	const invitationsQuery = useCachedQuery(api.users.getGroupInvites, {});
-
-	const isPartOfAGroup = $derived(Boolean(chatLayoutState.user?.membership?.workosGroupId));
-
-	const client = useConvexClient();
-
-	async function leaveGroup() {
-		try {
-			await client.action(api.groups.leaveGroup, {});
-		} catch (error) {
-			toast.error('Failed to leave group', {
-				description: error instanceof Error ? error.message : 'Unknown error'
-			});
-		}
-	}
 </script>
 
 <AccountSettings.Page>
 	<Card.Root class="gap-3">
-		<div class="flex items-center justify-between w-full">
-			<Card.Header class="flex-1 flex flex-col items-start justify-center">
-				<Card.Title>
-					{#if isPartOfAGroup}
-						{#if groupQuery.isLoading}
-							<Skeleton class="w-24 h-5.5" />
-						{:else}
-							<div class="flex items-center gap-2">
-								<span class="font-medium">
-									{groupQuery.data?.name}
-								</span>
-								{#if chatLayoutState.user?.membership?.role === 'admin'}
-									<Badge variant="default">Admin</Badge>
-								{/if}
-							</div>
-						{/if}
+		<Card.Header class="flex-1 flex flex-col items-start justify-center">
+			<Card.Title>
+				{#if chatLayoutState.isPartOfAGroup}
+					{#if groupSettingsState.groupQuery.isLoading}
+						<Skeleton class="w-24 h-5.5" />
 					{:else}
-						You are not currently part of a group
-					{/if}
-				</Card.Title>
-				{#if isPartOfAGroup}
-					{#if groupQuery.data?.description}
-						<Card.Description>
-							{groupQuery.data.description}
-						</Card.Description>
+						<div class="flex items-center gap-2">
+							<span class="font-medium">
+								{groupSettingsState.group?.name}
+							</span>
+							{#if groupSettingsState.isAdmin}
+								<Badge variant="default">Admin</Badge>
+							{/if}
+						</div>
 					{/if}
 				{:else}
-					<Card.Description>Join or create a group to continue.</Card.Description>
+					You are not currently part of a group
 				{/if}
-			</Card.Header>
+			</Card.Title>
+			{#if chatLayoutState.isPartOfAGroup}
+				{#if groupSettingsState.group?.description}
+					<Card.Description>
+						{groupSettingsState.group.description}
+					</Card.Description>
+				{/if}
+			{:else}
+				<Card.Description>Join or create a group to continue.</Card.Description>
+			{/if}
+		</Card.Header>
+		{#if !chatLayoutState.isPartOfAGroup}
 			<div class="px-4">
-				{#if isPartOfAGroup}
-					<Button variant="destructive" class="gap-2" onClickPromise={leaveGroup}>
-						<DoorOpenIcon class="size-4" />
-						Leave
-					</Button>
-				{:else}
-					<GroupsCreateDialog />
-				{/if}
+				<GroupsCreateDialog />
 			</div>
-		</div>
-		{#if isPartOfAGroup}
+		{/if}
+		{#if chatLayoutState.isPartOfAGroup}
 			<Card.Content>
 				<Field.Group>
 					<Field.Set>
 						<Field.Group class="gap-3">
 							<Field.Field orientation="horizontal" class="gap-2">
-								{#if groupQuery.isLoading}
+								{#if groupSettingsState.groupQuery.isLoading}
 									<Skeleton class="size-4 rounded-[4px]" />
 								{:else}
 									<Checkbox
 										readonly
-										checked={groupQuery.data?.options?.canViewMembersChats}
+										checked={groupSettingsState.group?.options?.canViewMembersChats}
 										class="border-border"
 									/>
 								{/if}
 								<Field.Label>Can view members chats</Field.Label>
 							</Field.Field>
 							<Field.Field orientation="horizontal" class="gap-2">
-								{#if groupQuery.isLoading}
+								{#if groupSettingsState.groupQuery.isLoading}
 									<Skeleton class="size-4 rounded-[4px]" />
 								{:else}
 									<Checkbox
 										readonly
-										checked={groupQuery.data?.options?.allowPublicChats}
+										checked={groupSettingsState.group?.options?.allowPublicChats}
 										class="border-border"
 									/>
 								{/if}
@@ -120,79 +95,30 @@
 			</Card.Content>
 		{/if}
 	</Card.Root>
-	{#if isPartOfAGroup}
-		{#if chatLayoutState.user?.membership?.role === 'admin'}
+	{#if chatLayoutState.isPartOfAGroup}
+		{#if groupSettingsState.isAdmin}
 			<GroupApiKeyCard />
 		{/if}
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Members</Card.Title>
-				<Card.Description>Manage the group members.</Card.Description>
-			</Card.Header>
-			<Card.Content>
-				<div class="border border-border rounded-lg bg-background">
-					<Table.Root>
-						<Table.Header>
-							<Table.Row>
-								<Table.Head>Member</Table.Head>
-								<Table.Head>Role</Table.Head>
-								<Table.Head></Table.Head>
-							</Table.Row>
-						</Table.Header>
-						<Table.Body>
-							{#each groupQuery.data?.members ?? [] as member (member.workosUserId)}
-								<Table.Row>
-									<Table.Cell>
-										<div class="flex items-center gap-2">
-											<Avatar.Root class="size-7">
-												<Avatar.Image src={member.profilePictureUrl} />
-												<Avatar.Fallback>
-													{member.firstName?.charAt(0)}
-												</Avatar.Fallback>
-											</Avatar.Root>
-											<div class="flex flex-col">
-												<p class="font-medium text-xs">{member.firstName} {member.lastName}</p>
-												<p class="text-xs text-muted-foreground">{member.email}</p>
-											</div>
-										</div>
-									</Table.Cell>
-									<Table.Cell>{member.role}</Table.Cell>
-									<Table.Cell>
-										<div class="flex justify-end">
-											<DropdownMenu.Root>
-												<DropdownMenu.Trigger
-													class={buttonVariants({ variant: 'ghost', size: 'icon' })}
-												>
-													<EllipsisIcon />
-												</DropdownMenu.Trigger>
-												<DropdownMenu.Content align="end" side="bottom">
-													<DropdownMenu.Item
-														variant="destructive"
-														disabled={chatLayoutState.user?.membership?.role !== 'admin' ||
-															member.workosUserId === chatLayoutState.user?.workosUserId}
-													>
-														Remove from group
-													</DropdownMenu.Item>
-												</DropdownMenu.Content>
-											</DropdownMenu.Root>
-										</div>
-									</Table.Cell>
-								</Table.Row>
-							{/each}
-						</Table.Body>
-					</Table.Root>
-				</div>
-			</Card.Content>
-		</Card.Root>
+		<GroupMembersCard />
+		<Item.Root variant="outline" class="bg-card">
+			<Item.Content>
+				<Item.Title>Leave Group</Item.Title>
+				<Item.Description>
+					Leave this group. You will lose access to all group features and shared resources.
+				</Item.Description>
+			</Item.Content>
+			<Item.Actions>
+				<Button variant="destructive" class="gap-2" onClickPromise={groupSettingsState.leaveGroup}>
+					<DoorOpenIcon class="size-4" />
+					Leave
+				</Button>
+			</Item.Actions>
+		</Item.Root>
 	{/if}
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>Invitations</Card.Title>
-			<Card.Description>
-				{isPartOfAGroup
-					? 'Joining a group will cause you to leave your current group'
-					: 'Join a group to get started'}
-			</Card.Description>
+			<Card.Description>Join a group to get started</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<div class="border border-border rounded-lg bg-background">
@@ -223,7 +149,6 @@
 					</Table.Body>
 				</Table.Root>
 			</div>
-			<!-- TODO: group invitations display -->
 		</Card.Content>
 	</Card.Root>
 </AccountSettings.Page>

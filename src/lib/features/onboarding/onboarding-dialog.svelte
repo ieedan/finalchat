@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import * as Modal from '$lib/components/ui/modal';
 	import type { User } from '$lib/convex/users.utils.js';
 	import OnboardingChooseModeView from './onboarding-choose-mode-view.svelte';
@@ -11,7 +12,7 @@
 	let { user }: Props = $props();
 </script>
 
-{#if user && !user?.onboarding?.completed}
+{#if user && !user?.onboarding?.completed && !page.url.pathname.startsWith('/settings')}
 	<Modal.Root open={true}>
 		<Modal.Content
 			escapeKeydownBehavior="ignore"

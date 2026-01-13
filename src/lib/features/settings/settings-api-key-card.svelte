@@ -43,6 +43,9 @@
 			const { data } = await res.json();
 
 			return data as ApiKey;
+		},
+		{
+			debounce: 100
 		}
 	);
 </script>

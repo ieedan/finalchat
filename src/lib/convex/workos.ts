@@ -1,9 +1,10 @@
-import { internalAction, internalMutation, internalQuery } from './_generated/server';
-import { updateUserMembership } from './auth.utils';
+import { internalAction, internalQuery } from './_generated/server';
+import { internalMutation } from './functions';
 import { z } from 'zod';
 import { authKit } from './auth';
 import { internal } from './_generated/api';
-import type { EventName } from '@workos-inc/node';
+import { v } from 'convex/values';
+import type { EventName, Organization, User } from '@workos-inc/node';
 
 const EVENT_TYPES: EventName[] = [
 	'user.created',
@@ -39,7 +40,7 @@ export const updateCursor = internalMutation(
 	}
 );
 
-export const processEvent = internalMutation(
+export const processEvent = internalAction(
 	async (
 		ctx,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,56 +48,33 @@ export const processEvent = internalMutation(
 	) => {
 		switch (event.event) {
 			case 'user.created': {
-				const user = await ctx.db
-					.query('users')
-					.withIndex('by_workos_user', (q) => q.eq('workosUserId', event.data.id))
-					.first();
-				if (user) {
-					await ctx.db.patch(user._id, {
-						firstName: event.data.firstName,
-						lastName: event.data.lastName,
-						email: event.data.email,
-						profilePictureUrl: event.data.profilePictureUrl
-					});
-				} else {
-					await ctx.db.insert('users', {
-						workosUserId: event.data.id,
-						firstName: event.data.firstName,
-						lastName: event.data.lastName,
-						email: event.data.email,
-						profilePictureUrl: event.data.profilePictureUrl
-					});
-				}
+				await ctx.runMutation(internal.workos.processUserCreated, {
+					id: event.data.id,
+					firstName: event.data.firstName,
+					lastName: event.data.lastName,
+					email: event.data.email,
+					profilePictureUrl: event.data.profilePictureUrl
+				});
 				break;
 			}
 
 			case 'user.deleted': {
-				const user = await ctx.db
-					.query('users')
-					.withIndex('by_workos_user', (q) => q.eq('workosUserId', event.data.id))
-					.first();
-				if (user) {
-					await ctx.db.delete(user._id);
-				}
+				await ctx.runMutation(internal.workos.processUserDeleted, {
+					id: event.data.id
+				});
 				break;
 			}
 
 			case 'user.updated': {
-				const user = await ctx.db
-					.query('users')
-					.withIndex('by_workos_user', (q) => q.eq('workosUserId', event.data.id))
-					.first();
-				if (user) {
-					await ctx.db.patch(user._id, {
-						workosUserId: event.data.id
-					});
-				}
+				await ctx.runMutation(internal.workos.processUserUpdated, {
+					id: event.data.id
+				});
 				break;
 			}
 
 			case 'organization_membership.created': {
 				if (event.data.status !== 'active') break;
-				await updateUserMembership(ctx, {
+				await ctx.runMutation(internal.workos.processOrganizationMembershipCreated, {
 					organizationId: event.data.organizationId,
 					role: event.data.role.slug,
 					userId: event.data.userId,
@@ -106,9 +84,7 @@ export const processEvent = internalMutation(
 			}
 
 			case 'organization_membership.deleted': {
-				await updateUserMembership(ctx, {
-					organizationId: null,
-					role: null,
+				await ctx.runMutation(internal.workos.processOrganizationMembershipDeleted, {
 					userId: event.data.userId,
 					membershipId: event.data.id
 				});
@@ -116,7 +92,7 @@ export const processEvent = internalMutation(
 			}
 
 			case 'organization_membership.updated': {
-				await updateUserMembership(ctx, {
+				await ctx.runMutation(internal.workos.processOrganizationMembershipUpdated, {
 					organizationId: event.data.organizationId,
 					role: event.data.role.slug,
 					userId: event.data.userId,
@@ -128,71 +104,46 @@ export const processEvent = internalMutation(
 			case 'invitation.created': {
 				if (!event.data.organizationId || !event.data.inviterUserId) break;
 
-				const [organization, inviter] = await Promise.all([
-					authKit.workos.organizations.getOrganization(event.data.organizationId),
-					authKit.workos.userManagement.getUser(event.data.inviterUserId)
-				]);
+				let organization: Organization | undefined;
+				let inviter: User | undefined;
+				try {
+					[organization, inviter] = await Promise.all([
+						authKit.workos.organizations.getOrganization(event.data.organizationId),
+						authKit.workos.userManagement.getUser(event.data.inviterUserId)
+					]);
+				} catch {
+					break;
+				}
 
-				const oldInvitation = await ctx.db
-					.query('invitations')
-					.withIndex('by_workos_invitation', (q) => q.eq('workosInvitationId', event.data.id))
-					.first();
-				if (oldInvitation) break;
-
-				await ctx.db.insert('invitations', {
-					status: event.data.state,
+				await ctx.runMutation(internal.workos.processInvitationCreated, {
 					workosInvitationId: event.data.id,
 					invitedEmail: event.data.email,
-					organization: {
-						workosOrganizationId: event.data.organizationId,
-						name: organization.name
-					},
-					invitedBy: {
-						workosUserId: event.data.inviterUserId,
-						name: `${inviter.firstName} ${inviter.lastName}`,
-						email: inviter.email
-					},
-					expiresAt: Date.parse(event.data.expiresAt)
+					status: event.data.state,
+					expiresAt: event.data.expiresAt,
+					organizationId: event.data.organizationId,
+					organizationName: organization.name,
+					inviterUserId: event.data.inviterUserId,
+					inviterName: `${inviter.firstName} ${inviter.lastName}`,
+					inviterEmail: inviter.email
 				});
 				break;
 			}
 
 			case 'invitation.accepted': {
-				const invitation = await ctx.db
-					.query('invitations')
-					.withIndex('by_workos_invitation', (q) => q.eq('workosInvitationId', event.data.id))
-					.first();
-
-				if (invitation) {
-					await ctx.db.patch(invitation._id, {
-						status: 'accepted'
-					});
-				}
+				await ctx.runMutation(internal.workos.processInvitationAccepted, {
+					workosInvitationId: event.data.id
+				});
 				break;
 			}
 
 			case 'invitation.revoked': {
-				const invitation = await ctx.db
-					.query('invitations')
-					.withIndex('by_workos_invitation', (q) => q.eq('workosInvitationId', event.data.id))
-					.first();
-
-				if (invitation) {
-					await ctx.db.patch(invitation._id, {
-						status: 'revoked',
-						workosInvitationId: event.data.id
-					});
-				}
+				await ctx.runMutation(internal.workos.processInvitationRevoked, {
+					workosInvitationId: event.data.id
+				});
 				break;
 			}
 
 			case 'organization.created': {
-				const oldGroup = await ctx.db
-					.query('groups')
-					.withIndex('by_group', (q) => q.eq('workosGroupId', event.data.id))
-					.first();
-				if (oldGroup) break;
-
 				const MetaDataSchema = z.object({
 					canViewMembersChats: z
 						.union([z.literal('true'), z.literal('false')])
@@ -207,41 +158,28 @@ export const processEvent = internalMutation(
 
 				const options = MetaDataSchema.parse(event.data.metadata || {});
 
-				await ctx.db.insert('groups', {
-					workosGroupId: event.data.id,
+				await ctx.runMutation(internal.workos.processOrganizationCreated, {
+					id: event.data.id,
 					name: event.data.name,
 					description: options.description,
-					options: {
-						canViewMembersChats: options.canViewMembersChats,
-						allowPublicChats: options.allowPublicChats
-					},
-					key: '',
-					encryptionMode: 'RSA'
+					canViewMembersChats: options.canViewMembersChats,
+					allowPublicChats: options.allowPublicChats
 				});
 				break;
 			}
 
 			case 'organization.deleted': {
-				const group = await ctx.db
-					.query('groups')
-					.withIndex('by_group', (q) => q.eq('workosGroupId', event.data.id))
-					.first();
-				if (group) {
-					await ctx.db.delete(group._id);
-				}
+				await ctx.runMutation(internal.workos.processOrganizationDeleted, {
+					id: event.data.id
+				});
 				break;
 			}
 
 			case 'organization.updated': {
-				const group = await ctx.db
-					.query('groups')
-					.withIndex('by_group', (q) => q.eq('workosGroupId', event.data.id))
-					.first();
-				if (group) {
-					await ctx.db.patch(group._id, {
-						name: event.data.name
-					});
-				}
+				await ctx.runMutation(internal.workos.processOrganizationUpdated, {
+					id: event.data.id,
+					name: event.data.name
+				});
 				break;
 			}
 
@@ -251,6 +189,283 @@ export const processEvent = internalMutation(
 		}
 	}
 );
+
+export const processUserCreated = internalMutation({
+	args: {
+		id: v.string(),
+		firstName: v.union(v.string(), v.null()),
+		lastName: v.union(v.string(), v.null()),
+		email: v.string(),
+		profilePictureUrl: v.union(v.string(), v.null())
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.db
+			.query('users')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', args.id))
+			.first();
+		if (user) {
+			await ctx.db.patch(user._id, {
+				firstName: args.firstName,
+				lastName: args.lastName,
+				email: args.email,
+				profilePictureUrl: args.profilePictureUrl
+			});
+		} else {
+			await ctx.db.insert('users', {
+				workosUserId: args.id,
+				firstName: args.firstName,
+				lastName: args.lastName,
+				email: args.email,
+				profilePictureUrl: args.profilePictureUrl
+			});
+		}
+	}
+});
+
+export const processUserDeleted = internalMutation({
+	args: {
+		id: v.string()
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.db
+			.query('users')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', args.id))
+			.first();
+		if (user) {
+			await ctx.db.delete(user._id);
+		}
+	}
+});
+
+export const processUserUpdated = internalMutation({
+	args: {
+		id: v.string()
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.db
+			.query('users')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', args.id))
+			.first();
+		if (user) {
+			await ctx.db.patch(user._id, {
+				workosUserId: args.id
+			});
+		}
+	}
+});
+
+export const processOrganizationMembershipCreated = internalMutation({
+	args: {
+		organizationId: v.string(),
+		role: v.string(),
+		userId: v.string(),
+		membershipId: v.string()
+	},
+	handler: async (ctx, args) => {
+		const membership = await ctx.db
+			.query('groupMembers')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', args.userId))
+			.first();
+		if (membership) {
+			await ctx.db.patch(membership._id, {
+				workosGroupId: args.organizationId,
+				role: args.role
+			});
+		} else {
+			await ctx.db.insert('groupMembers', {
+				workosGroupId: args.organizationId,
+				workosMembershipId: args.membershipId,
+				workosUserId: args.userId,
+				role: args.role
+			});
+		}
+	}
+});
+
+export const processOrganizationMembershipDeleted = internalMutation({
+	args: {
+		userId: v.string(),
+		membershipId: v.string()
+	},
+	handler: async (ctx, args) => {
+		const membership = await ctx.db
+			.query('groupMembers')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', args.userId))
+			.first();
+		if (membership) {
+			await ctx.db.delete(membership._id);
+		}
+	}
+});
+
+export const processOrganizationMembershipUpdated = internalMutation({
+	args: {
+		organizationId: v.string(),
+		role: v.string(),
+		userId: v.string(),
+		membershipId: v.string()
+	},
+	handler: async (ctx, args) => {
+		const membership = await ctx.db
+			.query('groupMembers')
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', args.userId))
+			.first();
+		if (membership) {
+			await ctx.db.patch(membership._id, {
+				workosGroupId: args.organizationId,
+				role: args.role
+			});
+		} else {
+			await ctx.db.insert('groupMembers', {
+				workosGroupId: args.organizationId,
+				workosMembershipId: args.membershipId,
+				workosUserId: args.userId,
+				role: args.role
+			});
+		}
+	}
+});
+
+export const processInvitationCreated = internalMutation({
+	args: {
+		workosInvitationId: v.string(),
+		invitedEmail: v.string(),
+		status: v.union(
+			v.literal('pending'),
+			v.literal('accepted'),
+			v.literal('revoked'),
+			v.literal('expired')
+		),
+		expiresAt: v.string(),
+		organizationId: v.string(),
+		organizationName: v.string(),
+		inviterUserId: v.string(),
+		inviterName: v.string(),
+		inviterEmail: v.string()
+	},
+	handler: async (ctx, args) => {
+		const oldInvitation = await ctx.db
+			.query('invitations')
+			.withIndex('by_workos_invitation', (q) => q.eq('workosInvitationId', args.workosInvitationId))
+			.first();
+		if (oldInvitation) return;
+
+		await ctx.db.insert('invitations', {
+			status: args.status,
+			workosInvitationId: args.workosInvitationId,
+			invitedEmail: args.invitedEmail,
+			organization: {
+				workosOrganizationId: args.organizationId,
+				name: args.organizationName
+			},
+			invitedBy: {
+				workosUserId: args.inviterUserId,
+				name: args.inviterName,
+				email: args.inviterEmail
+			},
+			expiresAt: Date.parse(args.expiresAt)
+		});
+	}
+});
+
+export const processInvitationAccepted = internalMutation({
+	args: {
+		workosInvitationId: v.string()
+	},
+	handler: async (ctx, args) => {
+		const invitation = await ctx.db
+			.query('invitations')
+			.withIndex('by_workos_invitation', (q) => q.eq('workosInvitationId', args.workosInvitationId))
+			.first();
+
+		if (invitation) {
+			await ctx.db.patch(invitation._id, {
+				status: 'accepted'
+			});
+		}
+	}
+});
+
+export const processInvitationRevoked = internalMutation({
+	args: {
+		workosInvitationId: v.string()
+	},
+	handler: async (ctx, args) => {
+		const invitation = await ctx.db
+			.query('invitations')
+			.withIndex('by_workos_invitation', (q) => q.eq('workosInvitationId', args.workosInvitationId))
+			.first();
+
+		if (invitation) {
+			await ctx.db.patch(invitation._id, {
+				status: 'revoked',
+				workosInvitationId: args.workosInvitationId
+			});
+		}
+	}
+});
+
+export const processOrganizationCreated = internalMutation({
+	args: {
+		id: v.string(),
+		name: v.string(),
+		description: v.optional(v.string()),
+		canViewMembersChats: v.optional(v.boolean()),
+		allowPublicChats: v.optional(v.boolean())
+	},
+	handler: async (ctx, args) => {
+		const oldGroup = await ctx.db
+			.query('groups')
+			.withIndex('by_group', (q) => q.eq('workosGroupId', args.id))
+			.first();
+		if (oldGroup) return;
+
+		await ctx.db.insert('groups', {
+			workosGroupId: args.id,
+			name: args.name,
+			description: args.description,
+			options: {
+				canViewMembersChats: args.canViewMembersChats ?? false,
+				allowPublicChats: args.allowPublicChats ?? true
+			},
+			key: '',
+			encryptionMode: 'RSA'
+		});
+	}
+});
+
+export const processOrganizationDeleted = internalMutation({
+	args: {
+		id: v.string()
+	},
+	handler: async (ctx, args) => {
+		const group = await ctx.db
+			.query('groups')
+			.withIndex('by_group', (q) => q.eq('workosGroupId', args.id))
+			.first();
+		if (group) {
+			await ctx.db.delete(group._id);
+		}
+	}
+});
+
+export const processOrganizationUpdated = internalMutation({
+	args: {
+		id: v.string(),
+		name: v.string()
+	},
+	handler: async (ctx, args) => {
+		const group = await ctx.db
+			.query('groups')
+			.withIndex('by_group', (q) => q.eq('workosGroupId', args.id))
+			.first();
+		if (group) {
+			await ctx.db.patch(group._id, {
+				name: args.name
+			});
+		}
+	}
+});
 
 /**
  * Scheduled in crons.ts
@@ -282,7 +497,7 @@ export const pollEvents = internalAction(async (ctx) => {
 		// Process each event sequentially
 		for (const event of response.data) {
 			// Process event
-			await ctx.runMutation(internal.workos.processEvent, { event });
+			await ctx.runAction(internal.workos.processEvent, { event });
 
 			// Update cursor to this event's ID
 			latestCursor = event.id;

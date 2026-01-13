@@ -21,32 +21,23 @@
 	import { cn } from '$lib/utils';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Checkbox } from '$lib/components/ui/checkbox';
-	import { useConvexClient } from 'convex-svelte';
-	import { api } from '$lib/convex/_generated/api';
-	import { toast } from 'svelte-sonner';
 	import ApiKeyInput from '$lib/features/api-keys/api-key-input.svelte';
-	import { encryptApiKey } from '$lib/features/api-keys/api-keys.remote';
+	import { useGroupSettings } from '../group.svelte';
 
-	const client = useConvexClient();
+	const groupSettingsState = useGroupSettings();
 
 	const form = superForm(defaults(zod4(CreateGroupSchema)), {
 		validators: zod4(CreateGroupSchema),
 		onUpdate: async ({ form }) => {
 			if (!form.valid) return;
-			try {
-				const encryptedApiKey = await encryptApiKey({ key: form.data.apiKey });
-				await client.action(api.groups.createGroup, {
-					name: form.data.name,
-					description: form.data.description,
-					canViewMembersChats: form.data.canViewMembersChats,
-					allowPublicChats: form.data.allowPublicChats,
-					apiKeyEncrypted: encryptedApiKey
-				});
-			} catch (error) {
-				toast.error('Failed to create group', {
-					description: error instanceof Error ? error.message : 'Unknown error'
-				});
-			}
+
+			await groupSettingsState.createGroup({
+				name: form.data.name,
+				description: form.data.description,
+				canViewMembersChats: form.data.canViewMembersChats,
+				allowPublicChats: form.data.allowPublicChats,
+				apiKey: form.data.apiKey
+			});
 		},
 		SPA: true
 	});
