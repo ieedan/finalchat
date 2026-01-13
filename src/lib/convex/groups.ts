@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { query } from './_generated/server';
-import { authAction, internalMutation } from './functions';
+import { authAction, authMutation, internalMutation } from './functions';
 import { authKit } from './auth';
 import { updateUserMembership } from './auth.utils';
 import { internal } from './_generated/api';
@@ -51,10 +51,11 @@ export const createGroup = authAction({
 		name: v.string(),
 		description: v.optional(v.string()),
 		canViewMembersChats: v.boolean(),
-		allowPublicChats: v.boolean()
+		allowPublicChats: v.boolean(),
+		apiKeyEncrypted: v.string()
 	},
 	handler: async (ctx, args) => {
-		if (!ctx.auth.user.membership) throw new Error('User already belongs to a group');
+		if (ctx.auth.user.membership) throw new Error('User already belongs to a group');
 
 		const workosGroup = await authKit.workos.organizations.createOrganization({
 			name: args.name,
@@ -77,7 +78,8 @@ export const createGroup = authAction({
 				name: workosGroup.name,
 				description: args.description ?? '',
 				canViewMembersChats: args.canViewMembersChats,
-				allowPublicChats: args.allowPublicChats
+				allowPublicChats: args.allowPublicChats,
+				apiKeyEncrypted: args.apiKeyEncrypted
 			}),
 			ctx.runMutation(internal.groups.internalUpdateUserMembership, {
 				userId: ctx.auth.user.workosUserId,
@@ -125,19 +127,42 @@ export const leaveGroup = authAction({
 	}
 });
 
+export const updateGroupApiKey = authMutation({
+	args: {
+		apiKey: v.string()
+	},
+	handler: async (ctx, args) => {
+		if (!ctx.auth.user.membership) throw new Error('User is not a member of a group');
+		if (ctx.auth.user.membership.role !== 'admin') throw new Error('User is not an admin');
+
+		const group = await ctx.db
+			.query('groups')
+			.withIndex('by_group', (q) => q.eq('workosGroupId', ctx.auth.user.membership!.workosGroupId))
+			.first();
+		if (!group) throw new Error('Group not found');
+
+		await ctx.db.patch(group._id, {
+			key: args.apiKey
+		});
+	}
+});
+
 export const internalCreateGroup = internalMutation({
 	args: {
 		workosGroupId: v.string(),
 		name: v.string(),
 		description: v.optional(v.string()),
 		canViewMembersChats: v.boolean(),
-		allowPublicChats: v.boolean()
+		allowPublicChats: v.boolean(),
+		apiKeyEncrypted: v.string()
 	},
 	handler: async (ctx, args) => {
 		return await ctx.db.insert('groups', {
 			workosGroupId: args.workosGroupId,
 			name: args.name,
 			description: args.description ?? '',
+			encryptionMode: 'RSA',
+			key: args.apiKeyEncrypted,
 			options: {
 				canViewMembersChats: args.canViewMembersChats,
 				allowPublicChats: args.allowPublicChats

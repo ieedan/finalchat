@@ -2,7 +2,6 @@
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import ApiKeyInput from '../api-keys/api-key-input.svelte';
-	import { useLocalApiKey } from '../api-keys/local-key-storage.svelte';
 	import { createApiKey } from '../api-keys/api-keys.remote';
 	import { Button } from '$lib/components/ui/button';
 	import type { ApiKey } from '../models/openrouter';
@@ -12,21 +11,13 @@
 
 	const chatLayoutState = useChatLayout();
 
-	const localApiKey = useLocalApiKey();
-
-	let storage: 'Local' | 'Remote' = $derived(localApiKey.current ? 'Local' : 'Remote');
 	let apiKey = $derived<string>(chatLayoutState.apiKey ?? '');
 
 	let loading = $state(false);
 
 	async function handleSave() {
 		loading = true;
-		if (storage === 'Local') {
-			localApiKey.current = apiKey;
-		} else {
-			await createApiKey({ key: apiKey }).updates(chatLayoutState.apiKeysQuery);
-			localApiKey.current = null;
-		}
+		await createApiKey({ key: apiKey }).updates(chatLayoutState.apiKeysQuery);
 		toast.success('API key updated!');
 		loading = false;
 	}
@@ -71,7 +62,7 @@
 			class="flex flex-col gap-4"
 		>
 			<div class="flex flex-col gap-1">
-				<ApiKeyInput bind:apiKey bind:storage />
+				<ApiKeyInput bind:apiKey />
 				<div>
 					{#if apiKeyInfoResource.current}
 						<span class="text-muted-foreground flex h-6 place-items-center text-xs">

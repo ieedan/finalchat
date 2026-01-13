@@ -16,6 +16,7 @@
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import GroupApiKeyCard from '$lib/features/groups/components/group-api-key-card.svelte';
 
 	const chatLayoutState = useChatLayout();
 
@@ -39,6 +40,10 @@
 			});
 		}
 	}
+
+	async function saveApiKey() {}
+
+	let apiKey = $derived(chatLayoutState.apiKey ?? '');
 </script>
 
 <AccountSettings.Page>
@@ -120,6 +125,9 @@
 		{/if}
 	</Card.Root>
 	{#if isPartOfAGroup}
+		{#if chatLayoutState.user?.membership?.role === 'admin'}
+			<GroupApiKeyCard />
+		{/if}
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>Members</Card.Title>

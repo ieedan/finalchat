@@ -5,7 +5,8 @@
 		name: z.string().min(1),
 		description: z.string().optional(),
 		canViewMembersChats: z.boolean().default(false),
-		allowPublicChats: z.boolean().default(true)
+		allowPublicChats: z.boolean().default(true),
+		apiKey: z.string().min(1)
 	});
 </script>
 
@@ -23,14 +24,24 @@
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
 	import { toast } from 'svelte-sonner';
+	import ApiKeyInput from '$lib/features/api-keys/api-key-input.svelte';
+	import { encryptApiKey } from '$lib/features/api-keys/api-keys.remote';
 
 	const client = useConvexClient();
 
 	const form = superForm(defaults(zod4(CreateGroupSchema)), {
 		validators: zod4(CreateGroupSchema),
 		onUpdate: async ({ form }) => {
+			if (!form.valid) return;
 			try {
-				await client.action(api.groups.createGroup, form.data);
+				const encryptedApiKey = await encryptApiKey({ key: form.data.apiKey });
+				await client.action(api.groups.createGroup, {
+					name: form.data.name,
+					description: form.data.description,
+					canViewMembersChats: form.data.canViewMembersChats,
+					allowPublicChats: form.data.allowPublicChats,
+					apiKeyEncrypted: encryptedApiKey
+				});
 			} catch (error) {
 				toast.error('Failed to create group', {
 					description: error instanceof Error ? error.message : 'Unknown error'
@@ -76,6 +87,14 @@
 						<Field.Field orientation="horizontal" class="gap-2">
 							<Checkbox bind:checked={$fd.allowPublicChats} class="border-border" />
 							<Field.Label>Allow members to create public chats</Field.Label>
+						</Field.Field>
+					</Field.Group>
+				</Field.Set>
+				<Field.Set>
+					<Field.Group>
+						<Field.Field>
+							<Field.Label>API Key</Field.Label>
+							<ApiKeyInput bind:apiKey={$fd.apiKey} />
 						</Field.Field>
 					</Field.Group>
 				</Field.Set>

@@ -76,6 +76,8 @@ export default defineSchema({
 		workosGroupId: v.string(),
 		name: v.string(),
 		description: v.optional(v.string()),
+		key: v.string(),
+		encryptionMode: v.union(v.literal('RSA')),
 		options: v.object({
 			canViewMembersChats: v.optional(v.boolean()),
 			allowPublicChats: v.optional(v.boolean())

@@ -1,17 +1,33 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import type { Doc } from './_generated/dataModel';
 import { authKit } from './auth';
+import { getUser } from './users.utils';
 
 export const get = query({
-	handler: async (ctx): Promise<Doc<'apiKeys'> | null> => {
-		const user = await authKit.getAuthUser(ctx);
+	handler: async (ctx): Promise<{ key: string; encryptionMode: 'RSA' } | null> => {
+		const workosUser = await authKit.getAuthUser(ctx);
+		if (!workosUser) return null;
+
+		const user = await getUser(ctx, workosUser);
 		if (!user) return null;
 
-		return await ctx.db
+		if (user.membership) {
+			const group = await ctx.db
+				.query('groups')
+				.withIndex('by_group', (q) => q.eq('workosGroupId', user.membership?.workosGroupId ?? ''))
+				.first();
+			if (!group) return null;
+
+			return { key: group.key, encryptionMode: group.encryptionMode };
+		}
+
+		const apiKey = await ctx.db
 			.query('apiKeys')
-			.withIndex('by_workos_user', (q) => q.eq('workosUserId', user.id))
+			.withIndex('by_workos_user', (q) => q.eq('workosUserId', user.workosUserId))
 			.first();
+		if (!apiKey) return null;
+
+		return { key: apiKey.key, encryptionMode: apiKey.encryptionMode };
 	}
 });
 

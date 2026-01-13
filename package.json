@@ -49,7 +49,7 @@
 		"@zxcvbn-ts/core": "^3.0.4",
 		"@zxcvbn-ts/language-common": "^3.0.4",
 		"@zxcvbn-ts/language-en": "^3.0.2",
-		"ai": "^5.0.110",
+		"ai": "^6.0.31",
 		"animated-svelte": "^0.0.0",
 		"bits-ui": "^2.14.4",
 		"browser-image-compression": "^2.0.2",

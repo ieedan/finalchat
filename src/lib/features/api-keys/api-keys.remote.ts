@@ -12,9 +12,7 @@ export const getApiKey = query(async () => {
 	const apiKey = await locals.convex.query(api.apiKeys.get, {});
 	if (!apiKey) return null;
 
-	apiKey.key = key.decrypt(apiKey.key, 'utf8');
-
-	return apiKey;
+	return key.decrypt(apiKey.key, 'utf8');
 });
 
 export const createApiKey = command(
@@ -27,5 +25,14 @@ export const createApiKey = command(
 		args.key = key.encrypt(args.key, 'base64');
 
 		await locals.convex.mutation(api.apiKeys.createOrUpdate, { key: args.key });
+	}
+);
+
+export const encryptApiKey = command(
+	z.object({
+		key: z.string()
+	}),
+	async (args) => {
+		return key.encrypt(args.key, 'base64');
 	}
 );

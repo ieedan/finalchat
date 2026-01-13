@@ -5,23 +5,14 @@
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import { useConvexClient } from 'convex-svelte';
 	import * as Field from '$lib/components/ui/field';
-	import { useLocalApiKey } from '$lib/features/api-keys/local-key-storage.svelte';
 	import ApiKeyInput from '../api-keys/api-key-input.svelte';
 	import { createApiKey } from '$lib/features/api-keys/api-keys.remote';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
-
-	let storage = $state<'Local' | 'Remote'>('Remote');
 	let apiKey = $state<string>('');
 
 	const chatLayoutState = useChatLayout();
 
-	const localApiKey = useLocalApiKey();
-
 	const convex = useConvexClient();
-
-	// async function skip() {
-	// 	await convex.mutation(api.users.completeSetupApiKey, {});
-	// }
 
 	const canSubmit = $derived(Boolean(apiKey));
 
@@ -30,12 +21,8 @@
 	async function submit(e: SubmitEvent) {
 		e.preventDefault();
 		submitting = true;
-		if (storage === 'Local') {
-			localApiKey.current = apiKey;
-		} else {
-			await createApiKey({ key: apiKey }).updates(chatLayoutState.apiKeysQuery);
-			localApiKey.current = null;
-		}
+
+		await createApiKey({ key: apiKey }).updates(chatLayoutState.apiKeysQuery);
 
 		await convex.mutation(api.users.completeSetupApiKey, {});
 		submitting = false;
@@ -59,7 +46,7 @@
 		</Modal.Description>
 	</Modal.Header>
 	<Field.Group class="gap-2">
-		<ApiKeyInput bind:apiKey bind:storage />
+		<ApiKeyInput bind:apiKey />
 	</Field.Group>
 	<div class="flex items-center justify-end">
 		<!-- <Button variant="outline" onClickPromise={skip}>Skip</Button> -->

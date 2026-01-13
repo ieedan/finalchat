@@ -8,7 +8,7 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import {
 	generateText,
 	AISDKError,
-	Experimental_Agent as ToolLoopAgent,
+	ToolLoopAgent,
 	type StreamTextResult,
 	type ModelMessage,
 	streamText
@@ -245,6 +245,8 @@ export const streamMessage = httpAction(async (ctx, request) => {
 		streamId,
 		async (ctx, _request, _streamId, append) => {
 			let last: ReturnType<typeof getLastUserAndAssistantMessages> | null = null;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			let streamResult: StreamTextResult<any, any> | null = null;
 			try {
 				const { messages, chat } = await ctx.runQuery(internal.messages.getMessagesForChat, {
 					chatId
@@ -320,8 +322,6 @@ ${systemPrompt}
 					});
 				}
 
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				let streamResult: StreamTextResult<any, unknown>;
 				if (last.userMessage.chatSettings.supportedParameters?.includes('tools')) {
 					const agent = new ToolLoopAgent({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
@@ -340,7 +340,7 @@ ${systemPrompt}
 						} satisfies ContextType
 					});
 
-					streamResult = agent.stream({
+					streamResult = await agent.stream({
 						messages: modelMessages
 					});
 				} else {
@@ -438,12 +438,36 @@ ${systemPrompt}
 				}
 			} catch (error) {
 				if (!last) return;
+				let lastError: string | null = null;
+				if (streamResult) {
+					const { fullStream } = streamResult;
+
+					for await (const chunk of fullStream) {
+						if (chunk.type === 'error') {
+							if (AISDKError.isInstance(chunk.error)) {
+								if (
+									chunk.error.name === 'AI_APICallError' &&
+									chunk.error.message === 'User not found.'
+								) {
+									lastError = 'Invalid API key.';
+								} else {
+									lastError = chunk.error.message;
+								}
+							} else if (chunk.error instanceof Error) {
+								lastError = chunk.error.message;
+							} else {
+								lastError = String(chunk.error);
+							}
+						}
+					}
+				}
 				await ctx.runMutation(internal.messages.updateMessageError, {
 					messageId: last.assistantMessage._id,
 					error:
-						error instanceof AISDKError
+						lastError ??
+						(error instanceof Error
 							? error.message
-							: 'There was an error generating the response'
+							: 'There was an unknown error generating the response')
 				});
 			}
 		}

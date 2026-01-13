@@ -159,7 +159,9 @@ export const { authKitEvent } = authKit.events({
 			workosGroupId: event.data.id,
 			name: event.data.name,
 			description: options.description,
-			options: options
+			options: options,
+			key: '',
+			encryptionMode: 'RSA'
 		});
 	},
 	'organization.deleted': async (ctx, event) => {

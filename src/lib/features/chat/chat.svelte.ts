@@ -6,11 +6,10 @@ import { useConvexClient } from 'convex-svelte';
 import { page } from '$app/state';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { Context, PersistedState } from 'runed';
+import { Context } from 'runed';
 import type { ConvexClient } from 'convex/browser';
 import type { RemoteQuery } from '@sveltejs/kit';
 import { getApiKey } from '../api-keys/api-keys.remote.js';
-import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
 import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
 import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
@@ -20,7 +19,7 @@ import type { User } from '$lib/convex/users.utils.js';
 type ChatLayoutOptions = {
 	user: User | null;
 	chats: Doc<'chats'>[];
-	apiKey: Doc<'apiKeys'> | null;
+	apiKey: string | null;
 	models: (OpenRouter.Model & { lab: string | null })[];
 };
 
@@ -28,8 +27,7 @@ class ChatLayoutState {
 	createdMessages = new SvelteSet<Id<'messages'>>();
 	userQuery: Query<typeof api.users.get>;
 	chatsQuery: Query<typeof api.chats.getAll>;
-	apiKeysQuery: RemoteQuery<Doc<'apiKeys'> | null>;
-	localApiKey: PersistedState<string | null>;
+	apiKeysQuery: RemoteQuery<string | null>;
 	client: ConvexClient;
 	constructor(readonly opts: ChatLayoutOptions) {
 		this.client = useConvexClient();
@@ -50,7 +48,6 @@ class ChatLayoutState {
 		);
 
 		this.apiKeysQuery = getApiKey();
-		this.localApiKey = useLocalApiKey();
 
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
@@ -89,9 +86,7 @@ class ChatLayoutState {
 	}
 
 	get apiKey(): string | null {
-		return (
-			this.localApiKey.current ?? this.apiKeysQuery.current?.key ?? this.opts.apiKey?.key ?? null
-		);
+		return this.apiKeysQuery.current ?? this.opts.apiKey ?? null;
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments }) => {
