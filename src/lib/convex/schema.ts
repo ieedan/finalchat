@@ -157,5 +157,9 @@ export default defineSchema({
 		.index('by_key', ['key'])
 		.index('by_workos_user', ['workosUserId'])
 		.index('by_workos_group', ['workosGroupId']),
-	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
+	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId']),
+	eventCursor: defineTable({
+		cursor: v.union(v.string(), v.null()),
+		lastProcessedAt: v.number()
+	})
 });

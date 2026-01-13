@@ -12,12 +12,14 @@ import type * as apiKeys from "../apiKeys.js";
 import type * as auth from "../auth.js";
 import type * as chatAttachments from "../chatAttachments.js";
 import type * as chats from "../chats.js";
+import type * as crons from "../crons.js";
 import type * as functions from "../functions.js";
 import type * as groups from "../groups.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as r2 from "../r2.js";
 import type * as users from "../users.js";
+import type * as workosEvents from "../workosEvents.js";
 
 import type {
   ApiFromModules,
@@ -30,12 +32,14 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   chatAttachments: typeof chatAttachments;
   chats: typeof chats;
+  crons: typeof crons;
   functions: typeof functions;
   groups: typeof groups;
   http: typeof http;
   messages: typeof messages;
   r2: typeof r2;
   users: typeof users;
+  workosEvents: typeof workosEvents;
 }>;
 
 /**
