@@ -40,10 +40,6 @@
 			});
 		}
 	}
-
-	async function saveApiKey() {}
-
-	let apiKey = $derived(chatLayoutState.apiKey ?? '');
 </script>
 
 <AccountSettings.Page>
