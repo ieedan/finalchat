@@ -11,7 +11,14 @@ export const env = createEnv({
 		R2_SECRET_ACCESS_KEY: z.string(),
 		R2_ENDPOINT: z.url(),
 		R2_BUCKET: z.string(),
-		GITHUB_TOKEN: z.optional(z.string())
+		GITHUB_TOKEN: z.optional(z.string()),
+		CONVEX_ENVIRONMENT: z
+			.enum(['production', 'development'])
+			.default(
+				process.env.CONVEX_CLOUD_URL === 'https://rightful-grouse-394.convex.cloud'
+					? 'production'
+					: 'development'
+			)
 	},
 	emptyStringAsUndefined: true,
 	runtimeEnv: process.env

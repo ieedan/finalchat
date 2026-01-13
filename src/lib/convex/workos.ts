@@ -5,6 +5,7 @@ import { authKit } from './auth';
 import { internal } from './_generated/api';
 import { v } from 'convex/values';
 import type { EventName, Organization, User } from '@workos-inc/node';
+import { env } from '../env.convex';
 
 const EVENT_TYPES: EventName[] = [
 	'user.created',
@@ -473,6 +474,12 @@ export const processOrganizationUpdated = internalMutation({
 export const pollEvents = internalAction(async (ctx) => {
 	// Get current cursor
 	const cursorDoc = await ctx.runQuery(internal.workos.getCursor);
+
+	// don't start polling events until data sync has been completed in pre-production environments
+	// this will prevent issues where we have conflicting updates
+	if (cursorDoc === null && env.CONVEX_ENVIRONMENT === 'development') {
+		return;
+	}
 
 	let after: string | undefined = undefined;
 	let rangeStart: string | undefined = undefined;
