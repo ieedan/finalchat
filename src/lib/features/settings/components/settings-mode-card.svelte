@@ -8,6 +8,7 @@
 	import { ModelIdCtx } from '$lib/context.svelte';
 	import { BASIC_MODELS } from '$lib/ai';
 	import { toast } from 'svelte-sonner';
+	import { useSettingsSetting, type Setting } from '../settings.svelte';
 
 	const client = useConvexClient();
 
@@ -37,9 +38,17 @@
 	}
 
 	const modeHasChanged = $derived(mode !== chatLayoutState.user?.settings?.mode);
+
+	const meta: Setting = {
+		id: 'mode',
+		title: 'Chat Experience',
+		description: 'Customize your chat experience.'
+	};
+
+	const settingState = useSettingsSetting(meta);
 </script>
 
-<Card.Root>
+<Card.Root style={settingState.style}>
 	<Card.Header>
 		<Card.Title>Chat Experience</Card.Title>
 		<Card.Description>Customize your chat experience.</Card.Description>

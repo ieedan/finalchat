@@ -104,7 +104,7 @@
 				>
 					<img src="/chat/{chat._id}/og.png" alt="OG" class="w-full aspect-video object-fit" />
 				</a>
-				<Snippet class="bg-popover" text={shareUrl} />
+				<Snippet class="bg-input" text={shareUrl} />
 			{/if}
 		</Drawer.Content>
 	</Drawer.Root>
@@ -140,7 +140,7 @@
 				>
 					<img src="/chat/{chat._id}/og.png" alt="OG" class="w-full aspect-video object-fit" />
 				</a>
-				<Snippet class="bg-popover" text={shareUrl} />
+				<Snippet class="bg-input" text={shareUrl} />
 			{/if}
 		</Popover.Content>
 	</Popover.Root>

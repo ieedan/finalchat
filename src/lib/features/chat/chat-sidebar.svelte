@@ -67,71 +67,73 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 </div>
 
 <Sidebar.Root variant="inset">
-	<Sidebar.Header class="pt-[2px]">
-		<div class="flex items-center justify-center h-9">
-			<a href="/chat" class="text-2xl font-bold">
-				<FinalChat class="size-6" />
-			</a>
-			{#if sidebar.isMobile}
-				<Sidebar.Trigger class="absolute left-2" />
-			{/if}
-		</div>
-		<Sidebar.MenuButton>
-			{#snippet child({ props: { class: _, ...props } })}
-				<a
-					href="/chat"
-					class={cn(
-						buttonVariants({ variant: 'default' }),
-						chatLayoutState.isAdvancedMode && 'flex items-center justify-between'
-					)}
-					{...props}
-				>
-					<span class="flex items-center gap-2">
-						<PlusIcon class="size-4!" />
-						New Chat
-					</span>
-					{#if chatLayoutState.isAdvancedMode}
-						<Kbd.Group
-							class="**:data-[slot=kbd]:bg-transparent **:data-[slot=kbd]:text-foreground gap-0"
-						>
-							<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
-							<Kbd.Root>⇧</Kbd.Root>
-							<Kbd.Root>O</Kbd.Root>
-						</Kbd.Group>
-					{/if}
+	<div class="py-2 px-.5 flex flex-col h-full w-full">
+		<Sidebar.Header class="pt-[2px]">
+			<div class="flex items-center justify-center h-9">
+				<a href="/chat" class="text-2xl font-bold">
+					<FinalChat class="size-6" />
 				</a>
-			{/snippet}
-		</Sidebar.MenuButton>
-	</Sidebar.Header>
-	<Sidebar.Content>
-		{#if pinnedChats.length > 0}
-			<Sidebar.Group class="py-0">
-				<Sidebar.GroupLabel>Pinned</Sidebar.GroupLabel>
-				<Sidebar.GroupContent>
-					<Sidebar.Menu class="gap-0.5">
-						{#each pinnedChats as chat (chat._id)}
-							<ChatButton {chat} gotoOpen={chatGotoDialogOpen} gotoIndex={gotoChatIndex} />
-						{/each}
-					</Sidebar.Menu>
-				</Sidebar.GroupContent>
-			</Sidebar.Group>
-		{/if}
-		{#each Object.entries(groups) as [name, chats] (name)}
-			{#if chats.length > 0}
+				{#if sidebar.isMobile}
+					<Sidebar.Trigger class="absolute left-2" />
+				{/if}
+			</div>
+			<Sidebar.MenuButton>
+				{#snippet child({ props: { class: _, ...props } })}
+					<a
+						href="/chat"
+						class={cn(
+							buttonVariants({ variant: 'default' }),
+							chatLayoutState.isAdvancedMode && 'flex items-center justify-between'
+						)}
+						{...props}
+					>
+						<span class="flex items-center gap-2">
+							<PlusIcon class="size-4!" />
+							New Chat
+						</span>
+						{#if chatLayoutState.isAdvancedMode}
+							<Kbd.Group
+								class="**:data-[slot=kbd]:bg-transparent **:data-[slot=kbd]:text-foreground gap-0"
+							>
+								<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
+								<Kbd.Root>⇧</Kbd.Root>
+								<Kbd.Root>O</Kbd.Root>
+							</Kbd.Group>
+						{/if}
+					</a>
+				{/snippet}
+			</Sidebar.MenuButton>
+		</Sidebar.Header>
+		<Sidebar.Content>
+			{#if pinnedChats.length > 0}
 				<Sidebar.Group class="py-0">
-					<Sidebar.GroupLabel>{name}</Sidebar.GroupLabel>
+					<Sidebar.GroupLabel>Pinned</Sidebar.GroupLabel>
 					<Sidebar.GroupContent>
 						<Sidebar.Menu class="gap-0.5">
-							{#each chats as chat (chat._id)}
+							{#each pinnedChats as chat (chat._id)}
 								<ChatButton {chat} gotoOpen={chatGotoDialogOpen} gotoIndex={gotoChatIndex} />
 							{/each}
 						</Sidebar.Menu>
 					</Sidebar.GroupContent>
 				</Sidebar.Group>
 			{/if}
-		{/each}
-	</Sidebar.Content>
-	<Sidebar.Footer>
+			{#each Object.entries(groups) as [name, chats] (name)}
+				{#if chats.length > 0}
+					<Sidebar.Group class="py-0">
+						<Sidebar.GroupLabel>{name}</Sidebar.GroupLabel>
+						<Sidebar.GroupContent>
+							<Sidebar.Menu class="gap-0.5">
+								{#each chats as chat (chat._id)}
+									<ChatButton {chat} gotoOpen={chatGotoDialogOpen} gotoIndex={gotoChatIndex} />
+								{/each}
+							</Sidebar.Menu>
+						</Sidebar.GroupContent>
+					</Sidebar.Group>
+				{/if}
+			{/each}
+		</Sidebar.Content>
+	</div>
+	<Sidebar.Footer class="bg-background border-t border-border">
 		{#if chatLayoutState.user}
 			<Sidebar.MenuButton>
 				{#snippet child({ props })}

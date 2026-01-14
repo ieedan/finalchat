@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import ApiKeyInput from '../api-keys/api-key-input.svelte';
-	import { createApiKey } from '../api-keys/api-keys.remote';
+	import ApiKeyInput from '../../api-keys/api-key-input.svelte';
+	import { createApiKey } from '../../api-keys/api-keys.remote';
 	import { Button } from '$lib/components/ui/button';
-	import type { ApiKey } from '../models/openrouter';
+	import type { ApiKey } from '../../models/openrouter';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { resource } from 'runed';
 	import { toast } from 'svelte-sonner';
+	import { useSettingsSetting, type Setting } from '../settings.svelte';
 
 	const chatLayoutState = useChatLayout();
 
@@ -48,12 +49,20 @@
 			debounce: 100
 		}
 	);
+
+	const meta: Setting = {
+		id: 'api-key',
+		title: 'API Key',
+		description: 'Manage your API key.'
+	};
+
+	const settingState = useSettingsSetting(meta);
 </script>
 
-<Card.Root>
+<Card.Root style={settingState.style}>
 	<Card.Header>
-		<Card.Title>API Key</Card.Title>
-		<Card.Description>Manage your API key.</Card.Description>
+		<Card.Title>{meta.title}</Card.Title>
+		<Card.Description>{meta.description}</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form

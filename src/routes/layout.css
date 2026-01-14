@@ -11,7 +11,7 @@
 	--card-foreground: var(--foreground);
 	--popover: var(--card);
 	--popover-foreground: var(--card-foreground);
-	--primary: oklch(50.54% 0.190493416205484 27.518097674677847);
+	--primary: oklch(0.5662 0.1905 27.52);
 	--primary-foreground: oklch(98.18% 0.005391873657638326 95.09859092511448);
 	--secondary: oklch(0.274 0.006 286.033);
 	--secondary-foreground: oklch(0.985 0 0);
@@ -21,7 +21,7 @@
 	--accent-foreground: var(--foreground);
 	--destructive: oklch(0.704 0.191 22.216);
 	--destructive-foreground: oklch(21.61% 0.00612555066067004 56.0433322108949);
-	--border: oklch(0.3448 0.006286933207768164 34.29748037425685);
+	--border: oklch(0.2984 0.006286933207768164 34.29748037425685);
 	--input: oklch(26.85% 0.006286933207768164 34.29748037425685);
 	--ring: oklch(0.552 0.016 285.938);
 	--sidebar: oklch(0.141 0.005 285.823);
@@ -82,6 +82,8 @@
 	/* For shiny text */
 	--animate-shimmer: shimmer 1s infinite;
 	--animate-shake: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+
+	--breakpoint-settings: 850px;
 }
 
 /* For shiny text */
@@ -96,7 +98,7 @@
 
 @layer base {
 	* {
-		@apply border-border outline-ring/50 font-light;
+		@apply border-border outline-ring/50;
 	}
 	body {
 		@apply bg-background text-foreground;

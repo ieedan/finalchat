@@ -7,6 +7,7 @@
 	import { api } from '$lib/convex/_generated/api';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import * as Kbd from '$lib/components/ui/kbd';
+	import { useSettingsSetting, type Setting } from '../settings.svelte';
 
 	const client = useConvexClient();
 	const chatLayoutState = useChatLayout();
@@ -18,9 +19,17 @@
 			submitOnEnter: value
 		});
 	}
+
+	const meta: Setting = {
+		id: 'submit-behavior',
+		title: 'Submit on Enter',
+		description: 'Customize the behavior of the submit button.'
+	};
+
+	const settingState = useSettingsSetting(meta);
 </script>
 
-<Card.Root>
+<Card.Root style={settingState.style}>
 	<Card.Content>
 		<div class="flex items-center justify-between gap-4">
 			<div class="flex flex-col gap-1">
