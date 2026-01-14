@@ -42,7 +42,10 @@ export const get = query({
  */
 export const getOrSetup = mutation({
 	handler: async (ctx): Promise<User | null> => {
+		const user = await ctx.auth.getUserIdentity();
+		console.log('basic user', user);
 		const workosUser = await authKit.getAuthUser(ctx);
+		console.log('workosUser', workosUser);
 		if (!workosUser) return null;
 
 		const existingUser = await getUser(ctx, workosUser);
