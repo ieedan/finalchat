@@ -35,8 +35,6 @@
 	};
 
 	const settingState = useSettingsSetting(meta);
-
-    $inspect(settingState.style)
 </script>
 
 <Card.Root style={settingState.style} class={cn('gap-4')}>

@@ -12,7 +12,6 @@ import type * as apiKeys from "../apiKeys.js";
 import type * as auth from "../auth.js";
 import type * as chatAttachments from "../chatAttachments.js";
 import type * as chats from "../chats.js";
-import type * as crons from "../crons.js";
 import type * as functions from "../functions.js";
 import type * as groups from "../groups.js";
 import type * as http from "../http.js";
@@ -20,7 +19,6 @@ import type * as messages from "../messages.js";
 import type * as r2 from "../r2.js";
 import type * as sync from "../sync.js";
 import type * as users from "../users.js";
-import type * as workos from "../workos.js";
 
 import type {
   ApiFromModules,
@@ -33,7 +31,6 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   chatAttachments: typeof chatAttachments;
   chats: typeof chats;
-  crons: typeof crons;
   functions: typeof functions;
   groups: typeof groups;
   http: typeof http;
@@ -41,7 +38,6 @@ declare const fullApi: ApiFromModules<{
   r2: typeof r2;
   sync: typeof sync;
   users: typeof users;
-  workos: typeof workos;
 }>;
 
 /**

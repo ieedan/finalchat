@@ -13,7 +13,10 @@
 	let { value = $bindable('') }: Props = $props();
 
 	useSettingsSearchInput({
-		value: box.with(() => value, (v) => (value = v))
+		value: box.with(
+			() => value,
+			(v) => (value = v)
+		)
 	});
 </script>
 

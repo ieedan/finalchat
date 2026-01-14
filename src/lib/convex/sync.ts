@@ -72,12 +72,6 @@ export const workos = internalAction(async (ctx) => {
 			organizationName: organization.name
 		});
 	}
-
-	// Set cursor to current time after sync completes
-	await ctx.runMutation(internal.workos.updateCursor, {
-		cursor: null,
-		lastProcessedAt: Date.now()
-	});
 });
 
 export const syncWorkosUser = internalMutation({
