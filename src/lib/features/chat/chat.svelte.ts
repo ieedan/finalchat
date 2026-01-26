@@ -13,7 +13,8 @@ import type { RemoteQuery } from '@sveltejs/kit';
 import { getApiKey } from '../api-keys/api-keys.remote.js';
 import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
 import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
-import { SvelteSet } from 'svelte/reactivity';w
+import { SvelteSet } from 'svelte/reactivity';
+w;
 import type * as OpenRouter from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 
@@ -65,9 +66,7 @@ class ChatLayoutState {
 	}
 
 	get enabledModels() {
-		return this.models.filter((model) =>
-			this.userSettings?.favoriteModelIds?.includes(model.id)
-		);
+		return this.models.filter((model) => this.userSettings?.favoriteModelIds?.includes(model.id));
 	}
 
 	get user() {
