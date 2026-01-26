@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { tool } from 'ai';
 
 export type ContextType = {

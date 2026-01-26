@@ -48,7 +48,7 @@
 	]);
 
 	const mobileModels = $derived(
-		chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'
+		chatLayoutState.isAdvancedMode
 			? chatLayoutState.models.filter((model) =>
 					chatLayoutState.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
 				)
@@ -69,7 +69,7 @@
 		<div class="flex w-full items-center flex-col justify-center">
 			<FinalChat class="size-20" />
 		</div>
-		{#if chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+		{#if chatLayoutState.isAdvancedMode}
 			<div class="md:flex flex-col gap-0 w-full max-w-sm hidden">
 				{#each shortcuts as shortcut (shortcut.name)}
 					<div class="flex items-center justify-between gap-8 px-3 py-2.5 rounded-lg group">
@@ -155,7 +155,7 @@
 				<PromptInput.Textarea placeholder="Ask me anything..." />
 				<PromptInput.Footer class="justify-between">
 					<div class="flex items-center gap-2">
-						{#if chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'}
+						{#if chatLayoutState.isAdvancedMode}
 							<ModelPickerAdvanced />
 						{:else}
 							<ModelPickerBasic />

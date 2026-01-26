@@ -1,10 +1,7 @@
 import { command, getRequestEvent, query } from '$app/server';
 import { api } from '$lib/convex/_generated/api';
-import NodeRSA from 'node-rsa';
-import { env } from '$lib/env.server';
+import { key } from '$lib/utils/encryption';
 import z from 'zod';
-
-const key = new NodeRSA(env.API_KEY_ENCRYPTION_KEY);
 
 export const getApiKey = query(async () => {
 	const { locals } = getRequestEvent();
