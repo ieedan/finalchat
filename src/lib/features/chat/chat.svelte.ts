@@ -14,7 +14,6 @@ import { getApiKey } from '../api-keys/api-keys.remote.js';
 import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
 import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
 import { SvelteSet } from 'svelte/reactivity';
-w;
 import type * as OpenRouter from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 
