@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { tool } from 'ai';
 
 export type ContextType = {
@@ -8,7 +8,6 @@ export type ContextType = {
 };
 
 export const fetchLinkContentTool = tool({
-	name: 'fetch-link-content',
 	description: 'Fetch the text content of a link',
 	inputSchema: z.object({
 		link: z.string()

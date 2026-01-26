@@ -8,7 +8,7 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import {
 	generateText,
 	AISDKError,
-	Experimental_Agent as ToolLoopAgent,
+	ToolLoopAgent,
 	type StreamTextResult,
 	type ModelMessage,
 	streamText
@@ -322,7 +322,7 @@ ${systemPrompt}
 				}
 
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				let streamResult: StreamTextResult<any, unknown>;
+				let streamResult: StreamTextResult<any, any>;
 				if (last.userMessage.chatSettings.supportedParameters?.includes('tools')) {
 					const agent = new ToolLoopAgent({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
@@ -341,7 +341,7 @@ ${systemPrompt}
 						} satisfies ContextType
 					});
 
-					streamResult = agent.stream({
+					streamResult = await agent.stream({
 						messages: modelMessages
 					});
 				} else {

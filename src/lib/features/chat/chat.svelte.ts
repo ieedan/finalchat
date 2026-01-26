@@ -57,7 +57,7 @@ class ChatLayoutState {
 	}
 
 	get isAdvancedMode() {
-		return this.userSettingsQuery.data?.onboarding?.mode === 'advanced';
+		return this.userSettings?.onboarding?.mode === 'advanced';
 	}
 
 	get models() {
@@ -65,9 +65,7 @@ class ChatLayoutState {
 	}
 
 	get enabledModels() {
-		return this.models.filter((model) =>
-			this.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
-		);
+		return this.models.filter((model) => this.userSettings?.favoriteModelIds?.includes(model.id));
 	}
 
 	get user() {
@@ -79,7 +77,7 @@ class ChatLayoutState {
 	}
 
 	get hasOnboarded() {
-		return this.userSettingsQuery.data?.onboarding?.completed;
+		return this.userSettings?.onboarding?.completed;
 	}
 
 	get chatId() {

@@ -4,7 +4,7 @@
 	import { CopyButton } from '$lib/components/ui/copy-button';
 
 	const style = tv({
-		base: 'relative w-full max-w-full rounded-md border bg-background',
+		base: 'relative w-full max-w-full rounded-md border bg-input',
 		variants: {
 			variant: {
 				default: 'border-border',

@@ -10,6 +10,10 @@
 				default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs',
 				destructive:
 					'bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-destructive/20 shadow-2xs',
+				'destructive-outline':
+					'bg-background text-destructive hover:bg-accent/50 border focus-visible:ring-destructive/20 shadow-2xs',
+				'destructive-ghost':
+					'bg-background text-destructive hover:bg-accent/50 focus-visible:ring-destructive/20 shadow-2xs',
 				outline: 'bg-background hover:bg-accent hover:text-accent-foreground border shadow-2xs',
 				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-2xs',
 				ghost: 'hover:bg-accent hover:text-accent-foreground',

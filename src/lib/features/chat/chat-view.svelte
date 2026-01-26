@@ -55,7 +55,7 @@
 	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
 
 	const mobileModels = $derived(
-		chatLayoutState.userSettingsQuery.data?.onboarding?.mode === 'advanced'
+		chatLayoutState.isAdvancedMode
 			? chatLayoutState.models.filter((model) =>
 					chatLayoutState.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
 				)
