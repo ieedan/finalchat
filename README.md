@@ -9,7 +9,7 @@ https://github.com/user-attachments/assets/cd81fecd-e510-408c-86dc-db49ee8307ed
 
 I built this because I wanted a chat app that was fast, free, and wonderful to use on both desktop and mobile.
 
-I call it _Finalchat_ because this is my final draft. This is everything I learned from [thom.chat](https://thom.chat) and [comprably.ai](https://comprably.ai). The last chat app.
+I call it **Finalchat** because this is my final draft. This is everything learned from [thom.chat](https://thom.chat) and [comprably.ai](https://comprably.ai). The final chat app.
 
 But to really be the last chat app it can't be closed source and it can't be SaaS. So here it is open source and free to use.
 
@@ -41,3 +41,7 @@ You can pass your prompt in the `q` query parameter along to the `/chat` route l
 ```
 https://finalchat.app/chat?q=Read https://example.com and tell me about it
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
