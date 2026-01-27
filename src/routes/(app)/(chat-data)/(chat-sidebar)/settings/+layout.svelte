@@ -41,7 +41,7 @@
 		</div>
 	</div>
 
-	<div class="w-full max-w-3xl flex flex-col py-0 settings:py-4 gap-4 place-items-center px-4">
+	<div class="w-full max-w-3xl flex flex-col py-0 settings:py-4 gap-2 place-items-center px-4">
 		{@render children()}
 	</div>
 </div>

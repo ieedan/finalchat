@@ -37,7 +37,9 @@
 		toast.success('Mode updated!');
 	}
 
-	const modeHasChanged = $derived(mode !== (chatLayoutState.userSettings?.onboarding?.mode ?? 'advanced'));
+	const modeHasChanged = $derived(
+		mode !== (chatLayoutState.userSettings?.onboarding?.mode ?? 'advanced')
+	);
 
 	const meta: Setting = {
 		id: 'mode',
