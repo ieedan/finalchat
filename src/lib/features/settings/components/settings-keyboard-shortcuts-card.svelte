@@ -5,6 +5,8 @@
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import { cn } from '$lib/utils';
 	import { useSettingsSetting, type Setting } from '../settings.svelte';
+	import { box } from 'svelte-toolbelt';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 
 	let { class: className }: { class?: string } = $props();
 
@@ -35,10 +37,13 @@
 		}
 	]);
 
+	const isMobile = new IsMobile();
+
 	const meta: Setting = {
 		id: 'keyboard-shortcuts',
 		title: 'Keyboard Shortcuts',
-		description: 'Quick reference for keyboard shortcuts.'
+		description: 'Quick reference for keyboard shortcuts.',
+		visible: box.with(() => !isMobile.current)
 	};
 
 	const settingState = useSettingsSetting(meta);

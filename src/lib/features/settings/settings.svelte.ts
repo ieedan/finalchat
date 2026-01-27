@@ -1,11 +1,12 @@
 import { Context, watch } from 'runed';
-import type { WritableBoxedValues } from 'svelte-toolbelt';
+import type { ReadableBox, WritableBoxedValues } from 'svelte-toolbelt';
 import fuzzysort from 'fuzzysort';
 
 export type Setting = {
 	id: string;
 	title: string;
 	description: string;
+	visible?: ReadableBox<boolean>;
 };
 
 class SettingsLayoutState {
@@ -30,7 +31,8 @@ class SettingsLayoutState {
 				keys: ['id', 'title', 'description'],
 				threshold: 0.5
 			})
-			.map((result) => result.obj);
+			.map((result) => result.obj)
+			.filter((setting) => (setting.visible ? setting.visible.current : true));
 	});
 }
 

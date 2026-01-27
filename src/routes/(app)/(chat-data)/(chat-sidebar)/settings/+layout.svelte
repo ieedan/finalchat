@@ -17,14 +17,13 @@
 </script>
 
 <div class="flex flex-col h-full place-items-center">
-	{#if sidebar.isMobile || !sidebar.open}{/if}
 	<div
 		class={cn('sticky z-20 top-0 h-0 w-full transition-[height]', {
-			'h-14 settings:h-0 [--height:3.5rem] settings:[--height:0]': sidebar.isMobile || !sidebar.open
+			'settings:h-0 h-14 [--height:3.5rem] settings:[--height:0]': sidebar.isMobile || !sidebar.open
 		})}
 	>
 		<div class="relative h-(--height) top-0">
-			<div class="absolute z-20 h-(--height) bg-background mask-b-from-25% top-0 w-full"></div>
+			<div class="absolute z-20 h-20 bg-background mask-b-from-25% top-0 w-full"></div>
 			<div class={cn('hidden', { 'flex settings:hidden': sidebar.isMobile || !sidebar.open })}>
 				{#if scrollState.y > 15}
 					<animated.span

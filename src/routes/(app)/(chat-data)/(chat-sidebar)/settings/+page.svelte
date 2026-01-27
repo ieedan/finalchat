@@ -9,12 +9,12 @@
 	import SettingsSubmitBehaviorCard from '$lib/features/settings/components/settings-submit-behavior-card.svelte';
 	import SettingsFontCard from '$lib/features/settings/components/settings-font-card.svelte';
 	import SettingsEmpty from '$lib/features/settings/components/settings-empty.svelte';
-	import SettingsNavigationCard from '$lib/features/settings/components/settings-navigation-card.svelte';
+	import SettingsAttachmentsCard from '$lib/features/settings/components/settings-attachments-card.svelte';
+	import SettingsHistoryCard from '$lib/features/settings/components/settings-history-card.svelte';
 </script>
 
 <SettingsSearchInput />
 <SettingsUserCard />
-<SettingsNavigationCard />
 <SettingsEmpty />
 <SettingsKeyboardShortcutsCard class="md:flex hidden" />
 <SettingsApiKeyCard />
@@ -22,4 +22,6 @@
 <SettingsModeCard />
 <SettingsSubmitBehaviorCard />
 <SettingsFontCard />
+<SettingsAttachmentsCard />
+<SettingsHistoryCard />
 <SettingsBugsCard />

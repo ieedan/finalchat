@@ -12,6 +12,7 @@
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { FinalChat } from '$lib/components/logos';
+	import { page } from '$app/state';
 	// import { navigating } from '$app/stores';
 
 	const chatLayoutState = useChatLayout();
@@ -40,8 +41,6 @@
 
 	const sidebar = Sidebar.useSidebar();
 
-	const headerTrigger = $derived(sidebar.isMobile || !sidebar.open);
-
 	// auto close sidebar when navigating to settings or back to chat
 	// navigating.subscribe((nav) => {
 	// 	if (nav?.to?.url.pathname.includes('/settings') && nav.from?.url.pathname.includes('/chat')) {
@@ -56,15 +55,16 @@
 sidebar trigger
 this has to be out here because the sidebar isn't rendered all the time on mobile
 -->
-<div
-	class={cn(
-		'transition-transform left-0 top-2.5 fixed translate-x-[8px] z-21 duration-200',
-		// just in case
-		headerTrigger && 'translate-x-[12px]'
-	)}
->
-	<Sidebar.Trigger />
-</div>
+{#if page.url.pathname !== '/settings/attachments' && page.url.pathname !== '/settings/history'}
+	<div
+		class={cn(
+			'transition-transform left-0 top-2.5 fixed md:translate-x-[12px] translate-x-[8px] z-21 duration-200',
+			!sidebar.open && 'translate-x-[12px]'
+		)}
+	>
+		<Sidebar.Trigger />
+	</div>
+{/if}
 
 <Sidebar.Root variant="inset">
 	<div class="py-2 px-.5 flex flex-col h-full w-full">
