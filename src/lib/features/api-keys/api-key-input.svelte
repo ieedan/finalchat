@@ -34,7 +34,7 @@
 <div
 	data-maybe-invalid={apiKey && !apiKey.startsWith('sk-or-')}
 	class={cn(
-		'flex items-center border border-border rounded-md bg-transparent dark:bg-input/30 data-[maybe-invalid=true]:border-amber-500 data-[maybe-invalid=true]:ring-amber-500',
+		'flex items-center border border-border rounded-md bg-input data-[maybe-invalid=true]:border-amber-500 data-[maybe-invalid=true]:ring-amber-500',
 		'focus-within:ring-2 px-1 focus-within:ring-ring ring-offset-2 ring-offset-background transition-all'
 	)}
 >
