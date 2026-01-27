@@ -24,9 +24,11 @@
 		})}
 	>
 		<div class="relative h-(--height) top-0">
-			<div
-				class="absolute z-20 h-(--gradient-height) bg-background mask-b-from-25% top-0 w-full"
-			></div>
+			{#if scrollState.y > 15}
+				<div
+					class="absolute z-20 h-(--gradient-height) bg-background mask-b-from-25% top-0 w-full"
+				></div>
+			{/if}
 			<div class={cn('hidden', { 'flex settings:hidden': sidebar.isMobile || !sidebar.open })}>
 				{#if scrollState.y > 15}
 					<animated.span

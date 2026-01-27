@@ -58,8 +58,8 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 {#if page.url.pathname !== '/settings/attachments' && page.url.pathname !== '/settings/history'}
 	<div
 		class={cn(
-			'transition-transform left-0 top-2.5 fixed md:translate-x-[12px] translate-x-[8px] z-21 duration-200',
-			!sidebar.open && 'translate-x-[12px]'
+			'transition-transform left-0 top-2.5 fixed md:translate-x-[8px] translate-x-[8px] z-21 duration-200',
+			!sidebar.open && 'translate-x-[16px]'
 		)}
 	>
 		<Sidebar.Trigger />
@@ -73,7 +73,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 				<a href="/chat" class="text-2xl font-bold">
 					<FinalChat class="size-6" />
 				</a>
-				{#if sidebar.isMobile}
+				{#if sidebar.isMobile || page.url.pathname === '/settings/attachments' || page.url.pathname === '/settings/history'}
 					<Sidebar.Trigger class="absolute left-2" />
 				{/if}
 			</div>
