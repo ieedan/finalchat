@@ -33,7 +33,7 @@ function greet(name: string) {
 	const settingState = useSettingsSetting(meta);
 </script>
 
-<Card.Root style={settingState.style}>
+<Card.Root class="w-full" style={settingState.style}>
 	<Card.Header>
 		<Card.Title>{meta.title}</Card.Title>
 		<Card.Description>{meta.description}</Card.Description>

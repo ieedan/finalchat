@@ -48,7 +48,7 @@
 	const settingState = useSettingsSetting(meta);
 </script>
 
-<Card.Root style={settingState.style}>
+<Card.Root class="w-full" style={settingState.style}>
 	<Card.Header>
 		<Card.Title>Chat Experience</Card.Title>
 		<Card.Description>Customize your chat experience.</Card.Description>
