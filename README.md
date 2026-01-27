@@ -27,12 +27,12 @@ But to really be the last chat app it can't be closed source and it can't be Saa
 
 ## The stack
 
-- Framework [SvelteKit](https://kit.svelte.dev)
-- Database [Convex](https://www.convex.dev)
-- UI [shadcn-svelte](https://ui.shadcn.com/docs/installation/svelte)
-- Icons [RemixIcon](https://remixicon.com)
-- Object storage [R2](https://www.r2.dev)
-- Authentication [WorkOs](https://workos.com)
+- [SvelteKit](https://kit.svelte.dev)
+- [Convex](https://www.convex.dev)
+- [WorkOs](https://workos.com)
+- [R2](https://www.r2.dev)
+- [shadcn-svelte](https://ui.shadcn.com/docs/installation/svelte)
+- [RemixIcon](https://remixicon.com)
 
 ## Want an "Open in Finalchat" button?
 

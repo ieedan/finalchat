@@ -8,7 +8,8 @@ export const DEFAULT_ENABLED_MODEL_IDS = [
 	'openai/gpt-5.2',
 	'openai/gpt-oss-120b',
 	'google/gemini-3-flash-preview',
-	'google/gemini-2.5-flash-lite'
+	'google/gemini-2.5-flash-lite',
+	'moonshotai/kimi-k2.5'
 ] as ModelId[];
 
 export const BASIC_MODELS: Model[] = [
