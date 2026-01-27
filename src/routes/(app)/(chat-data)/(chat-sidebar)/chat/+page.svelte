@@ -10,12 +10,12 @@
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { FinalChat, Github } from '$lib/components/logos';
 	import {
-		ArrowRightIcon,
-		MessageSquarePlusIcon,
-		MousePointerClickIcon,
-		PanelLeftIcon,
-		SendIcon
-	} from '@lucide/svelte';
+		RiArrowRightLine as ArrowRightIcon,
+		RiChatNewLine as MessageSquarePlusIcon,
+		RiRobot2Line as RobotIcon,
+		RiLayoutLeftLine as PanelLeftIcon,
+		RiSendPlaneLine as SendIcon
+	} from 'remixicon-svelte';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import { cn } from '$lib/utils.js';
 	import { BASIC_MODELS } from '$lib/ai';
@@ -41,7 +41,7 @@
 
 	const shortcuts = $derived([
 		{ name: 'New Chat', keys: [cmdOrCtrl, '⇧', 'O'], icon: MessageSquarePlusIcon },
-		{ name: 'Model Picker', keys: [cmdOrCtrl, '⇧', 'M'], icon: MousePointerClickIcon },
+		{ name: 'Model Picker', keys: [cmdOrCtrl, '⇧', 'M'], icon: RobotIcon },
 		{ name: 'Go to Chat', keys: [cmdOrCtrl, 'G'], icon: ArrowRightIcon },
 		{ name: 'Sidebar', keys: [cmdOrCtrl, 'B'], icon: PanelLeftIcon },
 		{ name: 'Submit', keys: submitOnEnter ? ['Enter'] : [cmdOrCtrl, 'Enter'], icon: SendIcon }

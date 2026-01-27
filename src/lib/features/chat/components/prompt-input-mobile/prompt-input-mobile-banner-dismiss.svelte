@@ -3,7 +3,7 @@
 	import { usePromptInputBannerDismiss } from '../prompt-input/prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
 	import { cn } from '$lib/utils';
-	import XIcon from '@lucide/svelte/icons/x';
+	import { RiCloseLine as XIcon } from 'remixicon-svelte';
 
 	let {
 		class: className,

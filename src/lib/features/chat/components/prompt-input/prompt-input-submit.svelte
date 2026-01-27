@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, type ButtonElementProps } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
-	import SendIcon from '@lucide/svelte/icons/send';
+	import { RiSendPlaneLine as SendIcon } from 'remixicon-svelte';
 	import { usePromptInputSubmit } from './prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
 

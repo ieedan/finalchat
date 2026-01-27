@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { ReasoningOutput } from 'ai';
 	import * as Collapsible from '$lib/components/ui/collapsible';
-	import BrainIcon from '@lucide/svelte/icons/brain';
+	import {
+		RiBrainLine as BrainIcon,
+		RiArrowUpSLine as ChevronUpIcon,
+		RiArrowDownSLine as ChevronDownIcon
+	} from 'remixicon-svelte';
 	import { Spinner } from '$lib/components/ui/spinner';
-	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import Streamdown from './components/streamdown.svelte';
 
 	type Props = {

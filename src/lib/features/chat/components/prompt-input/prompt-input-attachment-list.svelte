@@ -2,7 +2,7 @@
 	import { cn } from '$lib/utils';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { usePromptInputAttachmentList } from './prompt-input.svelte.js';
-	import XIcon from '@lucide/svelte/icons/x';
+	import { RiCloseLine as XIcon } from 'remixicon-svelte';
 	import { animated } from 'animated-svelte';
 
 	let { class: className, ...rest }: HTMLAttributes<HTMLDivElement> = $props();

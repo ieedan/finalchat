@@ -5,8 +5,16 @@
 	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
-	import CheckIcon from '@lucide/svelte/icons/check';
+	import {
+		RiArrowDownSLine as ChevronDownIcon,
+		RiCheckLine as CheckIcon,
+		RiImageLine as ImageIcon,
+		RiBrainLine as BrainIcon,
+		RiGridLine as GridIcon,
+		RiStarFill as StarIcon,
+		RiClipboardLine as ClipboardIcon,
+		RiStarLine as StarOffIcon
+	} from 'remixicon-svelte';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte.js';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
@@ -16,17 +24,11 @@
 		supportsReasoning,
 		type Model
 	} from '../openrouter';
-	import ImageIcon from '@lucide/svelte/icons/image';
-	import BrainIcon from '@lucide/svelte/icons/brain';
 	import { cn } from '$lib/utils';
-	import GridIcon from '@lucide/svelte/icons/grid';
-	import StarIcon from '@lucide/svelte/icons/star';
 	import { LABS, type Lab } from '../labs';
 	import { shortcut } from '$lib/actions/shortcut.svelte';
 	import fuzzysort from 'fuzzysort';
 	import { Debounced } from 'runed';
-	import ClipboardIcon from '@lucide/svelte/icons/clipboard';
-	import StarOffIcon from '@lucide/svelte/icons/star-off';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
 	import { Separator } from '$lib/components/ui/separator';
@@ -311,10 +313,10 @@
 								class={cn('text-sm flex items-center gap-1.5', isFavorite && 'text-destructive')}
 							>
 								{#if isFavorite}
-									<StarOffIcon class="size-3.5 inline shrink-0" />
+									<StarIcon class="size-3.5 inline shrink-0" />
 									Remove from favorites
 								{:else}
-									<StarIcon class="size-3.5 inline shrink-0" />
+									<StarOffIcon class="size-3.5 inline shrink-0" />
 									Add to favorites
 								{/if}
 							</span>
@@ -351,10 +353,10 @@
 											)}
 										>
 											{#if isFavorite}
-												<StarOffIcon class="size-3.5 inline shrink-0" />
+												<StarIcon class="size-3.5 inline shrink-0 text-destructive" />
 												Remove from favorites
 											{:else}
-												<StarIcon class="size-3.5 inline shrink-0" />
+												<StarOffIcon class="size-3.5 inline shrink-0" />
 												Add to favorites
 											{/if}
 										</span>

@@ -1,48 +1,51 @@
 <script lang="ts">
-	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import { useSidebar } from '$lib/components/ui/sidebar';
-	import { Button } from '$lib/components/ui/button';
+	import { setupSettingsLayout } from '$lib/features/settings/settings.svelte';
+	import { ScrollState } from 'runed';
+	import { animated } from 'animated-svelte';
+	import { cn } from '$lib/utils';
 
 	let { children } = $props();
 
 	const sidebar = useSidebar();
+
+	setupSettingsLayout();
+
+	const scrollState = new ScrollState({
+		element: () => window
+	});
 </script>
 
-<div class="flex flex-col h-full">
-	<header class="sticky top-0 border-b z-20 bg-background">
-		<div class="px-3 py-2.5 w-full flex items-center justify-between">
-			<div class="flex items-center gap-2">
-				{#if sidebar.isMobile || !sidebar.open}
-					<div class="size-9"></div>
+<div class="flex flex-col h-full place-items-center">
+	<div
+		class={cn('sticky z-20 top-0 h-0 w-full transition-[height]', {
+			'settings:h-0 h-14 [--height:3.5rem] [--gradient-height:5rem] settings:[--gradient-height:0] settings:[--height:0]':
+				sidebar.isMobile || !sidebar.open
+		})}
+	>
+		<div class="relative h-(--height) top-0">
+			{#if scrollState.y > 15}
+				<div
+					class="absolute z-20 h-(--gradient-height) bg-background mask-b-from-25% top-0 w-full"
+				></div>
+			{/if}
+			<div class={cn('hidden', { 'flex settings:hidden': sidebar.isMobile || !sidebar.open })}>
+				{#if scrollState.y > 15}
+					<animated.span
+						initial={{ opacity: 0, y: -10 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -10 }}
+						transition={{ duration: 0.2, timingFunction: 'ease-out' }}
+						class="absolute z-30 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 font-medium"
+					>
+						Settings
+					</animated.span>
 				{/if}
 			</div>
-			<div class="flex items-center gap-2">
-				<Button href="/auth/signout" variant="outline">Logout</Button>
-			</div>
 		</div>
-	</header>
+	</div>
 
-	<div class="flex-1 min-h-0 overflow-y-auto">
-		<div class="flex flex-col place-items-center">
-			<AccountSettings.Root class="w-full max-w-5xl">
-				<AccountSettings.Sidebar class="lg:border-r-0 z-20 bg-background">
-					<AccountSettings.SidebarGroup>
-						<AccountSettings.SidebarButton href="/settings">Account</AccountSettings.SidebarButton>
-						<AccountSettings.SidebarButton href="/settings/customization">
-							Customization
-						</AccountSettings.SidebarButton>
-						<AccountSettings.SidebarButton href="/settings/history">
-							History
-						</AccountSettings.SidebarButton>
-						<AccountSettings.SidebarButton href="/settings/attachments">
-							Attachments
-						</AccountSettings.SidebarButton>
-					</AccountSettings.SidebarGroup>
-				</AccountSettings.Sidebar>
-				<AccountSettings.Content>
-					{@render children()}
-				</AccountSettings.Content>
-			</AccountSettings.Root>
-		</div>
+	<div class="w-full max-w-3xl flex flex-col py-0 settings:pt-4 pb-4 gap-2 place-items-center px-4">
+		{@render children()}
 	</div>
 </div>

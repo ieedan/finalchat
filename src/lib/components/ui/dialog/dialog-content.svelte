@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Dialog as DialogPrimitive } from 'bits-ui';
 	import DialogPortal from './dialog-portal.svelte';
-	import XIcon from '@lucide/svelte/icons/x';
+	import { RiCloseLine as XIcon } from 'remixicon-svelte';
 	import type { Snippet } from 'svelte';
 	import * as Dialog from './index.js';
 	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';

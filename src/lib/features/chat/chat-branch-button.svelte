@@ -5,10 +5,11 @@
 	import { ModelIdCtx } from '$lib/context.svelte.js';
 	import { api } from '$lib/convex/_generated/api';
 	import type { MessageWithAttachments } from '$lib/convex/chats.utils';
-	import SplitIcon from '@lucide/svelte/icons/split';
+	import { RiGitBranchLine as SplitIcon } from 'remixicon-svelte';
 	import { useConvexClient } from 'convex-svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel';
 	import { useChatLayout } from './chat.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	type Props = {
 		message: MessageWithAttachments;
@@ -59,7 +60,16 @@
 </script>
 
 {#if chatLayoutState.user !== null}
-	<Button variant="ghost" size="icon" onClickPromise={branchFromMessage}>
-		<SplitIcon />
-	</Button>
+	<Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger>
+				<Button variant="ghost" size="icon" onClickPromise={branchFromMessage}>
+					<SplitIcon />
+				</Button>
+			</Tooltip.Trigger>
+			<Tooltip.Content>
+				{message.role === 'user' ? 'Branch and regenerate' : 'Branch'}
+			</Tooltip.Content>
+		</Tooltip.Root>
+	</Tooltip.Provider>
 {/if}

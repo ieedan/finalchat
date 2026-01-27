@@ -23,13 +23,16 @@ But to really be the last chat app it can't be closed source and it can't be Saa
 - Upload and generate images
 - Hotkeys for everything
 - Models can read links with custom handlers for GitHub and other common sites
+- Built for use on mobile devices (No seriously try it)
 
 ## The stack
 
-- Framework [SvelteKit](https://kit.svelte.dev)
-- Database [Convex](https://www.convex.dev)
-- UI [shadcn-svelte](https://ui.shadcn.com/docs/installation/svelte)
-- Object storage [R2](https://www.r2.dev)
+- [SvelteKit](https://kit.svelte.dev)
+- [Convex](https://www.convex.dev)
+- [WorkOs](https://workos.com)
+- [R2](https://www.r2.dev)
+- [shadcn-svelte](https://ui.shadcn.com/docs/installation/svelte)
+- [RemixIcon](https://remixicon.com)
 
 ## Want an "Open in Finalchat" button?
 

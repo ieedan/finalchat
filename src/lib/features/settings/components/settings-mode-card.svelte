@@ -8,6 +8,7 @@
 	import { ModelIdCtx } from '$lib/context.svelte';
 	import { BASIC_MODELS } from '$lib/ai';
 	import { toast } from 'svelte-sonner';
+	import { useSettingsSetting, type Setting } from '../settings.svelte';
 
 	const client = useConvexClient();
 
@@ -15,7 +16,7 @@
 
 	const modelId = ModelIdCtx.get();
 
-	let mode = $derived(chatLayoutState.userSettingsQuery.data?.onboarding?.mode ?? 'advanced');
+	let mode: 'basic' | 'advanced' = $derived(chatLayoutState.isAdvancedMode ? 'advanced' : 'basic');
 
 	async function handleChangeMode() {
 		await client.mutation(api.userSettings.updateMode, {
@@ -37,11 +38,19 @@
 	}
 
 	const modeHasChanged = $derived(
-		mode !== chatLayoutState.userSettingsQuery.data?.onboarding?.mode
+		mode !== (chatLayoutState.userSettings?.onboarding?.mode ?? 'advanced')
 	);
+
+	const meta: Setting = {
+		id: 'mode',
+		title: 'Chat Experience',
+		description: 'Customize your chat experience.'
+	};
+
+	const settingState = useSettingsSetting(meta);
 </script>
 
-<Card.Root>
+<Card.Root class="w-full" style={settingState.style}>
 	<Card.Header>
 		<Card.Title>Chat Experience</Card.Title>
 		<Card.Description>Customize your chat experience.</Card.Description>

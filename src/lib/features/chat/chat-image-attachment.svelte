@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { cn } from '$lib/utils';
-	import { EyeIcon } from '@lucide/svelte';
+	import { RiEyeLine as EyeIcon } from 'remixicon-svelte';
 	import { tv } from 'tailwind-variants';
 	import AttachmentDownload from './attachment-download.svelte';
 

@@ -2,10 +2,12 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { cn } from '$lib/utils';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import SendIcon from '@lucide/svelte/icons/send';
-	import ImageIcon from '@lucide/svelte/icons/image';
-	import BrainIcon from '@lucide/svelte/icons/brain';
+	import {
+		RiArrowDownSLine as ChevronDown,
+		RiSendPlaneLine as SendIcon,
+		RiImageLine as ImageIcon,
+		RiBrainLine as BrainIcon
+	} from 'remixicon-svelte';
 
 	type Props = {
 		mode: 'basic' | 'advanced';

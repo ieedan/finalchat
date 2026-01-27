@@ -5,6 +5,7 @@
 	import { RadioGroup as RadioGroupPrimitive } from 'bits-ui';
 	import { cn } from '$lib/utils';
 	import Streamdown from '$lib/features/chat/components/streamdown.svelte';
+	import { useSettingsSetting, type Setting } from '../settings.svelte';
 
 	const themeProvider = useThemeProvider();
 
@@ -22,12 +23,20 @@ function greet(name: string) {
   return \`Hello, \${name}!\`;
 }
 \`\`\``;
+
+	const meta: Setting = {
+		id: 'font',
+		title: 'Font',
+		description: 'Choose a font preset for the interface and code.'
+	};
+
+	const settingState = useSettingsSetting(meta);
 </script>
 
-<Card.Root class="gap-4">
+<Card.Root class="w-full" style={settingState.style}>
 	<Card.Header>
-		<Card.Title>Font</Card.Title>
-		<Card.Description>Choose a font preset for the interface and code.</Card.Description>
+		<Card.Title>{meta.title}</Card.Title>
+		<Card.Description>{meta.description}</Card.Description>
 	</Card.Header>
 	<Card.Content class="grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-8">
 		<!-- Font Presets -->

@@ -4,7 +4,7 @@
 	import { useModelPicker } from '$lib/features/chat/components/prompt-input/prompt-input.svelte.js';
 	import * as NativeSelect from '$lib/components/ui/native-select';
 	import { cn } from '$lib/utils';
-	import { SparklesIcon } from '@lucide/svelte';
+	import { RiSparklingLine as SparklesIcon } from 'remixicon-svelte';
 	import { usePlusState } from './prompt-input-mobile-plus.svelte';
 
 	type Props = {

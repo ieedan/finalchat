@@ -14,7 +14,11 @@
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import ShareButton from './chat-share-button.svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { EyeIcon, MessageCircleOffIcon, ArrowLeftIcon } from '@lucide/svelte';
+	import {
+		RiEyeLine as EyeIcon,
+		RiChatOffLine as MessageCircleOffIcon,
+		RiArrowLeftLine as ArrowLeftIcon
+	} from 'remixicon-svelte';
 	import * as Empty from '$lib/components/ui/empty';
 	import { Button } from '$lib/components/ui/button';
 	import { BASIC_MODELS } from '$lib/ai.js';
@@ -94,7 +98,7 @@
 		</header>
 		<div
 			bind:this={scrollContainer}
-			class={cn('flex flex-col flex-1 min-h-0 overflow-y-auto items-center', {
+			class={cn('flex flex-col flex-1 min-h-0 overflow-y-auto items-center overflow-x-hidden', {
 				'scroll-smooth': isMounted.current
 			})}
 		>

@@ -6,12 +6,13 @@
 	import { DEFAULT_AGE_GROUPS, getAgedGroups } from '$lib/utils/aged-groups';
 	import ChatButton from './chat-button.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import PlusIcon from '@lucide/svelte/icons/plus';
+	import { RiAddLine as PlusIcon } from 'remixicon-svelte';
 	import ChatGotoDialog from './chat-goto-dialog.svelte';
 	import { cn } from '$lib/utils';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { FinalChat } from '$lib/components/logos';
+	import { page } from '$app/state';
 	// import { navigating } from '$app/stores';
 
 	const chatLayoutState = useChatLayout();
@@ -40,8 +41,6 @@
 
 	const sidebar = Sidebar.useSidebar();
 
-	const headerTrigger = $derived(sidebar.isMobile || !sidebar.open);
-
 	// auto close sidebar when navigating to settings or back to chat
 	// navigating.subscribe((nav) => {
 	// 	if (nav?.to?.url.pathname.includes('/settings') && nav.from?.url.pathname.includes('/chat')) {
@@ -56,15 +55,16 @@
 sidebar trigger
 this has to be out here because the sidebar isn't rendered all the time on mobile
 -->
-<div
-	class={cn(
-		'transition-transform left-0 top-2.5 fixed translate-x-[16px] z-21 duration-200',
-		// just in case
-		headerTrigger && 'translate-x-[12px]'
-	)}
->
-	<Sidebar.Trigger />
-</div>
+{#if page.url.pathname !== '/settings/attachments' && page.url.pathname !== '/settings/history'}
+	<div
+		class={cn(
+			'transition-transform left-0 top-2.5 fixed md:translate-x-[8px] translate-x-[8px] z-21 duration-200',
+			!sidebar.open && 'translate-x-[16px]'
+		)}
+	>
+		<Sidebar.Trigger />
+	</div>
+{/if}
 
 <Sidebar.Root variant="inset">
 	<div class="py-2 px-.5 flex flex-col h-full w-full">
@@ -73,7 +73,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 				<a href="/chat" class="text-2xl font-bold">
 					<FinalChat class="size-6" />
 				</a>
-				{#if sidebar.isMobile}
+				{#if sidebar.isMobile || page.url.pathname === '/settings/attachments' || page.url.pathname === '/settings/history'}
 					<Sidebar.Trigger class="absolute left-2" />
 				{/if}
 			</div>
