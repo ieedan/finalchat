@@ -2,7 +2,12 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { cn } from '$lib/utils';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import { RiArrowDownSLine as ChevronDown, RiSendPlaneLine as SendIcon, RiImageLine as ImageIcon, RiBrainLine as BrainIcon } from 'remixicon-svelte';
+	import {
+		RiArrowDownSLine as ChevronDown,
+		RiSendPlaneLine as SendIcon,
+		RiImageLine as ImageIcon,
+		RiBrainLine as BrainIcon
+	} from 'remixicon-svelte';
 
 	type Props = {
 		mode: 'basic' | 'advanced';

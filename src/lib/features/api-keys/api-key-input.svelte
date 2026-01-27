@@ -2,7 +2,10 @@
 	import { cn } from '$lib/utils';
 	import * as Select from '$lib/components/ui/select';
 	import * as Password from '$lib/components/ui/password';
-	import { RiComputerLine as MonitorIcon, RiUploadCloud2Line as CloudCheckIcon } from 'remixicon-svelte';
+	import {
+		RiComputerLine as MonitorIcon,
+		RiUploadCloud2Line as CloudCheckIcon
+	} from 'remixicon-svelte';
 
 	type Props = {
 		apiKey: string;
