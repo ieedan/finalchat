@@ -1,5 +1,5 @@
 <script lang="ts">
-	import FileIcon from '@lucide/svelte/icons/file';
+	import FileIcon from 'remixicon-svelte/icons/file-line';
 
 	let { url, mediaType }: { url: string; mediaType: string } = $props();
 

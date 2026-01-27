@@ -2,7 +2,7 @@
 	import * as Modal from '$lib/components/ui/modal';
 	import { Button } from '$lib/components/ui/button';
 	import { api } from '$lib/convex/_generated/api';
-	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
+	import ArrowRightIcon from 'remixicon-svelte/icons/arrow-right-line';
 	import { useConvexClient } from 'convex-svelte';
 	import * as Field from '$lib/components/ui/field';
 	import { useLocalApiKey } from '$lib/features/api-keys/local-key-storage.svelte';

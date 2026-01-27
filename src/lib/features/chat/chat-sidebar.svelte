@@ -6,7 +6,7 @@
 	import { DEFAULT_AGE_GROUPS, getAgedGroups } from '$lib/utils/aged-groups';
 	import ChatButton from './chat-button.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import PlusIcon from '@lucide/svelte/icons/plus';
+	import PlusIcon from 'remixicon-svelte/icons/add-line';
 	import ChatGotoDialog from './chat-goto-dialog.svelte';
 	import { cn } from '$lib/utils';
 	import * as Kbd from '$lib/components/ui/kbd';
@@ -58,7 +58,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 -->
 <div
 	class={cn(
-		'transition-transform left-0 top-2.5 fixed translate-x-[16px] z-21 duration-200',
+		'transition-transform left-0 top-2.5 fixed translate-x-[8px] z-21 duration-200',
 		// just in case
 		headerTrigger && 'translate-x-[12px]'
 	)}

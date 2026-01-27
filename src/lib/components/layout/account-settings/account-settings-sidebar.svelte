@@ -2,7 +2,7 @@
 	import { cn } from '$lib/utils';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import * as Popover from '$lib/components/ui/popover';
-	import MenuIcon from '@lucide/svelte/icons/menu';
+	import MenuIcon from 'remixicon-svelte/icons/menu-line';
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 
 	let {

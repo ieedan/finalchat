@@ -5,7 +5,7 @@
 	import { ModelIdCtx } from '$lib/context.svelte.js';
 	import { api } from '$lib/convex/_generated/api';
 	import type { MessageWithAttachments } from '$lib/convex/chats.utils';
-	import SplitIcon from '@lucide/svelte/icons/split';
+	import SplitIcon from 'remixicon-svelte/icons/git-branch-line';
 	import { useConvexClient } from 'convex-svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel';
 	import { useChatLayout } from './chat.svelte';

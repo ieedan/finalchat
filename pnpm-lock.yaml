@@ -55,9 +55,6 @@ importers:
       '@jsrepo/transform-prettier':
         specifier: ^1.0.0
         version: 1.0.0(jsrepo@3.1.0(svelte@5.48.2))(prettier@3.8.1)
-      '@lucide/svelte':
-        specifier: ^0.563.1
-        version: 0.563.1(svelte@5.48.2)
       '@openrouter/ai-sdk-provider':
         specifier: ^2.0.2
         version: 2.0.2(ai@6.0.49(zod@4.3.6))(zod@4.3.6)
@@ -166,6 +163,9 @@ importers:
       prettier-plugin-svelte:
         specifier: ^3.4.1
         version: 3.4.1(prettier@3.8.1)(svelte@5.48.2)
+      remixicon-svelte:
+        specifier: ^0.0.3
+        version: 0.0.3(svelte@5.48.2)
       remove-markdown:
         specifier: ^0.6.3
         version: 0.6.3
@@ -217,9 +217,6 @@ importers:
       vite-plugin-devtools-json:
         specifier: ^1.0.0
         version: 1.0.0(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2))
-      vite-plugin-transform-lucide-imports:
-        specifier: ^0.3.0
-        version: 0.3.0(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2))
       vitest:
         specifier: ^4.0.18
         version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)
@@ -1107,11 +1104,6 @@ packages:
     peerDependencies:
       jsrepo: 3.1.0
       prettier: 3.x
-
-  '@lucide/svelte@0.563.1':
-    resolution: {integrity: sha512-Kt+MbnE5D9RsuI/csmf7M+HWxALe57x3A0DhQ8pPnnUpneh7zuldrYjlT+veWtk+tVnp5doQtaAAxLujzIlhBw==}
-    peerDependencies:
-      svelte: ^5
 
   '@mapbox/node-pre-gyp@2.0.2':
     resolution: {integrity: sha512-pppEzxuUFmNoMb5YObyc4AAr/NrQGhNU/ZuSMLFxkC1JzrfZ4if2O0vI1JuD/oqxf+z/MNTARIekLmgL1PZg/A==}
@@ -3547,6 +3539,11 @@ packages:
   regex@6.0.1:
     resolution: {integrity: sha512-uorlqlzAKjKQZ5P+kTJr3eeJGSVroLKoHmquUj4zHWuR+hEyNqlXsSKlYYF5F4NI6nl7tWCs0apKJ0lmfsXAPA==}
 
+  remixicon-svelte@0.0.3:
+    resolution: {integrity: sha512-Fv4F92ADVUZmwLLJuxw2lvBjwFA7Ep94Al+4zVPt3xRgpN2yI/UVbObdMJ3qj1/T5ebp8OTnKjEmUNM7mRX3JQ==}
+    peerDependencies:
+      svelte: ^5.0.0
+
   remove-markdown@0.6.3:
     resolution: {integrity: sha512-Qvp2p0Q1irE7AaJO7QemJe04HdObHylJrG+q4hszvPlYp7q4EvfINpEIaIEFdB+3XTDp1h6fiyT60ae00gmRow==}
 
@@ -3962,11 +3959,6 @@ packages:
 
   vite-plugin-devtools-json@1.0.0:
     resolution: {integrity: sha512-MobvwqX76Vqt/O4AbnNMNWoXWGrKUqZbphCUle/J2KXH82yKQiunOeKnz/nqEPosPsoWWPP9FtNuPBSYpiiwkw==}
-    peerDependencies:
-      vite: ^5.0.0 || ^6.0.0 || ^7.0.0
-
-  vite-plugin-transform-lucide-imports@0.3.0:
-    resolution: {integrity: sha512-/zIVzj7SqIvQ2kLAerVUJTTcQvMe+jyqfvzU/D5jJvf5f4z4CmlT+ui3LfhhVOPbY49dcsxLULfbFDRNxdSXhg==}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
 
@@ -5208,10 +5200,6 @@ snapshots:
     dependencies:
       jsrepo: 3.1.0(svelte@5.48.2)
       prettier: 3.8.1
-
-  '@lucide/svelte@0.563.1(svelte@5.48.2)':
-    dependencies:
-      svelte: 5.48.2
 
   '@mapbox/node-pre-gyp@2.0.2':
     dependencies:
@@ -7789,6 +7777,10 @@ snapshots:
     dependencies:
       regex-utilities: 2.3.0
 
+  remixicon-svelte@0.0.3(svelte@5.48.2):
+    dependencies:
+      svelte: 5.48.2
+
   remove-markdown@0.6.3: {}
 
   require-directory@2.1.1: {}
@@ -8263,14 +8255,6 @@ snapshots:
   vite-plugin-devtools-json@1.0.0(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)):
     dependencies:
       uuid: 11.1.0
-      vite: 7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)
-
-  vite-plugin-transform-lucide-imports@0.3.0(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)):
-    dependencies:
-      '@sveltejs/acorn-typescript': 1.0.7(acorn@8.15.0)
-      acorn: 8.15.0
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
       vite: 7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)
 
   vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2):

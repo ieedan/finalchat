@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ShinyText from '$lib/components/animations/shiny-text.svelte';
 	import type { ToolCallPart, ToolResultPart } from 'ai';
-	import BookOpenCheckIcon from '@lucide/svelte/icons/book-open-check';
+	import BookReadIcon from 'remixicon-svelte/icons/book-ai-line';
 
 	type Props = {
 		tool: ToolCallPart & {
@@ -18,7 +18,7 @@
 		<div class="py-2">
 			{#if tool.result}
 				<div class="text-muted-foreground text-nowrap flex items-center gap-1.5">
-					<BookOpenCheckIcon class="size-4 inline shrink-0" />
+					<BookReadIcon class="size-4 inline shrink-0" />
 					<span class="truncate">
 						<span class="font-medium">Read</span>
 						<a

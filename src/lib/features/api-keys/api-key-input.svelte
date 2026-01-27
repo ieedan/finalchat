@@ -2,8 +2,8 @@
 	import { cn } from '$lib/utils';
 	import * as Select from '$lib/components/ui/select';
 	import * as Password from '$lib/components/ui/password';
-	import MonitorIcon from '@lucide/svelte/icons/monitor';
-	import CloudCheckIcon from '@lucide/svelte/icons/cloud-check';
+	import MonitorIcon from 'remixicon-svelte/icons/computer-line';
+	import CloudCheckIcon from 'remixicon-svelte/icons/upload-cloud-2-line';
 
 	type Props = {
 		apiKey: string;

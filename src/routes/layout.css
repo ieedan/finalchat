@@ -39,7 +39,7 @@
 }
 
 @theme inline {
-	--radius: 0.75rem;
+	--radius: 0.35rem;
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);

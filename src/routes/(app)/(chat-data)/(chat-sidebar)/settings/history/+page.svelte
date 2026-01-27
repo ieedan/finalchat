@@ -1,7 +1,8 @@
 <script lang="ts">
 	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import * as Card from '$lib/components/ui/card';
-	import HistoryIcon from '@lucide/svelte/icons/history';
+	import HistoryIcon from 'remixicon-svelte/icons/history-line';
+	import DeleteIcon from 'remixicon-svelte/icons/delete-bin-line';
 	import { Button } from '$lib/components/ui/button';
 	import { createChatsTable } from './table';
 	import { useCachedQuery } from '$lib/cache/cached-query.svelte';
@@ -13,7 +14,6 @@
 	import * as Table from '$lib/components/ui/table';
 	import { FlexRender } from '$lib/components/ui/data-table';
 	import { Checkbox } from '$lib/components/ui/checkbox';
-	import Trash2Icon from '@lucide/svelte/icons/trash-2';
 
 	const chatsQuery = useCachedQuery(api.chats.getAll, {});
 
@@ -74,7 +74,7 @@
 						size="sm"
 						disabled={table.getSelectedRowModel().rows.length === 0}
 					>
-						<Trash2Icon />
+						<DeleteIcon />
 						Delete {table.getSelectedRowModel().rows.length}
 						{table.getSelectedRowModel().rows.length === 1 ? 'Chat' : 'Chats'}
 					</Button>

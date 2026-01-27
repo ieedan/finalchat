@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import * as Card from '$lib/components/ui/card';
-	import PaperclipIcon from '@lucide/svelte/icons/paperclip';
+	import PaperclipIcon from 'remixicon-svelte/icons/attachment-2';
 	import { Button } from '$lib/components/ui/button';
 	import { createAttachmentsTable, type AttachmentWithUrl } from './table';
 	import { useCachedQuery } from '$lib/cache/cached-query.svelte';
@@ -13,7 +13,7 @@
 	import * as Table from '$lib/components/ui/table';
 	import { FlexRender } from '$lib/components/ui/data-table';
 	import { Checkbox } from '$lib/components/ui/checkbox';
-	import Trash2Icon from '@lucide/svelte/icons/trash-2';
+	import DeleteIcon from 'remixicon-svelte/icons/delete-bin-line';
 
 	const attachmentsQuery = useCachedQuery(api.chatAttachments.getAll, {});
 
@@ -76,7 +76,7 @@
 						size="sm"
 						disabled={table.getSelectedRowModel().rows.length === 0}
 					>
-						<Trash2Icon />
+						<DeleteIcon />
 						Delete {table.getSelectedRowModel().rows.length}
 						{table.getSelectedRowModel().rows.length === 1 ? 'Attachment' : 'Attachments'}
 					</Button>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import { Button, type ButtonElementProps } from '$lib/components/ui/button';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChevronDownIcon from 'remixicon-svelte/icons/arrow-down-s-line';
 	import { animated } from 'animated-svelte';
 
 	type Props = {

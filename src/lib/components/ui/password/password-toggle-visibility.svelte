@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Toggle } from '$lib/components/ui/toggle';
-	import EyeIcon from '@lucide/svelte/icons/eye';
-	import EyeOffIcon from '@lucide/svelte/icons/eye-off';
+	import EyeIcon from 'remixicon-svelte/icons/eye-line';
+	import EyeOffIcon from 'remixicon-svelte/icons/eye-off-line';
 	import { usePasswordToggleVisibility } from './password.svelte.js';
 	import type { PasswordToggleVisibilityProps } from './types.js';
 	import { cn } from '$lib/utils.js';

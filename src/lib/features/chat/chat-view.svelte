@@ -14,7 +14,9 @@
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import ShareButton from './chat-share-button.svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { EyeIcon, MessageCircleOffIcon, ArrowLeftIcon } from '@lucide/svelte';
+	import EyeIcon from 'remixicon-svelte/icons/eye-line';
+	import MessageCircleOffIcon from 'remixicon-svelte/icons/chat-off-line';
+	import ArrowLeftIcon from 'remixicon-svelte/icons/arrow-left-line';
 	import * as Empty from '$lib/components/ui/empty';
 	import { Button } from '$lib/components/ui/button';
 	import { BASIC_MODELS } from '$lib/ai.js';

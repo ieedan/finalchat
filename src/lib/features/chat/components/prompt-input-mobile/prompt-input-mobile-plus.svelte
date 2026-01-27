@@ -30,7 +30,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { PlusIcon } from '@lucide/svelte';
+	import PlusIcon from 'remixicon-svelte/icons/add-line';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import type { Snippet } from 'svelte';
 	import { box, type WritableBoxedValues } from 'svelte-toolbelt';
