@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
-	import CheckIcon from 'remixicon-svelte/icons/check-line';
-	import MinusIcon from 'remixicon-svelte/icons/subtract-line';
+	import { RiCheckLine as CheckIcon, RiSubtractLine as MinusIcon } from 'remixicon-svelte';
 	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';
 	import type { Snippet } from 'svelte';
 

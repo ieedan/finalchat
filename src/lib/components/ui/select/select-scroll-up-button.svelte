@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ChevronUpIcon from 'remixicon-svelte/icons/arrow-up-s-line';
+	import { RiArrowUpSLine as ChevronUpIcon } from 'remixicon-svelte';
 	import { Select as SelectPrimitive } from 'bits-ui';
 	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';
 

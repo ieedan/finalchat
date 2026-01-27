@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CheckIcon from 'remixicon-svelte/icons/check-line';
+	import { RiCheckLine as CheckIcon } from 'remixicon-svelte';
 	import { Select as SelectPrimitive } from 'bits-ui';
 	import { cn, type WithoutChild } from '$lib/utils.js';
 

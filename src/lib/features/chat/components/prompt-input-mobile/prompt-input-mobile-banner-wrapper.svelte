@@ -4,7 +4,7 @@
 	import PromptInputBanner from './prompt-input-mobile-banner.svelte';
 	import PromptInputBannerContent from './prompt-input-banner-content.svelte';
 	import PromptInputBannerDismiss from './prompt-input-mobile-banner-dismiss.svelte';
-	import AlertIcon from 'remixicon-svelte/icons/alert-line';
+	import { RiAlertLine as AlertIcon } from 'remixicon-svelte';
 	import { PromptInputCtx } from '../prompt-input/prompt-input.svelte.js';
 
 	let { class: className, children, ...rest }: HTMLAttributes<HTMLDivElement> = $props();

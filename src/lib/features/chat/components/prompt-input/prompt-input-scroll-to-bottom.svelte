@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import { Button, type ButtonElementProps } from '$lib/components/ui/button';
-	import ChevronDownIcon from 'remixicon-svelte/icons/arrow-down-s-line';
+	import { RiArrowDownSLine as ChevronDownIcon } from 'remixicon-svelte';
 	import { animated } from 'animated-svelte';
 
 	type Props = {

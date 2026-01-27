@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn, type WithElementRef } from '$lib/utils.js';
 	import type { HTMLSelectAttributes } from 'svelte/elements';
-	import ChevronDownIcon from 'remixicon-svelte/icons/arrow-down-s-line';
+	import { RiArrowDownSLine as ChevronDownIcon } from 'remixicon-svelte';
 	import type { Snippet } from 'svelte';
 
 	let {

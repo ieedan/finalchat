@@ -1,5 +1,5 @@
 <script lang="ts">
-	import FileIcon from 'remixicon-svelte/icons/file-line';
+	import { RiFileLine as FileIcon } from 'remixicon-svelte';
 
 	let { url, mediaType }: { url: string; mediaType: string } = $props();
 

@@ -2,9 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
 	import { cn } from '$lib/utils.js';
-	import CheckIcon from 'remixicon-svelte/icons/check-line';
-	import CopyIcon from 'remixicon-svelte/icons/file-copy-line';
-	import XIcon from 'remixicon-svelte/icons/close-line';
+	import { RiCheckLine as CheckIcon, RiFileCopyLine as CopyIcon, RiCloseLine as XIcon } from 'remixicon-svelte';
 	import { scale } from 'svelte/transition';
 	import type { CopyButtonProps } from './types';
 

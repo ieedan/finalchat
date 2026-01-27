@@ -5,14 +5,7 @@
 	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
-	import ChevronDownIcon from 'remixicon-svelte/icons/arrow-down-s-line';
-	import CheckIcon from 'remixicon-svelte/icons/check-line';
-	import ImageIcon from 'remixicon-svelte/icons/image-line';
-	import BrainIcon from 'remixicon-svelte/icons/brain-line';
-	import GridIcon from 'remixicon-svelte/icons/grid-line';
-	import StarIcon from 'remixicon-svelte/icons/star-fill';
-	import ClipboardIcon from 'remixicon-svelte/icons/clipboard-line';
-	import StarOffIcon from 'remixicon-svelte/icons/star-line';
+	import { RiArrowDownSLine as ChevronDownIcon, RiCheckLine as CheckIcon, RiImageLine as ImageIcon, RiBrainLine as BrainIcon, RiGridLine as GridIcon, RiStarFill as StarIcon, RiClipboardLine as ClipboardIcon, RiStarLine as StarOffIcon } from 'remixicon-svelte';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte.js';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';

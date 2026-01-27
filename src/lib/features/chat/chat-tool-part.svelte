@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ShinyText from '$lib/components/animations/shiny-text.svelte';
 	import type { ToolCallPart, ToolResultPart } from 'ai';
-	import BookReadIcon from 'remixicon-svelte/icons/book-ai-line';
+	import { RiBookAiLine as BookReadIcon } from 'remixicon-svelte';
 
 	type Props = {
 		tool: ToolCallPart & {

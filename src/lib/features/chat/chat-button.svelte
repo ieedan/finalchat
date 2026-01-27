@@ -4,12 +4,7 @@
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
-	import Ellipsis from 'remixicon-svelte/icons/more-line';
-	import PencilIcon from 'remixicon-svelte/icons/pencil-line';
-	import PinIcon from 'remixicon-svelte/icons/pushpin-2-line';
-	import PinOffIcon from 'remixicon-svelte/icons/pushpin-2-fill';
-	import SplitIcon from 'remixicon-svelte/icons/git-branch-line';
-	import TrashIcon from 'remixicon-svelte/icons/delete-bin-line';
+	import { RiMoreLine as Ellipsis, RiPencilLine as PencilIcon, RiPushpin2Line as PinIcon, RiPushpin2Fill as PinOffIcon, RiGitBranchLine as SplitIcon, RiDeleteBinLine as TrashIcon } from 'remixicon-svelte';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';

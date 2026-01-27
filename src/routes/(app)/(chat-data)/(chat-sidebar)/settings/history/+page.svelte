@@ -1,8 +1,7 @@
 <script lang="ts">
 	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import * as Card from '$lib/components/ui/card';
-	import HistoryIcon from 'remixicon-svelte/icons/history-line';
-	import DeleteIcon from 'remixicon-svelte/icons/delete-bin-line';
+	import { RiHistoryLine as HistoryIcon, RiDeleteBinLine as DeleteIcon } from 'remixicon-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { createChatsTable } from './table';
 	import { useCachedQuery } from '$lib/cache/cached-query.svelte';

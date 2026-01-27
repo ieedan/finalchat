@@ -2,7 +2,7 @@
 	import * as FileDropZone from '$lib/components/ui/file-drop-zone';
 	import { usePromptInputAttachmentButton } from './prompt-input.svelte.js';
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import ImagePlusIcon from 'remixicon-svelte/icons/image-add-line';
+	import { RiImageAddLine as ImagePlusIcon } from 'remixicon-svelte';
 
 	usePromptInputAttachmentButton();
 </script>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as AccountSettings from '$lib/components/layout/account-settings';
 	import * as Card from '$lib/components/ui/card';
-	import PaperclipIcon from 'remixicon-svelte/icons/attachment-2';
+	import { RiAttachment2 as PaperclipIcon, RiDeleteBinLine as DeleteIcon } from 'remixicon-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { createAttachmentsTable, type AttachmentWithUrl } from './table';
 	import { useCachedQuery } from '$lib/cache/cached-query.svelte';
@@ -13,7 +13,6 @@
 	import * as Table from '$lib/components/ui/table';
 	import { FlexRender } from '$lib/components/ui/data-table';
 	import { Checkbox } from '$lib/components/ui/checkbox';
-	import DeleteIcon from 'remixicon-svelte/icons/delete-bin-line';
 
 	const attachmentsQuery = useCachedQuery(api.chatAttachments.getAll, {});
 

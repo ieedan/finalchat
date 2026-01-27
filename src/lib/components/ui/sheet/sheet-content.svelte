@@ -22,7 +22,7 @@
 
 <script lang="ts">
 	import { Dialog as SheetPrimitive } from 'bits-ui';
-	import XIcon from 'remixicon-svelte/icons/close-line';
+	import { RiCloseLine as XIcon } from 'remixicon-svelte';
 	import type { Snippet } from 'svelte';
 	import SheetOverlay from './sheet-overlay.svelte';
 	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';

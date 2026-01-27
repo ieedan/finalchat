@@ -9,11 +9,7 @@
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { FinalChat, Github } from '$lib/components/logos';
-	import ArrowRightIcon from 'remixicon-svelte/icons/arrow-right-line';
-	import MessageSquarePlusIcon from 'remixicon-svelte/icons/chat-new-line';
-	import RobotIcon from 'remixicon-svelte/icons/robot-2-line';
-	import PanelLeftIcon from 'remixicon-svelte/icons/layout-left-line';
-	import SendIcon from 'remixicon-svelte/icons/send-plane-line';
+	import { RiArrowRightLine as ArrowRightIcon, RiChatNewLine as MessageSquarePlusIcon, RiRobot2Line as RobotIcon, RiLayoutLeftLine as PanelLeftIcon, RiSendPlaneLine as SendIcon } from 'remixicon-svelte';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import { cn } from '$lib/utils.js';
 	import { BASIC_MODELS } from '$lib/ai';

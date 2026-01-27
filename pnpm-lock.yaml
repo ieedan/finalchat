@@ -218,8 +218,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2))
       vite-plugin-transform-remixicon-imports:
-        specifier: ^0.0.1
-        version: 0.0.1(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2))
+        specifier: ^0.0.3
+        version: 0.0.3(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2))
       vitest:
         specifier: ^4.0.18
         version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)
@@ -3965,8 +3965,8 @@ packages:
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
 
-  vite-plugin-transform-remixicon-imports@0.0.1:
-    resolution: {integrity: sha512-phhgUZlRp0fR8NgjgfhIXePBs1pM3a1UzCh6kJpPXwVOs1fMTaM9Dminlv9hi7seTOSJOrAA7U9dL3kmomW+Og==}
+  vite-plugin-transform-remixicon-imports@0.0.3:
+    resolution: {integrity: sha512-+KoiqEFht4XX0oxSJgR4ywZVkwMEFW96ubxg1PpD0go+P9debbeCDGENRHyg6NdEWwshCReXpNPFcsYA7sDzRA==}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
 
@@ -8265,7 +8265,7 @@ snapshots:
       uuid: 11.1.0
       vite: 7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)
 
-  vite-plugin-transform-remixicon-imports@0.0.1(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)):
+  vite-plugin-transform-remixicon-imports@0.0.3(vite@7.3.1(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.30.2)):
     dependencies:
       '@sveltejs/acorn-typescript': 1.0.7(acorn@8.15.0)
       acorn: 8.15.0

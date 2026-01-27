@@ -5,10 +5,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import { Separator } from '$lib/components/ui/separator';
 	import type { Doc } from '$lib/convex/_generated/dataModel';
-	import CheckIcon from 'remixicon-svelte/icons/check-line';
-	import LockIcon from 'remixicon-svelte/icons/lock-line';
-	import GlobeIcon from 'remixicon-svelte/icons/global-line';
-	import ShareIcon from 'remixicon-svelte/icons/share-line';
+	import { RiCheckLine as CheckIcon, RiLockLine as LockIcon, RiGlobalLine as GlobeIcon, RiShareLine as ShareIcon } from 'remixicon-svelte';
 	import { Snippet } from '$lib/components/ui/snippet';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';

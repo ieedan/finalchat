@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Command as CommandPrimitive } from 'bits-ui';
-	import SearchIcon from 'remixicon-svelte/icons/search-line';
+	import { RiSearchLine as SearchIcon } from 'remixicon-svelte';
 	import { cn } from '$lib/utils.js';
 
 	let {

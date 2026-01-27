@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
-	import ChevronRightIcon from 'remixicon-svelte/icons/arrow-right-s-line';
+	import { RiArrowRightSLine as ChevronRightIcon } from 'remixicon-svelte';
 	import { cn } from '$lib/utils.js';
 
 	let {

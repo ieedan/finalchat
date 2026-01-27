@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as FileDropZone from '$lib/components/ui/file-drop-zone';
 	import { usePromptInputAttachmentButton } from '../prompt-input/prompt-input.svelte.js';
-	import ImagePlusIcon from 'remixicon-svelte/icons/image-add-line';
+	import { RiImageAddLine as ImagePlusIcon } from 'remixicon-svelte';
 	import PromptInputPlusItem from './prompt-input-plus-item.svelte';
 
 	usePromptInputAttachmentButton();

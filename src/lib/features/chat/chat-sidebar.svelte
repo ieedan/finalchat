@@ -6,7 +6,7 @@
 	import { DEFAULT_AGE_GROUPS, getAgedGroups } from '$lib/utils/aged-groups';
 	import ChatButton from './chat-button.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import PlusIcon from 'remixicon-svelte/icons/add-line';
+	import { RiAddLine as PlusIcon } from 'remixicon-svelte';
 	import ChatGotoDialog from './chat-goto-dialog.svelte';
 	import { cn } from '$lib/utils';
 	import * as Kbd from '$lib/components/ui/kbd';

@@ -3,7 +3,7 @@
 	import { useFileDropZoneTrigger } from './file-drop-zone.svelte.js';
 	import { displaySize } from './index.js';
 	import type { FileDropZoneTriggerProps } from './types.js';
-	import UploadIcon from 'remixicon-svelte/icons/upload-2-line';
+	import { RiUpload2Line as UploadIcon } from 'remixicon-svelte';
 
 	let {
 		ref = $bindable(null),

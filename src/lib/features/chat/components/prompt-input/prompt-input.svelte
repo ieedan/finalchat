@@ -3,7 +3,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { usePromptInput, type OnSubmit } from './prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
-	import AlertIcon from 'remixicon-svelte/icons/alert-line';
+	import { RiAlertLine as AlertIcon } from 'remixicon-svelte';
 	import PromptInputBannerContent from './prompt-input-banner-content.svelte';
 	import PromptInputBanner from './prompt-input-banner.svelte';
 	import PromptInputBannerDismiss from './prompt-input-banner-dismiss.svelte';

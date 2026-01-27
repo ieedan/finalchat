@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import ArrowRightIcon from 'remixicon-svelte/icons/arrow-right-line';
+	import { RiArrowRightLine as ArrowRightIcon } from 'remixicon-svelte';
 	import { api } from '$lib/convex/_generated/api';
 	import { useConvexClient } from 'convex-svelte';
 	import ChooseModeField from '../modes/choose-mode-field.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PlusIcon from 'remixicon-svelte/icons/add-line';
+	import { RiAddLine as PlusIcon } from 'remixicon-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { useNumberFieldButton } from './number-field.svelte.js';
 	import type { NumberFieldButtonProps } from './types.js';

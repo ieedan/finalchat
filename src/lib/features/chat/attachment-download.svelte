@@ -3,7 +3,7 @@
 	import { AccessTokenCtx } from '$lib/context.svelte';
 	import { env } from '$lib/env.client';
 	import { getImageFileExtension } from '$lib/utils/media-types';
-	import DownloadIcon from 'remixicon-svelte/icons/download-2-line';
+	import { RiDownload2Line as DownloadIcon } from 'remixicon-svelte';
 
 	let {
 		attachmentKey,

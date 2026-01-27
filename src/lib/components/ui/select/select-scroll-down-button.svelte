@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ChevronDownIcon from 'remixicon-svelte/icons/arrow-down-s-line';
+	import { RiArrowDownSLine as ChevronDownIcon } from 'remixicon-svelte';
 	import { Select as SelectPrimitive } from 'bits-ui';
 	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';
 

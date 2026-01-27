@@ -14,9 +14,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import ShareButton from './chat-share-button.svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import EyeIcon from 'remixicon-svelte/icons/eye-line';
-	import MessageCircleOffIcon from 'remixicon-svelte/icons/chat-off-line';
-	import ArrowLeftIcon from 'remixicon-svelte/icons/arrow-left-line';
+	import { RiEyeLine as EyeIcon, RiChatOffLine as MessageCircleOffIcon, RiArrowLeftLine as ArrowLeftIcon } from 'remixicon-svelte';
 	import * as Empty from '$lib/components/ui/empty';
 	import { Button } from '$lib/components/ui/button';
 	import { BASIC_MODELS } from '$lib/ai.js';

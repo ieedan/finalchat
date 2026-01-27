@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
-	import LoaderIcon from 'remixicon-svelte/icons/loader-2-line';
+	import { RiLoader2Line as LoaderIcon } from 'remixicon-svelte';
 	import type { ComponentProps } from 'svelte';
 
 	let { class: className, ...restProps }: ComponentProps<typeof LoaderIcon> = $props();
