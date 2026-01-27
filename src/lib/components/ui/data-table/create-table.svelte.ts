@@ -16,12 +16,14 @@ import { createSvelteTable } from './data-table.svelte.js';
 
 export function createTable<TData extends RowData>({
 	data,
-	columns
+	columns,
+	pageSize = 10
 }: {
 	data: ReadableBox<TData[]>;
 	columns: ColumnDef<TData>[];
+	pageSize?: number;
 }) {
-	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
+	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize });
 	let sorting = $state<SortingState>([]);
 	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = $state<VisibilityState>({});

@@ -7,6 +7,7 @@ import type { ReadableBox } from 'svelte-toolbelt';
 export function createChatsTable(data: ReadableBox<Doc<'chats'>[]>) {
 	return createTable({
 		data,
+		pageSize: Number.MAX_SAFE_INTEGER,
 		columns: [
 			{
 				id: 'select',
