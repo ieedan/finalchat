@@ -11,7 +11,7 @@ export type AttachmentWithUrl = Doc<'chatAttachments'> & { url: string };
 export function createAttachmentsTable(data: ReadableBox<AttachmentWithUrl[]>) {
 	return createTable({
 		data,
-		pageSize: Number.MAX_SAFE_INTEGER,
+		pageSize: 25,
 		columns: [
 			{
 				id: 'select',

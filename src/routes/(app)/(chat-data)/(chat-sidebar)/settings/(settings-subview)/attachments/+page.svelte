@@ -1,6 +1,11 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { RiAttachment2 as PaperclipIcon, RiDeleteBinLine as DeleteIcon } from 'remixicon-svelte';
+	import {
+		RiAttachment2 as PaperclipIcon,
+		RiDeleteBinLine as DeleteIcon,
+		RiArrowLeftSLine as ChevronLeftIcon,
+		RiArrowRightSLine as ChevronRightIcon
+	} from 'remixicon-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { createAttachmentsTable, type AttachmentWithUrl } from './table';
 	import { useCachedQuery } from '$lib/cache/cached-query.svelte';
@@ -78,7 +83,7 @@
 					{table.getSelectedRowModel().rows.length === 1 ? 'Attachment' : 'Attachments'}
 				</Button>
 			</div>
-			<div class="max-h-[400px] overflow-y-auto">
+			<div class="h-[400px] overflow-y-auto">
 				<Table.Root>
 					<Table.Body>
 						{#each table.getRowModel().rows as row (row.id)}
@@ -98,6 +103,31 @@
 						{/each}
 					</Table.Body>
 				</Table.Root>
+			</div>
+			<div class="border-border flex items-center justify-between border-t px-2 py-2">
+				<div class="text-sm text-muted-foreground">
+					Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+				</div>
+				<div class="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onclick={() => table.previousPage()}
+						disabled={!table.getCanPreviousPage()}
+					>
+						<ChevronLeftIcon class="size-4" />
+						Previous
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onclick={() => table.nextPage()}
+						disabled={!table.getCanNextPage()}
+					>
+						Next
+						<ChevronRightIcon class="size-4" />
+					</Button>
+				</div>
 			</div>
 		</div>
 	</Card.Content>
