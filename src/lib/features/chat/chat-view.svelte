@@ -98,7 +98,7 @@
 		</header>
 		<div
 			bind:this={scrollContainer}
-			class={cn('flex flex-col flex-1 min-h-0 overflow-y-auto items-center', {
+			class={cn('flex flex-col flex-1 min-h-0 overflow-y-auto items-center overflow-x-hidden', {
 				'scroll-smooth': isMounted.current
 			})}
 		>

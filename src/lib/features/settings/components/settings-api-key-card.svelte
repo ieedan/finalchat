@@ -1,20 +1,21 @@
 <script lang="ts">
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import ApiKeyInput from '../api-keys/api-key-input.svelte';
-	import { useLocalApiKey } from '../api-keys/local-key-storage.svelte';
-	import { createApiKey } from '../api-keys/api-keys.remote';
+	import ApiKeyInput from '../../api-keys/api-key-input.svelte';
+	import { createApiKey } from '../../api-keys/api-keys.remote';
 	import { Button } from '$lib/components/ui/button';
-	import type { ApiKey } from '../models/openrouter';
+	import type { ApiKey } from '../../models/openrouter';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { resource } from 'runed';
 	import { toast } from 'svelte-sonner';
+	import { useSettingsSetting, type Setting } from '../settings.svelte';
+	import { useLocalApiKey } from '$lib/features/api-keys/local-key-storage.svelte';
 
 	const chatLayoutState = useChatLayout();
 
 	const localApiKey = useLocalApiKey();
 
-	let storage: 'Local' | 'Remote' = $derived(localApiKey.current ? 'Local' : 'Remote');
+	let storage = $state<'Local' | 'Remote'>('Remote');
 	let apiKey = $derived<string>(chatLayoutState.apiKey ?? '');
 
 	let loading = $state(false);
@@ -52,14 +53,25 @@
 			const { data } = await res.json();
 
 			return data as ApiKey;
+		},
+		{
+			debounce: 100
 		}
 	);
+
+	const meta: Setting = {
+		id: 'api-key',
+		title: 'API Key',
+		description: 'Manage your API key.'
+	};
+
+	const settingState = useSettingsSetting(meta);
 </script>
 
-<Card.Root>
+<Card.Root class="w-full" style={settingState.style}>
 	<Card.Header>
-		<Card.Title>API Key</Card.Title>
-		<Card.Description>Manage your API key.</Card.Description>
+		<Card.Title>{meta.title}</Card.Title>
+		<Card.Description>{meta.description}</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form
@@ -71,7 +83,7 @@
 			class="flex flex-col gap-4"
 		>
 			<div class="flex flex-col gap-1">
-				<ApiKeyInput bind:apiKey bind:storage />
+				<ApiKeyInput bind:storage bind:apiKey />
 				<div>
 					{#if apiKeyInfoResource.current}
 						<span class="text-muted-foreground flex h-6 place-items-center text-xs">
