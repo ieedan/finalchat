@@ -9,6 +9,7 @@
 	import { useConvexClient } from 'convex-svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel';
 	import { useChatLayout } from './chat.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	type Props = {
 		message: MessageWithAttachments;
@@ -59,7 +60,16 @@
 </script>
 
 {#if chatLayoutState.user !== null}
-	<Button variant="ghost" size="icon" onClickPromise={branchFromMessage}>
-		<SplitIcon />
-	</Button>
+	<Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger>
+				<Button variant="ghost" size="icon" onClickPromise={branchFromMessage}>
+					<SplitIcon />
+				</Button>
+			</Tooltip.Trigger>
+			<Tooltip.Content>
+				{message.role === 'user' ? 'Branch and regenerate' : 'Branch'}
+			</Tooltip.Content>
+		</Tooltip.Root>
+	</Tooltip.Provider>
 {/if}

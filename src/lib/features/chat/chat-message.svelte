@@ -12,6 +12,7 @@
 	import type { Id } from '$lib/convex/_generated/dataModel.js';
 	import { useMedia } from '$lib/hooks/use-media.svelte';
 	import ChatImageAttachment from './chat-image-attachment.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -125,14 +126,21 @@
 			<div class="flex items-center gap-1">
 				<ChatBranchButton {message} bind:createdMessages />
 				{#if message.content}
-					<CopyButton
-						text={message.role === 'assistant'
-							? message.parts
-									.filter((p) => p.type === 'text')
-									.map((p) => p.text)
-									.join('')
-							: message.content}
-					/>
+					<Tooltip.Provider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>
+								<CopyButton
+									text={message.role === 'assistant'
+										? message.parts
+												.filter((p) => p.type === 'text')
+												.map((p) => p.text)
+												.join('')
+										: message.content}
+								/>
+							</Tooltip.Trigger>
+							<Tooltip.Content>Copy message</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
 				{/if}
 			</div>
 		</div>

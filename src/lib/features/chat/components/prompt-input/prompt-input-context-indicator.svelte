@@ -16,7 +16,7 @@
 </script>
 
 <Tooltip.Provider>
-	<Tooltip.Root delayDuration={250}>
+	<Tooltip.Root>
 		<Tooltip.Trigger>
 			<Gauge value={usedPercent} max={100} class={cn('size-5', className)} />
 		</Tooltip.Trigger>
