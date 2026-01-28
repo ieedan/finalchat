@@ -2,6 +2,5 @@ onlyBuiltDependencies:
   - esbuild
 
 patchedDependencies:
-  '@workos/authkit-sveltekit': patches/@workos__authkit-sveltekit.patch
   bits-ui: patches/bits-ui.patch
   convex-svelte: patches/convex-svelte.patch
