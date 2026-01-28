@@ -45,7 +45,6 @@ export const search = query({
 			matchedMessage?: MatchedText;
 		}[]
 	> => {
-		console.log('search', args.query);
 		if (args.query.trim().length === 0) return [];
 
 		const user = await ctx.auth.getUserIdentity();
@@ -405,11 +404,11 @@ export const branchFromMessage = mutation({
 						chatSettings:
 							m._id === args.message._id && args.message.role === 'user'
 								? {
-									modelId: args.message.modelId,
-									supportedParameters: args.message.supportedParameters,
-									inputModalities: args.message.inputModalities,
-									outputModalities: args.message.outputModalities
-								}
+										modelId: args.message.modelId,
+										supportedParameters: args.message.supportedParameters,
+										inputModalities: args.message.inputModalities,
+										outputModalities: args.message.outputModalities
+									}
 								: m.chatSettings
 					});
 				} else {

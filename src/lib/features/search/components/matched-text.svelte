@@ -16,13 +16,8 @@
 
 		const si = match.word.start - Math.floor(maxLength / 2);
 
-		console.log(si);
-
 		return Math.max(0, si);
 	});
-
-    $inspect(match)
-	$inspect(startIndex)
 </script>
 
 <span {...restProps}>
@@ -30,7 +25,10 @@
 		{#if startIndex > 0}
 			<span class="text-muted-foreground">...</span>
 		{/if}
-		<span>{match.text.slice(startIndex, match.word.start)}</span><span class="text-foreground font-semibold">{match.text.slice(match.word.start, match.word.end)}</span><span>{match.text.slice(match.word.end, startIndex + maxLength)}</span>
+		<span>{match.text.slice(startIndex, match.word.start)}</span><span
+			class="text-foreground font-semibold"
+			>{match.text.slice(match.word.start, match.word.end)}</span
+		><span>{match.text.slice(match.word.end, startIndex + maxLength)}</span>
 		{#if match.text.length > startIndex + maxLength}
 			<span class="text-muted-foreground">...</span>
 		{/if}

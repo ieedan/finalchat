@@ -1,8 +1,6 @@
 <script lang="ts">
 	import * as InputGroup from '$lib/components/ui/input-group';
 	import { RiSearchLine as SearchIcon } from 'remixicon-svelte';
-	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
-	import * as Kbd from '$lib/components/ui/kbd';
 	import { useSettingsSearchInput } from '../settings.svelte';
 	import { box } from 'svelte-toolbelt';
 
