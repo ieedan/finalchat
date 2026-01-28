@@ -1,6 +1,7 @@
 import { defineBaseMetaTags } from 'svelte-meta-tags';
 
 export async function load(event) {
+	const auth = await event.locals.auth();
 	const baseMetaTags = defineBaseMetaTags({
 		title: 'Finalchat',
 		titleTemplate: '%s ~ Finalchat',
@@ -15,8 +16,8 @@ export async function load(event) {
 
 	return {
 		...baseMetaTags,
-		accessToken: event.locals.auth.accessToken,
-		user: event.locals.auth.user,
+		accessToken: auth?.accessToken ?? null,
+		user: auth?.user ?? null,
 		fontPreset
 	};
 }

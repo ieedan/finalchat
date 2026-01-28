@@ -32,8 +32,7 @@ export const updateMode = mutation({
 					mode: args.mode
 				},
 				// in basic mode users probably would just prefer to submit on Enter
-				submitOnEnter: args.mode === 'basic',
-				favoriteModelIds: DEFAULT_ENABLED_MODEL_IDS
+				submitOnEnter: args.mode === 'basic'
 			});
 			return;
 		}
@@ -74,6 +73,10 @@ export const addFavoriteModel = mutation({
 		const userSettings = await getUserSettings(ctx, user);
 		if (!userSettings) return;
 
+		if (!userSettings.favoriteModelIds) {
+			userSettings.favoriteModelIds = DEFAULT_ENABLED_MODEL_IDS;
+		}
+
 		const modelIdsSet = new Set(userSettings.favoriteModelIds);
 		modelIdsSet.add(args.modelId);
 
@@ -93,6 +96,10 @@ export const removeFavoriteModel = mutation({
 
 		const userSettings = await getUserSettings(ctx, user);
 		if (!userSettings) return;
+
+		if (!userSettings.favoriteModelIds) {
+			userSettings.favoriteModelIds = DEFAULT_ENABLED_MODEL_IDS;
+		}
 
 		const modelIdsSet = new Set(userSettings.favoriteModelIds);
 		modelIdsSet.delete(args.modelId);

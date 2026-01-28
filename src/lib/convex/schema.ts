@@ -57,21 +57,12 @@ export default defineSchema({
 				completed: v.optional(v.boolean())
 			})
 		),
-		favoriteModelIds: v.array(v.string()),
+		favoriteModelIds: v.optional(v.array(v.string())),
 		systemPrompt: v.optional(v.string()),
 		submitOnEnter: v.optional(v.boolean())
 	}).index('by_user', ['userId']),
-	groups: defineTable({
-		name: v.string(),
-		description: v.optional(v.string()),
-		options: v.object({
-			canViewMembersChats: v.optional(v.boolean()),
-			allowPublicChats: v.optional(v.boolean())
-		})
-	}),
 	apiKeys: defineTable({
 		userId: v.optional(v.string()),
-		groupId: v.optional(v.id('groups')),
 		name: v.optional(v.string()),
 		provider: v.union(v.literal('OpenRouter')),
 		key: v.string(),
@@ -81,7 +72,6 @@ export default defineSchema({
 		generating: v.boolean(),
 		generatingTitle: v.optional(v.boolean()),
 		userId: v.string(),
-		groupId: v.optional(v.id('groups')),
 		title: v.string(),
 		updatedAt: v.number(),
 		pinned: v.boolean(),
@@ -95,7 +85,6 @@ export default defineSchema({
 	}).index('by_user', ['userId']),
 	chatAttachments: defineTable({
 		userId: v.string(),
-		groupId: v.optional(v.id('groups')),
 		chatId: v.id('chats'),
 		messageId: v.id('messages'),
 		key: v.string(),

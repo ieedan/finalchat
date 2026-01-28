@@ -119,6 +119,7 @@
 						{:else if chat.branchedFrom}
 							<button
 								type="button"
+								tabindex={-1}
 								onclick={(e) => {
 									e.preventDefault();
 									e.stopPropagation();

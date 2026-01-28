@@ -1,36 +1,15 @@
-import { authKitHandle, configureAuthKit } from '@workos/authkit-sveltekit';
 import { env } from '$lib/env.server';
 import type { Handle } from '@sveltejs/kit';
 import { ConvexClient } from 'convex/browser';
 import { sequence } from '@sveltejs/kit/hooks';
-import { dev } from '$app/environment';
-
-const previewRedirectUri = `${dev ? 'http' : 'https'}://${env.VERCEL_URL}/auth/callback`;
-const redirectUri =
-	env.VERCEL_ENV === 'production' ? `https://finalchat.app/auth/callback` : previewRedirectUri;
-
-const authKitConfig = {
-	clientId: env.PUBLIC_WORKOS_CLIENT_ID,
-	apiKey: env.WORKOS_API_KEY,
-	redirectUri,
-	cookiePassword: env.WORKOS_COOKIE_PASSWORD
-};
-
-configureAuthKit(authKitConfig);
-
-const authHandle = authKitHandle();
+import { authKit } from '$lib/workos.server';
 
 const injectConvex: Handle = async ({ event, resolve }) => {
 	const convex = new ConvexClient(env.PUBLIC_CONVEX_URL);
-
-	if (event.locals.auth.accessToken) {
-		// where it's needed we should already be keeping the token up to date with authKit
-		convex.setAuth(async () => event.locals.auth.accessToken);
-	}
 
 	event.locals.convex = convex;
 
 	return resolve(event);
 };
 
-export const handle = sequence(authHandle, injectConvex);
+export const handle = sequence(authKit.handle(), injectConvex);
