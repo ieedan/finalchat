@@ -25,12 +25,4 @@
 	<InputGroup.Addon>
 		<SearchIcon />
 	</InputGroup.Addon>
-	<InputGroup.Addon align="inline-end">
-		<Kbd.Group>
-			<Kbd.Root>
-				{cmdOrCtrl}
-			</Kbd.Root>
-			<Kbd.Root>K</Kbd.Root>
-		</Kbd.Group>
-	</InputGroup.Addon>
 </InputGroup.Root>

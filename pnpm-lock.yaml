@@ -16,6 +16,9 @@ importers:
 
   .:
     devDependencies:
+      '@convex-dev/migrations':
+        specifier: ^0.3.1
+        version: 0.3.1(convex@1.31.6(react@19.2.1))
       '@convex-dev/persistent-text-streaming':
         specifier: ^0.3.0
         version: 0.3.0(convex@1.31.6(react@19.2.1))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -460,6 +463,11 @@ packages:
 
   '@convex-dev/action-retrier@0.3.0':
     resolution: {integrity: sha512-opBNsgOPSuVY3qSARNub98XqPzSpSS7Jga0oGeWFhO+DcWBMt2gD3ssUeEA1Gi7wTNiZBX+T6OBfBnqMfv6Tuw==}
+    peerDependencies:
+      convex: ^1.24.8
+
+  '@convex-dev/migrations@0.3.1':
+    resolution: {integrity: sha512-dGiN82vWMN415/AGMcVooDOJk8iTousZahBBs27uA03pL74Uo3ksucUW3CiCfPx75rv+x9UnenEakimQYYNIrA==}
     peerDependencies:
       convex: ^1.24.8
 
@@ -4538,6 +4546,10 @@ snapshots:
   '@chevrotain/utils@11.0.3': {}
 
   '@convex-dev/action-retrier@0.3.0(convex@1.31.6(react@19.2.1))':
+    dependencies:
+      convex: 1.31.6(react@19.2.1)
+
+  '@convex-dev/migrations@0.3.1(convex@1.31.6(react@19.2.1))':
     dependencies:
       convex: 1.31.6(react@19.2.1)
 

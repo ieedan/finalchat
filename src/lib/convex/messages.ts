@@ -145,6 +145,7 @@ export const create = mutation({
 		const streamId = await persistentTextStreaming.createStream(ctx);
 		const assistantMessageId = await ctx.db.insert('messages', {
 			chatId,
+			userId: user.subject,
 			role: 'assistant',
 			streamId,
 			meta: {

@@ -3,6 +3,7 @@
 	import ChatSidebar from '$lib/features/chat/chat-sidebar.svelte';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import OnboardingDialog from '$lib/features/onboarding/onboarding-dialog.svelte';
+	import SearchModal from '$lib/features/search/components/search-modal.svelte';
 
 	let { children } = $props();
 
@@ -15,6 +16,8 @@
 		{@render children()}
 	</Sidebar.Inset>
 </Sidebar.Provider>
+
+<SearchModal />
 
 <OnboardingDialog
 	user={chatLayoutState.user}

@@ -21,6 +21,7 @@
 		"test": "npm run test:unit -- --run"
 	},
 	"devDependencies": {
+		"@convex-dev/migrations": "^0.3.1",
 		"@convex-dev/persistent-text-streaming": "^0.3.0",
 		"@convex-dev/r2": "latest",
 		"@dotenvx/dotenvx": "^1.52.0",

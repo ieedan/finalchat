@@ -23,6 +23,7 @@ export type ChatMessageUser = Infer<typeof ChatMessageUser> & {
 
 export const ChatMessageAssistant = v.object({
 	chatId: v.id('chats'),
+	userId: v.optional(v.string()),
 	role: v.literal('assistant'),
 	content: v.optional(v.string()),
 	error: v.optional(v.string()),
@@ -82,7 +83,12 @@ export default defineSchema({
 			})
 		),
 		public: v.optional(v.boolean())
-	}).index('by_user', ['userId']),
+	})
+		.index('by_user', ['userId'])
+		.searchIndex('search_title', {
+			searchField: 'title',
+			filterFields: ['userId']
+		}),
 	chatAttachments: defineTable({
 		userId: v.string(),
 		chatId: v.id('chats'),
@@ -94,5 +100,11 @@ export default defineSchema({
 		.index('by_message', ['messageId'])
 		.index('by_key', ['key'])
 		.index('by_user', ['userId']),
-	messages: defineTable(ChatMessage).index('by_stream', ['streamId']).index('by_chat', ['chatId'])
+	messages: defineTable(ChatMessage)
+		.index('by_stream', ['streamId'])
+		.index('by_chat', ['chatId'])
+		.searchIndex('search_content', {
+			searchField: 'content',
+			filterFields: ['chatId', 'userId']
+		})
 });
