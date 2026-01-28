@@ -16,8 +16,8 @@ export async function load(event) {
 
 	return {
 		...baseMetaTags,
-		accessToken: auth?.accessToken,
-		user: auth?.user,
+		accessToken: auth?.accessToken ?? null,
+		user: auth?.user ?? null,
 		fontPreset
 	};
 }
