@@ -7,6 +7,8 @@
 	import { RiArrowRightLine as ArrowRightIcon } from 'remixicon-svelte';
 	import { shortcut } from '$lib/actions/shortcut.svelte';
 	import MatchingText from './matching-text.svelte';
+	import removeMarkdown from 'remove-markdown';
+	import type { StreamResult } from '$lib/utils/stream-transport-protocol';
 
 	let open = $state(false);
 	let search = $state('');
@@ -19,7 +21,42 @@
 		}
 	});
 
-	$inspect(messages.data);
+	function getMatchingMessageText(
+		message: { role: 'user' | 'assistant'; content?: string | null; parts?: StreamResult },
+		searchQuery: string
+	): string | null {
+		if (!message) return null;
+
+		const queryLower = searchQuery.toLowerCase();
+
+		if (message.role === 'user') {
+			const content = message.content || '';
+			const plainText = removeMarkdown(content);
+			// Since the message matched the search, show the content
+			return plainText;
+		}
+
+		// For assistant messages, find the first text or reasoning part that matches
+		if (message.role === 'assistant' && message.parts) {
+			for (const part of message.parts) {
+				if (part.type === 'text' || part.type === 'reasoning') {
+					const plainText = removeMarkdown(part.text);
+					// Check if this part contains the search query
+					if (plainText.toLowerCase().includes(queryLower)) {
+						return plainText;
+					}
+				}
+			}
+			// If no part matches, show the first text/reasoning part anyway
+			for (const part of message.parts) {
+				if (part.type === 'text' || part.type === 'reasoning') {
+					return removeMarkdown(part.text);
+				}
+			}
+		}
+
+		return null;
+	}
 </script>
 
 <svelte:window use:shortcut={{ key: 'k', ctrl: true, callback: () => (open = !open) }} />
@@ -42,11 +79,21 @@
 								<span class="text-foreground">
 									<MatchingText text={result.chat.title} {search} />
 								</span>
-								<span class="text-muted-foreground">
-									{result.messages.length > 0
-										? result.messages.length + ' messages'
-										: 'No messages'}
-								</span>
+								{#if result.messages.length > 0}
+									{@const firstMessage = result.messages[0]}
+									{@const matchingText = getMatchingMessageText(firstMessage, search)}
+									{#if matchingText}
+										<span class="text-muted-foreground text-sm line-clamp-1">
+											<MatchingText text={matchingText} {search} maxLength={80} />
+										</span>
+									{:else}
+										<span class="text-muted-foreground">
+											{result.messages.length} {result.messages.length === 1 ? 'message' : 'messages'}
+										</span>
+									{/if}
+								{:else}
+									<span class="text-muted-foreground">No messages</span>
+								{/if}
 							</div>
 							<ArrowRightIcon />
 						</Command.Item>
