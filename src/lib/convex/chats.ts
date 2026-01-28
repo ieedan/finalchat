@@ -11,8 +11,9 @@ import { api, internal } from './_generated/api';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { Prompt } from './messages';
 import { asyncMap } from 'convex-helpers';
-import { deserializeStream, type StreamResult } from '../utils/stream-transport-protocol';
-import type { ChatMessageAssistant, ChatMessageUser } from './schema';
+import { deserializeStream } from '../utils/stream-transport-protocol';
+import removeMarkdown from 'remove-markdown';
+import { createMatch, type MatchedText } from '../utils/full-text-search';
 
 export const getAll = query({
 	args: {},
@@ -32,14 +33,18 @@ export const getAll = query({
 
 export const search = query({
 	args: {
-		query: v.string(),
+		query: v.string()
 	},
-	handler: async (ctx, args): Promise<{
-		chat: Doc<'chats'>; messages: ((ChatMessageUser)
-			| (ChatMessageAssistant & {
-				parts: StreamResult;
-			}))[]
-	}[]> => {
+	handler: async (
+		ctx,
+		args
+	): Promise<
+		{
+			_id: Id<'chats'>;
+			matchedTitle: MatchedText;
+			matchedMessage?: MatchedText;
+		}[]
+	> => {
 		console.log('search', args.query);
 		if (args.query.trim().length === 0) return [];
 
@@ -65,12 +70,6 @@ export const search = query({
 				)
 				.collect()
 		]);
-
-
-		// ranking
-		// 1. title match
-		// 2. title match + content match (x amount of messages)
-		// 3. content match
 
 		const allResults = [...chatResults, ...messageResults];
 
@@ -122,30 +121,59 @@ export const search = query({
 					chatResult = (await ctx.db.get(chatId))!;
 				}
 
-				const normalizedMessages = messages.map((message) => {
+				let matchedTitle: MatchedText;
+				if (chat === null) {
+					matchedTitle = {
+						text: chatResult.title,
+						word: undefined
+					};
+				} else {
+					matchedTitle = createMatch(chatResult.title, args.query);
+				}
+
+				let matchedMessage: MatchedText | undefined = undefined;
+				for (const message of messages) {
 					if (message.role === 'assistant') {
 						const deserializedContentResult = deserializeStream({
 							text: message.content ?? '',
 							stack: []
 						});
 						if (deserializedContentResult.isErr()) {
-							return {
-								...message,
-								parts: []
-							};
+							continue;
 						}
-						return {
-							...message,
-							parts: deserializedContentResult.value.stack
-						};
+
+						const parts = deserializedContentResult.value.stack;
+
+						for (const part of parts) {
+							if (part.type === 'text') {
+								const matchResult = createMatch(removeMarkdown(part.text), args.query);
+								if (matchResult.word) {
+									matchedMessage = matchResult;
+									break;
+								}
+							} else if (part.type === 'reasoning') {
+								const matchResult = createMatch(removeMarkdown(part.text), args.query);
+								if (matchResult.word) {
+									matchedMessage = matchResult;
+									break;
+								}
+							}
+						}
+
+						if (matchedMessage) break;
 					}
 
-					return message
-				})
+					const matchResult = createMatch(removeMarkdown(message.content ?? ''), args.query);
+					if (matchResult.word) {
+						matchedMessage = matchResult;
+						break;
+					}
+				}
 
 				return {
-					chat: chatResult,
-					messages: normalizedMessages
+					_id: chatId,
+					matchedTitle,
+					matchedMessage
 				};
 			}
 		);
