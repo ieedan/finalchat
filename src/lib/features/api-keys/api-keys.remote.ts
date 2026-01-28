@@ -6,6 +6,9 @@ import z from 'zod';
 export const getApiKey = query(async () => {
 	const { locals } = getRequestEvent();
 
+	const auth = await locals.auth();
+	if (!auth) return null;
+
 	const apiKey = await locals.convex.query(api.apiKeys.get, {});
 	if (!apiKey) return null;
 
@@ -20,6 +23,9 @@ export const createApiKey = command(
 	}),
 	async (args) => {
 		const { locals } = getRequestEvent();
+
+		const auth = await locals.auth();
+		if (!auth) return;
 
 		args.key = key.encrypt(args.key, 'base64');
 

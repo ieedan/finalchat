@@ -5,7 +5,7 @@ const SESSION_COOKIE_OPTIONS = {
 	path: '/',
 	httpOnly: true,
 	secure: true,
-	sameSite: 'lax',
+	sameSite: 'lax'
 } as const;
 
 export function getSessionCookie(cookies: Cookies) {

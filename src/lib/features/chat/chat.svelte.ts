@@ -16,6 +16,7 @@ import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte
 import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
+import { DEFAULT_ENABLED_MODEL_IDS } from '$lib/ai.js';
 
 type ChatLayoutOptions = {
 	user: User | null;
@@ -64,8 +65,14 @@ class ChatLayoutState {
 		return this.opts.models;
 	}
 
+	get favoriteModelIds() {
+		return this.userSettings?.favoriteModelIds
+			? this.userSettings?.favoriteModelIds
+			: DEFAULT_ENABLED_MODEL_IDS;
+	}
+
 	get enabledModels() {
-		return this.models.filter((model) => this.userSettings?.favoriteModelIds?.includes(model.id));
+		return this.models.filter((model) => this.favoriteModelIds.includes(model.id));
 	}
 
 	get user() {

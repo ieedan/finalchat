@@ -127,7 +127,7 @@
 	}
 
 	async function handleToggleFavorite(modelId: ModelId) {
-		if (chatLayoutState.userSettings?.favoriteModelIds?.includes(modelId)) {
+		if (chatLayoutState.favoriteModelIds.includes(modelId)) {
 			await handleRemoveFromFavorites(modelId);
 		} else {
 			await handleAddToFavorites(modelId);
@@ -198,7 +198,7 @@
 				<Command.Empty>No models found.</Command.Empty>
 				{#if !gridMode}
 					<Command.Group>
-						{#each sortedModels.filter( (model) => chatLayoutState.userSettings?.favoriteModelIds?.includes(model.id) ) as model (model.id)}
+						{#each sortedModels.filter( (model) => chatLayoutState.favoriteModelIds.includes(model.id) ) as model (model.id)}
 							<Command.Item
 								class="flex items-center justify-between gap-4"
 								value={model.id}
@@ -235,9 +235,7 @@
 							)}
 						>
 							{#each models as model (model.id)}
-								{@const isFavorite = chatLayoutState.userSettings?.favoriteModelIds?.includes(
-									model.id
-								)}
+								{@const isFavorite = chatLayoutState.favoriteModelIds.includes(model.id)}
 								<Command.Item
 									class="flex items-center justify-center relative border border-border rounded-md gap-4 size-32"
 									value={model.id}
@@ -305,9 +303,7 @@
 			{#if gridMode}
 				<div class="flex items-center gap-2">
 					{#if activeModel}
-						{@const isFavorite = chatLayoutState.userSettings?.favoriteModelIds?.includes(
-							activeModel.id
-						)}
+						{@const isFavorite = chatLayoutState.favoriteModelIds.includes(activeModel.id)}
 						<Button variant="ghost" size="sm" onclick={() => handleToggleFavorite(activeModel.id)}>
 							<span
 								class={cn('text-sm flex items-center gap-1.5', isFavorite && 'text-destructive')}
