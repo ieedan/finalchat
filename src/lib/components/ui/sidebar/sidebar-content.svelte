@@ -33,7 +33,7 @@
 	{@render children?.()}
 	<div
 		class={cn(
-			'absolute z-20 h-10 bg-background mask-t-from-25% -bottom-px w-full opacity-0 transition-opacity ease-in-out',
+			'absolute z-20 h-10 bg-sidebar mask-t-from-25% -bottom-px w-full opacity-0 transition-opacity ease-in-out',
 			!scrollState.arrived.bottom && 'opacity-100'
 		)}
 	></div>
