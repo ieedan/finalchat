@@ -50,7 +50,7 @@
 	const mobileModels = $derived(
 		chatLayoutState.isAdvancedMode
 			? chatLayoutState.models.filter((model) =>
-					chatLayoutState.userSettingsQuery.data?.favoriteModelIds?.includes(model.id)
+					chatLayoutState.favoriteModelIds?.includes(model.id)
 				)
 			: BASIC_MODELS
 	);
