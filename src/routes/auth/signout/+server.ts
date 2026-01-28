@@ -1,5 +1,3 @@
-import { authKit } from '@workos/authkit-sveltekit';
+import { authKit } from '$lib/workos.server';
 
-export async function GET(event) {
-	return await authKit.signOut(event);
-}
+export const GET = authKit.handleSignOut();

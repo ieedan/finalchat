@@ -1,3 +1,3 @@
-import { authKit } from '@workos/authkit-sveltekit';
+import { authKit } from '$lib/workos.server';
 
 export const GET = authKit.handleCallback();

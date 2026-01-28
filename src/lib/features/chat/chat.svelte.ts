@@ -57,7 +57,7 @@ class ChatLayoutState {
 	}
 
 	get isAdvancedMode() {
-		return this.userSettings?.onboarding?.mode === 'advanced';
+		return !this.userSettings || this.userSettings?.onboarding?.mode === 'advanced';
 	}
 
 	get models() {

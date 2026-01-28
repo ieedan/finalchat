@@ -43,7 +43,6 @@
 		"@types/node": "^25.0.10",
 		"@types/node-rsa": "^1.1.4",
 		"@workos-inc/node": "^8.0.0",
-		"@workos/authkit-sveltekit": "0.0.1-alpha.0",
 		"@zxcvbn-ts/core": "^3.0.4",
 		"@zxcvbn-ts/language-common": "^3.0.4",
 		"@zxcvbn-ts/language-en": "^3.0.2",
