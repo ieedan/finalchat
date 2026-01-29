@@ -20,9 +20,9 @@
 <SettingsKeyboardShortcutsCard class="md:flex hidden" />
 <SettingsApiKeyCard />
 <SettingsSystemPromptCard />
+<SettingsSubmitBehaviorCard />
 <SettingsModeCard />
 <SettingsThemeCard />
-<SettingsSubmitBehaviorCard />
 <SettingsFontCard />
 <SettingsAttachmentsCard />
 <SettingsHistoryCard />
