@@ -170,20 +170,25 @@
 				onkeydown={(e) => {
 					if (e.metaKey && e.key === 'ArrowRight') {
 						e.preventDefault();
+						e.stopPropagation();
 						mode = 'grid';
 					} else if (e.metaKey && e.key === 'ArrowLeft') {
 						e.preventDefault();
+						e.stopPropagation();
 						mode = 'list';
 					} else if (e.metaKey && e.key === 'u') {
 						e.preventDefault();
+						e.stopPropagation();
 						if (internalModelId) {
 							handleToggleFavorite(internalModelId);
 						}
 					} else if (e.metaKey && e.key === 'k') {
 						e.preventDefault();
+						e.stopPropagation();
 						actionsMenuOpen = !actionsMenuOpen;
 					} else if (e.key === 'Backspace' && search === '' && mode === 'grid' && !e.repeat) {
 						e.preventDefault();
+						e.stopPropagation();
 						mode = 'list';
 					}
 				}}

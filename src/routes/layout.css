@@ -5,14 +5,47 @@
 @source "../../node_modules/svelte-streamdown/**/*";
 
 :root {
+	/* Default fonts - overridden by app.html script from cookies */
+	--font-sans: 'IBM Plex Sans Variable', sans-serif;
+	--font-mono: 'Geist Mono', monospace;
+
+	--primary: oklch(0.5662 0.1905 27.52);
+	--primary-foreground: oklch(98.18% 0.005391873657638326 95.09859092511448);
+
+	--background: oklch(0.9518 0.005391873657638326 95.09859092511448);
+	--foreground: oklch(0.3761 0.00612555066067004 56.0433322108949);
+	--card: oklch(98.18% 0.005391873657638326 95.09859092511448);
+	--card-foreground: var(--foreground);
+	--popover: oklch(0.9518 0.005391873657638326 95.09859092511448);
+	--popover-foreground: var(--card-foreground);
+	--secondary: oklch(98.18% 0.005391873657638326 95.09859092511448);
+	--secondary-foreground: oklch(21.61% 0.00612555066067004 56.0433322108949);
+	--muted: oklch(98.18% 0.005391873657638326 95.09859092511448);
+	--muted-foreground: oklch(0.295 0.015 286.067);
+	--accent: oklch(0.9118 0.005391873657638326 95.09859092511448);
+	--accent-foreground: var(--foreground);
+	--destructive: oklch(0.704 0.191 22.216);
+	--destructive-foreground: oklch(98.18% 0.005391873657638326 95.09859092511448);
+	--border: oklch(0.898 0.006286933207768164 34.29748037425685);
+	--input: oklch(0.932 0.006286933207768164 34.29748037425685);
+	--ring: oklch(0.552 0.016 285.938);
+	--sidebar: oklch(98.18% 0.005391873657638326 95.09859092511448);
+	--sidebar-foreground: var(--foreground);
+	--sidebar-primary: var(--primary);
+	--sidebar-primary-foreground: var(--primary-foreground);
+	--sidebar-accent: oklch(0.900 0.006286933207768164 34.29748037425685);
+	--sidebar-accent-foreground: var(--foreground);
+	--sidebar-border: var(--border);
+	--sidebar-ring: var(--ring);
+}
+
+.dark {
 	--background: oklch(21.61% 0.00612555066067004 56.0433322108949);
 	--foreground: oklch(98.18% 0.005391873657638326 95.09859092511448);
 	--card: oklch(26.85% 0.006286933207768164 34.29748037425685);
 	--card-foreground: var(--foreground);
 	--popover: var(--card);
 	--popover-foreground: var(--card-foreground);
-	--primary: oklch(0.5662 0.1905 27.52);
-	--primary-foreground: oklch(98.18% 0.005391873657638326 95.09859092511448);
 	--secondary: oklch(0.274 0.006 286.033);
 	--secondary-foreground: oklch(0.985 0 0);
 	--muted: oklch(0.274 0.006 286.033);
@@ -32,10 +65,6 @@
 	--sidebar-accent-foreground: var(--foreground);
 	--sidebar-border: var(--border);
 	--sidebar-ring: var(--ring);
-
-	/* Default fonts - overridden by app.html script from cookies */
-	--font-sans: 'IBM Plex Sans Variable', sans-serif;
-	--font-mono: 'Geist Mono', monospace;
 }
 
 @theme inline {
