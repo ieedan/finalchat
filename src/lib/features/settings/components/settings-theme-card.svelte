@@ -30,8 +30,8 @@
 	const conversationAreaBase = 'flex flex-col gap-1.5 p-1.5 flex-1 min-h-0 overflow-hidden';
 </script>
 
-{#snippet sidebar(theme: Theme)}
-	<div class={cn(themeClasses(theme), sidebarStrip)}>
+{#snippet sidebar()}
+	<div class={cn(sidebarStrip)}>
 		<div class="h-4 w-full shrink-0 rounded-sm bg-primary"></div>
 		<div class="mt-1 flex flex-col gap-0.5 items-start">
 			<div class="h-1 w-full max-w-full rounded-sm bg-sidebar-accent/80"></div>
@@ -45,7 +45,7 @@
 {/snippet}
 
 {#snippet conversationBubbles({ compact = false }: { compact?: boolean })}
-	{@const bubbleMaxW = compact ? 'max-w-[90%]' : 'max-w-[85%]'}
+	{@const bubbleMaxW = 'max-w-[50%]'}
 	{@const bubblePadding = compact ? 'px-1.5 py-0.5' : 'px-2 py-1'}
 	{@const lineH = compact ? 'h-1' : 'h-1.5'}
 	{@const lineW1 = compact ? 'w-8' : 'w-12'}
@@ -70,13 +70,10 @@
 	</div>
 {/snippet}
 
-{#snippet inputBar(theme: Theme)}
-	<div class={cn(themeClasses(theme), 'px-1.5 pb-1.5')}>
+{#snippet inputBar()}
+	<div class="px-1.5 pb-1.5">
 		<div
-			class={cn(
-				themeClasses(theme),
-				'flex items-center gap-1.5 rounded-md border border-border bg-input/80 p-1.5 shrink-0'
-			)}
+			class="flex items-center gap-1.5 rounded-md border border-border bg-input/80 p-1.5 shrink-0"
 		>
 			<div class="h-4 flex-1 rounded bg-background/80 min-w-0"></div>
 			<div class="size-3.5 shrink-0 rounded-sm bg-primary"></div>
@@ -84,23 +81,14 @@
 	</div>
 {/snippet}
 
-{#snippet inputBarSplit()}
-	<div class="flex shrink-0 overflow-hidden">
-		<div class={cn(lightPreviewClasses, 'w-1/2 bg-background pl-1.5 pb-1.5')}>
-			<div
-				class="flex items-center gap-1.5 rounded-md border border-border rounded-r-none border-r-0 bg-input/80 p-1.5 pr-0 shrink-0"
-			>
-				<div class="h-4 flex-1 rounded rounded-r-none bg-background/80 min-w-0"></div>
+{#snippet themePreview({ class: className, theme }: { theme: Theme; class?: string })}
+	<div class={cn(themeClasses(theme), 'flex h-full w-full', className)}>
+		{@render sidebar()}
+		<div class={cn(mainAreaBase)}>
+			<div class={cn('flex flex-1 flex-col min-h-0 min-w-0 overflow-hidden')}>
+				{@render conversationBubbles({})}
 			</div>
-		</div>
-
-		<div class={cn(darkPreviewClasses, 'w-1/2 bg-background pr-1.5 pb-1.5')}>
-			<div
-				class="flex items-center gap-1.5 rounded-md border border-border rounded-l-none border-l-0 bg-input/80 p-1.5 pl-0 shrink-0"
-			>
-				<div class="h-4 flex-1 rounded rounded-l-none bg-background/80 min-w-0"></div>
-				<div class="size-3.5 shrink-0 rounded-sm bg-primary"></div>
-			</div>
+			{@render inputBar()}
 		</div>
 	</div>
 {/snippet}
@@ -110,8 +98,10 @@
 		<Card.Title>Theme</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		<RadioGroup.Root bind:value={userPrefersMode.current} class="grid grid-cols-3 gap-4">
-			<!-- Light -->
+		<RadioGroup.Root
+			bind:value={userPrefersMode.current}
+			class="grid grid-cols-2 sm:grid-cols-3 gap-4"
+		>
 			<label
 				for="theme-light"
 				class="flex cursor-pointer flex-col items-center gap-2 transition-all"
@@ -123,67 +113,40 @@
 							'ring-2 ring-primary ring-offset-2 ring-offset-background'
 					)}
 				>
-					<div class={cn(lightPreviewClasses, 'flex h-full w-full')}>
-						{@render sidebar('light')}
-						<div class={cn(mainAreaBase)}>
-							<div
-								class={cn(
-									lightPreviewClasses,
-									'flex flex-1 flex-col min-h-0 min-w-0 overflow-hidden'
-								)}
-							>
-								{@render conversationBubbles({})}
-							</div>
-							{@render inputBar('light')}
-						</div>
-					</div>
+					{@render themePreview({ theme: 'light' })}
 				</div>
 				<span class="text-sm text-muted-foreground">Light</span>
 				<RadioGroup.Item id="theme-light" value="light" class="sr-only" />
 			</label>
 
-			<!-- Auto -->
 			<label
 				for="theme-system"
-				class="flex cursor-pointer flex-col items-center gap-2 transition-all"
+				class="hidden cursor-pointer flex-col items-center gap-2 transition-all sm:flex"
 			>
 				<div
 					class={cn(
-						'aspect-16/12 w-full rounded-lg overflow-hidden border border-border flex transition-shadow',
+						'aspect-16/12 w-full rounded-lg overflow-hidden relative border border-border transition-shadow',
 						userPrefersMode.current === 'system' &&
 							'ring-2 ring-primary ring-offset-2 ring-offset-background'
 					)}
 				>
-					{@render sidebar('light')}
-					<div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-						<div class="flex min-h-0 flex-1">
-							<div
-								class={cn(
-									lightPreviewClasses,
-									mainAreaBase,
-									'w-1/2 min-w-0 max-w-[50%] shrink-0 rounded-none overflow-hidden'
-								)}
-							>
-								{@render conversationBubbles({ compact: true })}
-							</div>
-							<div
-								class={cn(
-									darkPreviewClasses,
-									mainAreaBase,
-									'w-1/2 min-w-0 max-w-[50%] shrink-0 rounded-none overflow-hidden'
-								)}
-							>
-								{@render conversationBubbles({ compact: true })}
-							</div>
-						</div>
-						{@render inputBarSplit()}
+					<!-- Dark: full size but clipped to right half only -->
+					<div
+						class="absolute inset-0 size-full overflow-hidden [clip-path:inset(0_0_0_50%)] isolate"
+					>
+						{@render themePreview({ theme: 'dark' })}
+					</div>
+					<!-- Light: full size but clipped to left half only -->
+					<div
+						class="absolute inset-0 size-full overflow-hidden [clip-path:inset(0_50%_0_0)] isolate"
+					>
+						{@render themePreview({ theme: 'light' })}
 					</div>
 				</div>
-				<span class="text-sm text-muted-foreground">Auto</span>
+				<span class="text-sm text-muted-foreground">System</span>
 				<RadioGroup.Item id="theme-system" value="system" class="sr-only" />
 			</label>
 
-			<!-- Dark -->
 			<label
 				for="theme-dark"
 				class="flex cursor-pointer flex-col items-center gap-2 transition-all"
@@ -195,20 +158,7 @@
 							'ring-2 ring-primary ring-offset-2 ring-offset-background'
 					)}
 				>
-					<div class={cn(darkPreviewClasses, 'flex h-full w-full')}>
-						{@render sidebar('dark')}
-						<div class={cn(mainAreaBase)}>
-							<div
-								class={cn(
-									darkPreviewClasses,
-									'flex flex-1 flex-col min-h-0 min-w-0 overflow-hidden'
-								)}
-							>
-								{@render conversationBubbles({})}
-							</div>
-							{@render inputBar('dark')}
-						</div>
-					</div>
+					{@render themePreview({ theme: 'dark' })}
 				</div>
 				<span class="text-sm text-muted-foreground">Dark</span>
 				<RadioGroup.Item id="theme-dark" value="dark" class="sr-only" />

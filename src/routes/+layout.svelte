@@ -62,7 +62,7 @@
 
 <MetaTags {...metaTags} />
 
-<ModeWatcher/>
+<ModeWatcher />
 <Startup />
 <ConfirmDeleteDialog />
 <Toaster position="bottom-right" />
