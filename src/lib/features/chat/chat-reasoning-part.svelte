@@ -16,7 +16,7 @@
 
 	let { part, isLastPart }: Props = $props();
 
-	let showReasoning = $state(true);
+	let showReasoning = $derived(isLastPart);
 </script>
 
 <div class="pb-2">

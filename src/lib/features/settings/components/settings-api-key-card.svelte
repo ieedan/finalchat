@@ -97,7 +97,7 @@
 						>
 							We encountered an error while trying to check your usage. Please try again later.
 						</span>
-					{:else}
+					{:else if apiKeyInfoResource.loading}
 						<Skeleton class="h-6 w-[200px]" />
 					{/if}
 				</div>

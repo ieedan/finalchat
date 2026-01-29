@@ -5,7 +5,8 @@ const SESSION_COOKIE_OPTIONS = {
 	path: '/',
 	httpOnly: true,
 	secure: true,
-	sameSite: 'lax'
+	sameSite: 'lax',
+	maxAge: 60 * 60 * 24 * 400 // 400 days
 } as const;
 
 export function getSessionCookie(cookies: Cookies) {

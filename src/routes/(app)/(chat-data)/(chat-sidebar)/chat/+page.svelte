@@ -124,6 +124,18 @@
 						</p>
 					</PromptInputMobile.BannerContent>
 				</PromptInputMobile.Banner>
+				{#if chatLayoutState.user !== null}
+					<PromptInputMobile.Banner dismissedByError dismissed={chatLayoutState.apiKey !== null}>
+						<PromptInputMobile.BannerContent>
+							<p>
+								You're currently limited to free models. <a
+									href="/settings"
+									class="font-medium underline">Setup API key</a
+								>.
+							</p>
+						</PromptInputMobile.BannerContent>
+					</PromptInputMobile.Banner>
+				{/if}
 				<PromptInputMobile.InputWrapper>
 					<PromptInputMobile.AttachmentList />
 					<PromptInputMobile.Input placeholder="Ask me anything..." />
@@ -152,6 +164,18 @@
 					</p>
 				</PromptInput.BannerContent>
 			</PromptInput.Banner>
+			{#if chatLayoutState.user !== null}
+				<PromptInput.Banner dismissedByError dismissed={chatLayoutState.apiKey !== null}>
+					<PromptInput.BannerContent>
+						<p>
+							You're currently limited to free models. <a
+								href="/settings"
+								class="font-medium underline">Setup API key</a
+							>.
+						</p>
+					</PromptInput.BannerContent>
+				</PromptInput.Banner>
+			{/if}
 			<PromptInput.Content>
 				<PromptInput.AttachmentList />
 				<PromptInput.Textarea placeholder="Ask me anything..." />
@@ -160,7 +184,7 @@
 						{#if chatLayoutState.isAdvancedMode}
 							<ModelPickerAdvanced />
 						{:else}
-							<ModelPickerBasic />
+							<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 						{/if}
 						<PromptInput.AttachmentButton />
 					</div>

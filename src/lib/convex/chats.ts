@@ -1,4 +1,4 @@
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 import type { Doc, Id } from './_generated/dataModel';
 import { internalMutation, mutation } from './functions';
 import {
@@ -227,7 +227,7 @@ export const internalGet = internalQuery({
 	},
 	handler: async (ctx, args): Promise<Doc<'chats'> & { messages: MessageWithAttachments[] }> => {
 		const chat = await ctx.db.get(args.chatId);
-		if (!chat) throw new Error('Chat not found');
+		if (!chat) throw new ConvexError('Chat not found');
 
 		const messages = await getChatMessagesInternal(ctx, args.chatId);
 
@@ -254,11 +254,11 @@ export const updatePinned = mutation({
 	},
 	handler: async (ctx, args): Promise<void> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
 
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat || chat.userId !== user.subject)
-			throw new Error('Chat not found or you are not authorized to access it');
+			throw new ConvexError('Chat not found or you are not authorized to access it');
 
 		await ctx.db.patch(args.chatId, {
 			pinned: args.pinned
@@ -273,11 +273,11 @@ export const updateTitle = mutation({
 	},
 	handler: async (ctx, args): Promise<void> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
 
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat || chat.userId !== user.subject)
-			throw new Error('Chat not found or you are not authorized to access it');
+			throw new ConvexError('Chat not found or you are not authorized to access it');
 
 		await ctx.db.patch(args.chatId, {
 			title: args.title
@@ -291,12 +291,12 @@ export const remove = mutation({
 	},
 	handler: async (ctx, args): Promise<void> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
 
 		for (const id of args.ids) {
 			const chat = await ctx.db.get(id);
 			if (!chat || chat.userId !== user.subject)
-				throw new Error('Chat not found or you are not authorized to access it');
+				throw new ConvexError('Chat not found or you are not authorized to access it');
 
 			await ctx.db.delete(id);
 		}
@@ -352,21 +352,21 @@ export const branchFromMessage = mutation({
 		args
 	): Promise<{ newChatId: Id<'chats'>; newAssistantMessageId: Id<'messages'> | null }> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
 
 		const sourceMessage = await ctx.db.get(args.message._id);
 		if (!sourceMessage || sourceMessage.role !== args.message.role) {
-			throw new Error('Source message not found');
+			throw new ConvexError('Source message not found');
 		}
 
 		const ogChat = await ctx.runQuery(internal.chats.internalGet, { chatId: sourceMessage.chatId });
 		if (!ogChat || (ogChat.userId !== user.subject && !ogChat.public)) {
-			throw new Error('Chat not found or you are not authorized to access it');
+			throw new ConvexError('Chat not found or you are not authorized to access it');
 		}
 
 		const chatIndex = ogChat.messages.findIndex((m) => m._id === args.message._id);
 		if (chatIndex === -1) {
-			throw new Error('Source message not found in chat');
+			throw new ConvexError('Source message not found in chat');
 		}
 
 		const messages = ogChat.messages.slice(0, chatIndex + 1);
@@ -476,11 +476,11 @@ export const updatePublic = mutation({
 	},
 	handler: async (ctx, args): Promise<void> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
 
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat || chat.userId !== user.subject)
-			throw new Error('Chat not found or you are not authorized to access it');
+			throw new ConvexError('Chat not found or you are not authorized to access it');
 
 		await ctx.db.patch(args.chatId, {
 			public: args.public

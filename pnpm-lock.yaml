@@ -25,6 +25,9 @@ importers:
       '@convex-dev/r2':
         specifier: latest
         version: 0.8.1(@standard-schema/spec@1.1.0)(convex-svelte@0.0.12(patch_hash=0cbda42873f10880d19ab3a5d6e778eb090ee338fd17ef8cfabb25aebedefee8)(convex@1.31.6(react@19.2.1))(svelte@5.48.2))(convex@1.31.6(react@19.2.1))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(svelte@5.48.2)(typescript@5.9.3)(zod@4.3.6)
+      '@convex-dev/rate-limiter':
+        specifier: ^0.3.2
+        version: 0.3.2(convex@1.31.6(react@19.2.1))(react@19.2.1)
       '@dotenvx/dotenvx':
         specifier: ^1.52.0
         version: 1.52.0
@@ -486,6 +489,15 @@ packages:
       react: ^18 || ^19
       react-dom: ^18 || ^19
       svelte: '>=5.0.0'
+
+  '@convex-dev/rate-limiter@0.3.2':
+    resolution: {integrity: sha512-+oBPsBfFbzdxiF/9XaaTQmVnvDlvEfg/c69/v8LxTbw4VLuiflIKlfnPQL8OS0azXQQ11hcPWHmU8ytFmHKDXA==}
+    peerDependencies:
+      convex: ^1.24.8
+      react: ^18.2.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@dotenvx/dotenvx@1.52.0':
     resolution: {integrity: sha512-CaQcc8JvtzQhUSm9877b6V4Tb7HCotkcyud9X2YwdqtQKwgljkMRwU96fVYKnzN3V0Hj74oP7Es+vZ0mS+Aa1w==}
@@ -4579,6 +4591,12 @@ snapshots:
       - supports-color
       - typescript
       - zod
+
+  '@convex-dev/rate-limiter@0.3.2(convex@1.31.6(react@19.2.1))(react@19.2.1)':
+    dependencies:
+      convex: 1.31.6(react@19.2.1)
+    optionalDependencies:
+      react: 19.2.1
 
   '@dotenvx/dotenvx@1.52.0':
     dependencies:

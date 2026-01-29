@@ -1,3 +1,4 @@
+import { ConvexError } from 'convex/values';
 import { z } from 'zod';
 import { tool } from 'ai';
 
@@ -29,14 +30,14 @@ export const fetchLinkContentTool = tool({
 				signal: abortSignal
 			});
 			if (!response.ok) {
-				throw new Error(`${response.status} ${response.statusText}`);
+				throw new ConvexError(`${response.status} ${response.statusText}`);
 			}
 			const contentType = response.headers.get('content-type');
 			const allowedTypes = ['text/plain', 'text/markdown'];
 			if (allowedTypes.some((type) => contentType?.includes(type))) {
 				return await response.text();
 			}
-			throw new Error(
+			throw new ConvexError(
 				'Link response was not markdown. Maybe you need to add .md or .mdx to the end of the link?'
 			);
 		} catch (error) {

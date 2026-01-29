@@ -3,15 +3,14 @@
 	import { box } from 'svelte-toolbelt';
 	import type { Model } from '$lib/features/chat/types';
 	import { useModelPicker } from '$lib/features/chat/components/prompt-input/prompt-input.svelte.js';
-	import { BASIC_MODELS } from '$lib/ai.js';
 	import { shortcut } from '$lib/actions/shortcut.svelte';
 
 	type Props = {
-		models?: Model[];
+		models: Model[];
 		animated?: boolean;
 	};
 
-	let { models = BASIC_MODELS, animated = false }: Props = $props();
+	let { models, animated = false }: Props = $props();
 
 	const modelPickerState = useModelPicker({
 		models: box.with(() => models)
@@ -41,7 +40,7 @@
 	<Select.Trigger>
 		{selectedModel.name}
 	</Select.Trigger>
-	<Select.Content align="start" {animated} side="top">
+	<Select.Content align="start" {animated} side="top" class="max-h-[200px] overflow-y-auto">
 		{#each models as model (model.id)}
 			<Select.Item value={model.id}>
 				{model.name}

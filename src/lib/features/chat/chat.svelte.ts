@@ -16,7 +16,9 @@ import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte
 import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
-import { DEFAULT_ENABLED_MODEL_IDS } from '$lib/ai.js';
+import { BASIC_MODELS, DEFAULT_ENABLED_MODEL_IDS } from '$lib/ai.js';
+import type { Model, ModelId } from './types.js';
+import { ConvexError } from 'convex/values';
 
 type ChatLayoutOptions = {
 	user: User | null;
@@ -62,13 +64,36 @@ class ChatLayoutState {
 	}
 
 	get models() {
+		// limit users without api keys to free models
+		if (this.apiKey === null && this.user !== null) {
+			return this.opts.models.filter((model) => model.id.endsWith(':free'));
+		}
 		return this.opts.models;
 	}
 
 	get favoriteModelIds() {
+		if (this.apiKey === null && this.user !== null) {
+			// get 1 model for each unique lab providing free inference
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+			const providersMap = new Map<string, ModelId>();
+			this.models.forEach((model) => {
+				if (providersMap.has(model.lab ?? 'unknown')) return;
+				providersMap.set(model.lab ?? 'unknown', model.id);
+			});
+			return Array.from(providersMap.values());
+		}
+
 		return this.userSettings?.favoriteModelIds
 			? this.userSettings?.favoriteModelIds
 			: DEFAULT_ENABLED_MODEL_IDS;
+	}
+
+	get availableBasicModels(): Model[] {
+		if (this.apiKey === null && this.user !== null) {
+			return this.models.filter((model) => model.id.endsWith(':free'));
+		}
+
+		return BASIC_MODELS;
 	}
 
 	get enabledModels() {
@@ -105,28 +130,34 @@ class ChatLayoutState {
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments }) => {
 		if (!this.user) throw new Error('You must be signed in to start chatting!');
-		if (!this.apiKey)
-			throw new Error('You need to have an API key setup before you can start chatting!');
 
 		const model = this.models.find((m) => m.id === modelId);
 		if (!model) throw new Error(`Model with id: ${modelId} not found`);
-		const { chatId, assistantMessageId } = await this.client.mutation(api.messages.create, {
-			chatId: this.chatId,
-			apiKey: this.apiKey ?? '',
-			prompt: {
-				input,
-				modelId,
-				attachments,
-				supportedParameters: model.supported_parameters,
-				inputModalities: model.architecture.input_modalities,
-				outputModalities: model.architecture.output_modalities
+		try {
+			const { chatId, assistantMessageId } = await this.client.mutation(api.messages.create, {
+				chatId: this.chatId,
+				apiKey: this.apiKey ?? '',
+				prompt: {
+					input,
+					modelId,
+					attachments,
+					supportedParameters: model.supported_parameters,
+					inputModalities: model.architecture.input_modalities,
+					outputModalities: model.architecture.output_modalities
+				}
+			});
+
+			this.createdMessages.add(assistantMessageId);
+
+			if (this.chatId !== chatId) {
+				await goto(resolve(`/chat/${chatId}`));
 			}
-		});
+		} catch (error) {
+			if (error instanceof ConvexError) {
+				throw new Error(error.data);
+			}
 
-		this.createdMessages.add(assistantMessageId);
-
-		if (this.chatId !== chatId) {
-			await goto(resolve(`/chat/${chatId}`));
+			throw error;
 		}
 	};
 }

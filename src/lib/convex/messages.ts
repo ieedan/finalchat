@@ -1,4 +1,4 @@
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 import { httpAction, internalAction, internalQuery, query } from './_generated/server';
 import { mutation, internalMutation } from './functions';
 import { api, internal } from './_generated/api';
@@ -27,6 +27,9 @@ import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';
 import { env } from '../env.convex';
 import type { ContextType } from './ai.utils';
+import { truncateRight } from '../utils/strings';
+import { rateLimiter } from './rateLimiter';
+import { formatTimeUntil } from '../utils/time';
 
 export const Prompt = v.object({
 	modelId: v.string(),
@@ -59,23 +62,40 @@ export const create = mutation({
 		assistantMessageId: Id<'messages'>;
 	}> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
+
+		const isFreeUser = args.apiKey.trim() === '';
+
+		if (isFreeUser && !args.prompt.modelId.endsWith(':free')) {
+			throw new ConvexError('API key is required for non-free models');
+		}
+
+		if (isFreeUser) {
+			const status = await rateLimiter.limit(ctx, 'freeMessages', { key: user.subject });
+			if (!status.ok) {
+				throw new ConvexError(
+					`Rate limit exceeded. Try again in ${formatTimeUntil(status.retryAfter)}`
+				);
+			}
+		}
 
 		let isChatOwner: boolean;
 		let chatId: Id<'chats'>;
 		if (!args.chatId) {
 			chatId = await ctx.db.insert('chats', {
 				userId: user.subject,
-				title: 'Untitled Chat',
+				title: isFreeUser ? truncateRight(args.prompt.input, 30) : 'Untitled Chat',
 				generating: false,
 				updatedAt: Date.now(),
 				pinned: false
 			});
 
-			ctx.scheduler.runAfter(0, internal.messages.generateChatTitle, {
-				chatId,
-				apiKey: args.apiKey
-			});
+			if (!isFreeUser) {
+				ctx.scheduler.runAfter(0, internal.messages.generateChatTitle, {
+					chatId,
+					apiKey: args.apiKey
+				});
+			}
 
 			isChatOwner = true;
 		} else {
@@ -89,7 +109,7 @@ export const create = mutation({
 
 			if (!isChatOwner) {
 				const lastMessages = getLastUserAndAssistantMessages(chat.messages);
-				if (!lastMessages) throw new Error('No last messages found');
+				if (!lastMessages) throw new ConvexError('No last messages found');
 				// if we aren't the chat owner we are going to fork the chat from the last assistant message
 				const { newChatId, newAssistantMessageId } = await ctx.runMutation(
 					api.chats.branchFromMessage,
@@ -103,7 +123,7 @@ export const create = mutation({
 					}
 				);
 
-				if (!newAssistantMessageId) throw new Error('Failed to branch from message');
+				if (!newAssistantMessageId) throw new ConvexError('Failed to branch from message');
 
 				return {
 					chatId: newChatId,
@@ -178,7 +198,7 @@ export const generateChatTitle = internalAction({
 	},
 	handler: async (ctx, args) => {
 		const chat = await ctx.runQuery(internal.chats.internalGet, { chatId: args.chatId });
-		if (!chat) throw new Error('Chat not found');
+		if (!chat) throw new ConvexError('Chat not found');
 
 		if (chat.generatingTitle) return;
 
@@ -255,8 +275,15 @@ export const streamMessage = httpAction(async (ctx, request) => {
 
 				last = getLastUserAndAssistantMessages(messages);
 				if (!last) {
-					throw new Error('There was a problem getting the previous messages');
+					throw new ConvexError('There was a problem getting the previous messages');
 				}
+
+				if (!apiKey && !last.userMessage.chatSettings.modelId.endsWith(':free')) {
+					throw new ConvexError('API key is required for non-free models');
+				}
+
+				const isFreeUser = !apiKey && last.userMessage.chatSettings.modelId.endsWith(':free');
+				const apiKeyToUse = isFreeUser ? env.OPENROUTER_API_KEY : (apiKey ?? '');
 
 				// remove the assistant message so it's not part of the generation
 				messages.pop();
@@ -266,7 +293,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				});
 
 				const openrouter = createOpenRouter({
-					apiKey
+					apiKey: apiKeyToUse
 				});
 
 				// convert messages into model messages
@@ -437,7 +464,7 @@ ${systemPrompt}
 					ctx.scheduler.runAfter(1000, internal.messages.getGenerationCost, {
 						genId: openRouterGenId,
 						messageId: last.assistantMessage._id,
-						apiKey: apiKey ?? ''
+						apiKey: apiKeyToUse
 					});
 				}
 			} catch (error) {
@@ -494,8 +521,8 @@ export const updateGenerationCost = internalMutation({
 	},
 	handler: async (ctx, args) => {
 		const message = await ctx.db.get(args.messageId);
-		if (!message) throw new Error('Message not found');
-		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
+		if (!message) throw new ConvexError('Message not found');
+		if (message.role !== 'assistant') throw new ConvexError('Message is not an assistant message');
 
 		await ctx.db.patch(args.messageId, {
 			meta: {
@@ -512,8 +539,8 @@ export const startGenerating = internalMutation({
 	},
 	handler: async (ctx, args) => {
 		const message = await ctx.db.get(args.messageId);
-		if (!message) throw new Error('Message not found');
-		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
+		if (!message) throw new ConvexError('Message not found');
+		if (message.role !== 'assistant') throw new ConvexError('Message is not an assistant message');
 
 		await Promise.all([
 			ctx.db.patch(args.messageId, {
@@ -538,7 +565,7 @@ export const getMessagesForChat = internalQuery({
 		args
 	): Promise<{ chat: Doc<'chats'>; messages: MessageWithAttachments[] }> => {
 		const chat = await ctx.db.get(args.chatId);
-		if (!chat) throw new Error('Chat not found');
+		if (!chat) throw new ConvexError('Chat not found');
 
 		const messages = await getChatMessagesInternal(ctx, args.chatId);
 
@@ -562,8 +589,8 @@ export const updateMessageContent = internalMutation({
 	},
 	handler: async (ctx, args) => {
 		const message = await ctx.db.get(args.messageId);
-		if (!message) throw new Error('Message not found');
-		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
+		if (!message) throw new ConvexError('Message not found');
+		if (message.role !== 'assistant') throw new ConvexError('Message is not an assistant message');
 		await Promise.all([
 			ctx.db.patch(args.messageId, {
 				content: args.content,
@@ -588,8 +615,8 @@ export const updateMessageError = internalMutation({
 	},
 	handler: async (ctx, args) => {
 		const message = await ctx.db.get(args.messageId);
-		if (!message) throw new Error('Message not found');
-		if (message.role !== 'assistant') throw new Error('Message is not an assistant message');
+		if (!message) throw new ConvexError('Message not found');
+		if (message.role !== 'assistant') throw new ConvexError('Message is not an assistant message');
 		await Promise.all([
 			ctx.db.patch(args.messageId, {
 				error: args.error,
