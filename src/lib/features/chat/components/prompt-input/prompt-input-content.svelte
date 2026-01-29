@@ -6,7 +6,7 @@
 </script>
 
 <div
-	class={cn('rounded-lg relative z-10 border bg-card! dark:bg-background flex flex-col', className)}
+	class={cn('rounded-lg relative z-10 border bg-card dark:bg-background flex flex-col', className)}
 	{...rest}
 >
 	{@render children?.()}
