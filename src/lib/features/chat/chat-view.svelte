@@ -164,10 +164,16 @@
 								</PromptInputMobile.BannerContent>
 							</PromptInputMobile.Banner>
 							{#if chatLayoutState.user !== null}
-								<PromptInputMobile.Banner dismissedByError dismissed={chatLayoutState.apiKey !== null}>
+								<PromptInputMobile.Banner
+									dismissedByError
+									dismissed={chatLayoutState.apiKey !== null}
+								>
 									<PromptInputMobile.BannerContent>
 										<p>
-											You're currently limited to free models. <a href="/settings" class="font-medium underline">Setup API key</a>.
+											You're currently limited to free models. <a
+												href="/settings"
+												class="font-medium underline">Setup API key</a
+											>.
 										</p>
 									</PromptInputMobile.BannerContent>
 								</PromptInputMobile.Banner>
@@ -206,7 +212,10 @@
 							<PromptInput.Banner dismissedByError dismissed={chatLayoutState.apiKey !== null}>
 								<PromptInput.BannerContent>
 									<p>
-										You're currently limited to free models. <a href="/settings" class="font-medium underline">Setup API key</a>.
+										You're currently limited to free models. <a
+											href="/settings"
+											class="font-medium underline">Setup API key</a
+										>.
 									</p>
 								</PromptInput.BannerContent>
 							</PromptInput.Banner>

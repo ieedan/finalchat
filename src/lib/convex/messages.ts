@@ -73,7 +73,7 @@ export const create = mutation({
 		if (!args.chatId) {
 			chatId = await ctx.db.insert('chats', {
 				userId: user.subject,
-				title: isFreeUser ? truncateRight(args.prompt.input, 30) :'Untitled Chat',
+				title: isFreeUser ? truncateRight(args.prompt.input, 30) : 'Untitled Chat',
 				generating: false,
 				updatedAt: Date.now(),
 				pinned: false
@@ -211,21 +211,21 @@ export const generateChatTitle = internalAction({
 
 			<chat>
 			${chat.messages
-						.map((message) => {
-							if (message.role === 'user') {
-								return `<message role="${message.role}">
+				.map((message) => {
+					if (message.role === 'user') {
+						return `<message role="${message.role}">
 				${message.content}
 			</message>`;
-							}
+					}
 
-							return `<message role="${message.role}">
+					return `<message role="${message.role}">
 				${message.parts
-									.filter((part) => part.type === 'text')
-									.map((part) => part.text)
-									.join('')}
+					.filter((part) => part.type === 'text')
+					.map((part) => part.text)
+					.join('')}
 			</message>`;
-						})
-						.join('\n')}
+				})
+				.join('\n')}
 			</chat>`
 			});
 
@@ -293,17 +293,17 @@ export const streamMessage = httpAction(async (ctx, request) => {
 							...modelMessages,
 							...(message.attachments.length > 0
 								? [
-									{
-										role: 'assistant' as const,
-										content: [
-											...message.attachments.map((attachment) => ({
-												type: 'file' as const,
-												data: attachment.url,
-												mediaType: 'image'
-											}))
-										]
-									}
-								]
+										{
+											role: 'assistant' as const,
+											content: [
+												...message.attachments.map((attachment) => ({
+													type: 'file' as const,
+													data: attachment.url,
+													mediaType: 'image'
+												}))
+											]
+										}
+									]
 								: [])
 						];
 					}

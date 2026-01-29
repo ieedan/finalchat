@@ -49,7 +49,8 @@
 	<Modal.Header>
 		<Modal.Title>Setup API Key</Modal.Title>
 		<Modal.Description>
-			Configure your API key to access all models, or continue with free models that have strict rate limits.
+			Configure your API key to access all models, or continue with free models that have strict
+			rate limits.
 		</Modal.Description>
 	</Modal.Header>
 	<Field.Group class="gap-4">
