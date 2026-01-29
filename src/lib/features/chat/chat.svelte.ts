@@ -17,6 +17,7 @@ import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 import { DEFAULT_ENABLED_MODEL_IDS } from '$lib/ai.js';
+import type { ModelId } from './types.js';
 
 type ChatLayoutOptions = {
 	user: User | null;
@@ -62,10 +63,25 @@ class ChatLayoutState {
 	}
 
 	get models() {
+		// limit users without api keys to free models
+		if (this.apiKey === null && this.user !== null) {
+			return this.opts.models.filter((model) => model.id.endsWith(':free'));
+		}
 		return this.opts.models;
 	}
 
 	get favoriteModelIds() {
+		if (this.apiKey === null && this.user !== null) {
+			// get 1 model for each unique lab providing free inference
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+			const providersMap = new Map<string, ModelId>();
+			this.models.forEach((model) => {
+				if (providersMap.has(model.lab ?? 'unknown')) return;
+				providersMap.set(model.lab ?? 'unknown', model.id);
+			});
+			return Array.from(providersMap.values());
+		}
+
 		return this.userSettings?.favoriteModelIds
 			? this.userSettings?.favoriteModelIds
 			: DEFAULT_ENABLED_MODEL_IDS;

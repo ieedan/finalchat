@@ -27,6 +27,7 @@ import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';
 import { env } from '../env.convex';
 import type { ContextType } from './ai.utils';
+import { truncateRight } from '../utils/strings';
 
 export const Prompt = v.object({
 	modelId: v.string(),
@@ -61,21 +62,29 @@ export const create = mutation({
 		const user = await ctx.auth.getUserIdentity();
 		if (!user) throw new Error('Unauthorized');
 
+		const isFreeUser = args.apiKey.trim() === '';
+
+		if (isFreeUser && !args.prompt.modelId.endsWith(':free')) {
+			throw new Error('API key is required for non-free models');
+		}
+
 		let isChatOwner: boolean;
 		let chatId: Id<'chats'>;
 		if (!args.chatId) {
 			chatId = await ctx.db.insert('chats', {
 				userId: user.subject,
-				title: 'Untitled Chat',
+				title: isFreeUser ? truncateRight(args.prompt.input, 30) :'Untitled Chat',
 				generating: false,
 				updatedAt: Date.now(),
 				pinned: false
 			});
 
-			ctx.scheduler.runAfter(0, internal.messages.generateChatTitle, {
-				chatId,
-				apiKey: args.apiKey
-			});
+			if (!isFreeUser) {
+				ctx.scheduler.runAfter(0, internal.messages.generateChatTitle, {
+					chatId,
+					apiKey: args.apiKey
+				});
+			}
 
 			isChatOwner = true;
 		} else {
@@ -202,21 +211,21 @@ export const generateChatTitle = internalAction({
 
 			<chat>
 			${chat.messages
-				.map((message) => {
-					if (message.role === 'user') {
-						return `<message role="${message.role}">
+						.map((message) => {
+							if (message.role === 'user') {
+								return `<message role="${message.role}">
 				${message.content}
 			</message>`;
-					}
+							}
 
-					return `<message role="${message.role}">
+							return `<message role="${message.role}">
 				${message.parts
-					.filter((part) => part.type === 'text')
-					.map((part) => part.text)
-					.join('')}
+									.filter((part) => part.type === 'text')
+									.map((part) => part.text)
+									.join('')}
 			</message>`;
-				})
-				.join('\n')}
+						})
+						.join('\n')}
 			</chat>`
 			});
 
@@ -258,6 +267,12 @@ export const streamMessage = httpAction(async (ctx, request) => {
 					throw new Error('There was a problem getting the previous messages');
 				}
 
+				if (!apiKey && !last.userMessage.chatSettings.modelId.endsWith(':free')) {
+					throw new Error('API key is required for non-free models');
+				}
+
+				const isFreeUser = !apiKey && last.userMessage.chatSettings.modelId.endsWith(':free');
+
 				// remove the assistant message so it's not part of the generation
 				messages.pop();
 
@@ -266,7 +281,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				});
 
 				const openrouter = createOpenRouter({
-					apiKey
+					apiKey: isFreeUser ? env.OPENROUTER_API_KEY : apiKey
 				});
 
 				// convert messages into model messages
@@ -278,17 +293,17 @@ export const streamMessage = httpAction(async (ctx, request) => {
 							...modelMessages,
 							...(message.attachments.length > 0
 								? [
-										{
-											role: 'assistant' as const,
-											content: [
-												...message.attachments.map((attachment) => ({
-													type: 'file' as const,
-													data: attachment.url,
-													mediaType: 'image'
-												}))
-											]
-										}
-									]
+									{
+										role: 'assistant' as const,
+										content: [
+											...message.attachments.map((attachment) => ({
+												type: 'file' as const,
+												data: attachment.url,
+												mediaType: 'image'
+											}))
+										]
+									}
+								]
 								: [])
 						];
 					}
