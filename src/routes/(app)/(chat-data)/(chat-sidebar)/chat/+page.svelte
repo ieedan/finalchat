@@ -184,7 +184,7 @@
 						{#if chatLayoutState.isAdvancedMode}
 							<ModelPickerAdvanced />
 						{:else}
-							<ModelPickerBasic />
+							<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 						{/if}
 						<PromptInput.AttachmentButton />
 					</div>
