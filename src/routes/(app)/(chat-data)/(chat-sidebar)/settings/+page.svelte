@@ -11,6 +11,7 @@
 	import SettingsEmpty from '$lib/features/settings/components/settings-empty.svelte';
 	import SettingsAttachmentsCard from '$lib/features/settings/components/settings-attachments-card.svelte';
 	import SettingsHistoryCard from '$lib/features/settings/components/settings-history-card.svelte';
+	import SettingsThemeCard from '$lib/features/settings/components/settings-theme-card.svelte';
 </script>
 
 <SettingsSearchInput />
@@ -20,6 +21,7 @@
 <SettingsApiKeyCard />
 <SettingsSystemPromptCard />
 <SettingsModeCard />
+<SettingsThemeCard />
 <SettingsSubmitBehaviorCard />
 <SettingsFontCard />
 <SettingsAttachmentsCard />
