@@ -20,7 +20,7 @@ import {
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
 import { fetchLinkContentTool } from './ai.utils.js';
-import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol/v1';
+import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';

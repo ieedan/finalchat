@@ -4,7 +4,7 @@ import { deserializeStream as deserializeStreamV1 } from "./v1";
 import { deserializeStream as deserializeStreamV2, createChunkAppender } from "./v2";
 import type { ModelMessage, ReasoningOutput, TextPart } from "ai";
 
-export { createChunkAppender };
+export { createChunkAppender, type StreamResult };
 
 export function deserializeStream({
     text,
