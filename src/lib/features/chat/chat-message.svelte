@@ -109,10 +109,14 @@
 								)
 							: null,
 						message.meta.cost ? `$${message.meta.cost}` : null,
-						...(message.meta.imageGen
+						...(!message.meta.imageGen
 							? [
-									message.meta.tokenUsage ? `${message.meta.tokenUsage} tokens` : null,
-									tokensPerSecond ? `${tokensPerSecond} tokens/sec` : null
+									media.lg
+										? message.meta.tokenUsage
+											? `${message.meta.tokenUsage} tokens`
+											: null
+										: null,
+									media.lg ? (tokensPerSecond ? `${tokensPerSecond} tokens/sec` : null) : null
 								]
 							: [])
 					]

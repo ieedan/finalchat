@@ -10,6 +10,10 @@ import { internalQuery, query } from './_generated/server';
 import { api, internal } from './_generated/api';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { Prompt } from './messages';
+import { asyncMap } from 'convex-helpers';
+import { deserializeStream } from '../utils/stream-transport-protocol';
+import removeMarkdown from 'remove-markdown';
+import { createMatch, type MatchedText } from '../utils/full-text-search';
 
 export const getAll = query({
 	args: {},
@@ -24,6 +28,154 @@ export const getAll = query({
 			.collect();
 
 		return chats.sort((a, b) => b.updatedAt - a.updatedAt);
+	}
+});
+
+export const search = query({
+	args: {
+		query: v.string()
+	},
+	handler: async (
+		ctx,
+		args
+	): Promise<
+		{
+			_id: Id<'chats'>;
+			matchedTitle: MatchedText;
+			matchedMessage?: MatchedText;
+		}[]
+	> => {
+		if (args.query.trim().length === 0) return [];
+
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return [];
+
+		const chatCache = new Map<
+			Id<'chats'>,
+			{ chat: Doc<'chats'> | null; messages: Doc<'messages'>[] }
+		>();
+
+		const [chatResults, messageResults] = await Promise.all([
+			ctx.db
+				.query('chats')
+				.withSearchIndex('search_title', (q) =>
+					q.search('title', args.query).eq('userId', user.subject)
+				)
+				.collect(),
+			ctx.db
+				.query('messages')
+				.withSearchIndex('search_content', (q) =>
+					q.search('content', args.query).eq('userId', user.subject)
+				)
+				.collect()
+		]);
+
+		const allResults = [...chatResults, ...messageResults];
+
+		allResults.forEach((result) => {
+			if ('chatId' in result) {
+				// message
+				const ogChat = chatCache.get(result.chatId);
+				if (ogChat) {
+					ogChat.messages.push(result);
+					chatCache.set(result.chatId, ogChat);
+					return;
+				}
+
+				chatCache.set(result.chatId, { chat: null, messages: [result] });
+			} else {
+				// chat
+				const ogChat = chatCache.get(result._id);
+				if (ogChat) {
+					// this really shouldn't happen but just in case
+					ogChat.chat = result;
+					chatCache.set(result._id, ogChat);
+					return;
+				}
+
+				chatCache.set(result._id, { chat: result, messages: [] });
+			}
+		});
+
+		return await asyncMap(
+			Array.from(chatCache.entries()).sort((a, b) => {
+				// Check if each has a title match
+				const hasTitleMatchA = a[1].chat !== null;
+				const hasTitleMatchB = b[1].chat !== null;
+
+				// Priority 1: Title matches come first
+				if (hasTitleMatchA && !hasTitleMatchB) return -1;
+				if (!hasTitleMatchA && hasTitleMatchB) return 1;
+
+				// Priority 2: Sort by number of content matches (descending)
+				// More messages = higher priority
+				return b[1].messages.length - a[1].messages.length;
+			}),
+			async ([chatId, { chat, messages }]) => {
+				// backfill the chat if the only matches were messages
+				let chatResult: Doc<'chats'>;
+				if (chat) {
+					chatResult = chat;
+				} else {
+					chatResult = (await ctx.db.get(chatId))!;
+				}
+
+				let matchedTitle: MatchedText;
+				if (chat === null) {
+					matchedTitle = {
+						text: chatResult.title,
+						word: undefined
+					};
+				} else {
+					matchedTitle = createMatch(chatResult.title, args.query);
+				}
+
+				let matchedMessage: MatchedText | undefined = undefined;
+				for (const message of messages) {
+					if (message.role === 'assistant') {
+						const deserializedContentResult = deserializeStream({
+							text: message.content ?? '',
+							stack: []
+						});
+						if (deserializedContentResult.isErr()) {
+							continue;
+						}
+
+						const parts = deserializedContentResult.value.stack;
+
+						for (const part of parts) {
+							if (part.type === 'text') {
+								const matchResult = createMatch(removeMarkdown(part.text), args.query);
+								if (matchResult.word) {
+									matchedMessage = matchResult;
+									break;
+								}
+							} else if (part.type === 'reasoning') {
+								const matchResult = createMatch(removeMarkdown(part.text), args.query);
+								if (matchResult.word) {
+									matchedMessage = matchResult;
+									break;
+								}
+							}
+						}
+
+						if (matchedMessage) break;
+					}
+
+					const matchResult = createMatch(removeMarkdown(message.content ?? ''), args.query);
+					if (matchResult.word) {
+						matchedMessage = matchResult;
+						break;
+					}
+				}
+
+				return {
+					_id: chatId,
+					matchedTitle,
+					matchedMessage
+				};
+			}
+		);
 	}
 });
 
@@ -262,6 +414,7 @@ export const branchFromMessage = mutation({
 				} else {
 					newMessageId = await ctx.db.insert('messages', {
 						role: 'assistant',
+						userId: user.subject,
 						chatId: newChatId,
 						streamId: m.streamId,
 						meta: m.meta,
@@ -290,6 +443,7 @@ export const branchFromMessage = mutation({
 			const streamId = await persistentTextStreaming.createStream(ctx);
 			newAssistantMessageId = await ctx.db.insert('messages', {
 				chatId: newChatId,
+				userId: user.subject,
 				role: 'assistant',
 				streamId,
 				meta: {

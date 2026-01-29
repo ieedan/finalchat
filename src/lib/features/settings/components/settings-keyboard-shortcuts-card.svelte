@@ -24,6 +24,10 @@
 			keys: [cmdOrCtrl, '⇧', 'M']
 		},
 		{
+			name: 'Search',
+			keys: [cmdOrCtrl, 'K']
+		},
+		{
 			name: 'Go to Chat',
 			keys: [cmdOrCtrl, 'G']
 		},

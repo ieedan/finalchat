@@ -11,7 +11,8 @@ import {
 	ToolLoopAgent,
 	type StreamTextResult,
 	type ModelMessage,
-	streamText
+	streamText,
+	smoothStream
 } from 'ai';
 import {
 	getChatMessagesInternal,
@@ -145,6 +146,7 @@ export const create = mutation({
 		const streamId = await persistentTextStreaming.createStream(ctx);
 		const assistantMessageId = await ctx.db.insert('messages', {
 			chatId,
+			userId: user.subject,
 			role: 'assistant',
 			streamId,
 			meta: {
@@ -342,12 +344,14 @@ ${systemPrompt}
 					});
 
 					streamResult = await agent.stream({
-						messages: modelMessages
+						messages: modelMessages,
+						experimental_transform: smoothStream()
 					});
 				} else {
 					streamResult = streamText({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
-						messages: modelMessages
+						messages: modelMessages,
+						experimental_transform: smoothStream()
 					});
 				}
 

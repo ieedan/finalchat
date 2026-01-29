@@ -1,10 +1,7 @@
 import { describe, it, expect, vi, assert } from 'vitest';
-import {
-	createChunkAppender,
-	deserializeStream,
-	type StreamResult
-} from './stream-transport-protocol';
+import { createChunkAppender, deserializeStream } from './v2';
 import type { ToolCallPart, ToolResultPart } from 'ai';
+import type { StreamResult } from './types';
 
 describe('custom reasoning protocol', () => {
 	it('should serialize and deserialize chunks correctly', () => {
@@ -50,7 +47,7 @@ describe('custom reasoning protocol', () => {
 		const result = deserializeStream({ text: serializedContent, stack: [] });
 		assert(result.isOk());
 
-		expect(result.value.version).toBe('v1');
+		expect(result.value.version).toBe('v2');
 		expect(result.value.remainingText).toBeNull();
 
 		expect(result.value.stack).toStrictEqual([

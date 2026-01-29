@@ -56,14 +56,11 @@ export class AuthKitAuth {
 				this.opts.redirectUri instanceof URL
 					? this.opts.redirectUri.toString()
 					: new URL(this.opts.redirectUri, event.url.origin).toString();
-			console.log(redirectUri);
 			const authorizationUrl = this.workos.userManagement.getAuthorizationUrl({
 				provider: 'authkit',
 				redirectUri,
 				clientId: this.opts.clientId
 			});
-
-			console.log(authorizationUrl);
 
 			redirect(302, authorizationUrl);
 		};

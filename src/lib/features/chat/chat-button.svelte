@@ -43,11 +43,11 @@
 	}
 
 	async function deleteChat() {
+		if (page.params.chatId === chat._id) goto('/chat');
+
 		await client.mutation(api.chats.remove, {
 			ids: [chat._id]
 		});
-
-		if (page.params.chatId === chat._id) await goto('/chat');
 	}
 
 	async function renameChat(title: string) {

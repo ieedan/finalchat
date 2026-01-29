@@ -6,7 +6,7 @@
 	import { env } from '$lib/env.client';
 	import { useStream } from '$lib/utils/persistent-text-streaming.svelte.js';
 	import type { StreamId } from '@convex-dev/persistent-text-streaming';
-	import { deserializeStream } from '$lib/utils/stream-transport-protocol';
+	import { deserializeStream } from '$lib/utils/stream-transport-protocol/index.js';
 	import ChatAssistantMessage from './chat-assistant-message.svelte';
 	import ShinyText from '$lib/components/animations/shiny-text.svelte';
 	import type { Doc } from '$lib/convex/_generated/dataModel';

@@ -14,7 +14,8 @@
 		RiChatNewLine as MessageSquarePlusIcon,
 		RiRobot2Line as RobotIcon,
 		RiLayoutLeftLine as PanelLeftIcon,
-		RiSendPlaneLine as SendIcon
+		RiSendPlaneLine as SendIcon,
+		RiSearchLine as SearchIcon
 	} from 'remixicon-svelte';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import { cn } from '$lib/utils.js';
@@ -42,6 +43,7 @@
 	const shortcuts = $derived([
 		{ name: 'New Chat', keys: [cmdOrCtrl, '⇧', 'O'], icon: MessageSquarePlusIcon },
 		{ name: 'Model Picker', keys: [cmdOrCtrl, '⇧', 'M'], icon: RobotIcon },
+		{ name: 'Search', keys: [cmdOrCtrl, 'K'], icon: SearchIcon },
 		{ name: 'Go to Chat', keys: [cmdOrCtrl, 'G'], icon: ArrowRightIcon },
 		{ name: 'Sidebar', keys: [cmdOrCtrl, 'B'], icon: PanelLeftIcon },
 		{ name: 'Submit', keys: submitOnEnter ? ['Enter'] : [cmdOrCtrl, 'Enter'], icon: SendIcon }
