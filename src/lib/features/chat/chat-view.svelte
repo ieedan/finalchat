@@ -208,7 +208,7 @@
 								</p>
 							</PromptInput.BannerContent>
 						</PromptInput.Banner>
-						{#if chatLayoutState.apiKey !== null}
+						{#if chatLayoutState.user !== null}
 							<PromptInput.Banner dismissedByError dismissed={chatLayoutState.apiKey !== null}>
 								<PromptInput.BannerContent>
 									<p>
