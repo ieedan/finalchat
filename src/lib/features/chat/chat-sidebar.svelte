@@ -92,7 +92,7 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 					</span>
 					{#if chatLayoutState.isAdvancedMode}
 						<Kbd.Group
-							class="**:data-[slot=kbd]:bg-transparent **:data-[slot=kbd]:text-foreground gap-0"
+							class="**:data-[slot=kbd]:bg-transparent **:data-[slot=kbd]:text-primary-foreground gap-0"
 						>
 							<Kbd.Root>{cmdOrCtrl}</Kbd.Root>
 							<Kbd.Root>⇧</Kbd.Root>

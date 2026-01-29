@@ -17,6 +17,7 @@
 	import { MetaTags, deepMerge } from 'svelte-meta-tags';
 	import { ThemeProvider } from '$lib/components/theme-provider';
 	import Startup from '$lib/components/startup.svelte';
+	import { ModeWatcher } from 'mode-watcher';
 
 	let { children, data } = $props();
 
@@ -61,6 +62,7 @@
 
 <MetaTags {...metaTags} />
 
+<ModeWatcher />
 <Startup />
 <ConfirmDeleteDialog />
 <Toaster position="bottom-right" />

@@ -7,15 +7,15 @@
 		base: "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive focus-visible:border-ring focus-visible:ring-ring/50 relative inline-flex shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md text-sm font-medium whitespace-nowrap outline-hidden transition-all select-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 		variants: {
 			variant: {
-				default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs',
+				default: 'bg-primary text-primary-foreground hover:bg-primary/90',
 				destructive:
-					'bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-destructive/20 shadow-2xs',
+					'bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-destructive/20',
 				'destructive-outline':
-					'bg-background text-destructive hover:bg-accent/50 border focus-visible:ring-destructive/20 shadow-2xs',
+					'bg-background text-destructive hover:bg-accent/50 border focus-visible:ring-destructive/20',
 				'destructive-ghost':
-					'bg-background text-destructive hover:bg-accent/50 focus-visible:ring-destructive/20 shadow-2xs',
-				outline: 'bg-background hover:bg-accent hover:text-accent-foreground border shadow-2xs',
-				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-2xs',
+					'bg-background text-destructive hover:bg-accent/50 focus-visible:ring-destructive/20',
+				outline: 'bg-background hover:bg-accent hover:text-accent-foreground border',
+				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				ghost: 'hover:bg-accent hover:text-accent-foreground',
 				link: 'text-primary underline-offset-4 hover:underline',
 				input: 'bg-input text-foreground'

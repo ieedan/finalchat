@@ -31,7 +31,7 @@
 			</div>
 			<p class="text-sm text-muted-foreground">Simple, safe, and accessible to anyone.</p>
 		</div>
-		<div class="rounded-lg border flex flex-col mt-4">
+		<div class="rounded-lg border flex flex-col mt-4 bg-card dark:bg-background">
 			<div class="p-2">
 				<p class="text-xs text-muted-foreground">Ask anything...</p>
 			</div>
@@ -67,7 +67,7 @@
 			</div>
 			<p class="text-sm text-muted-foreground">Advanced with more control and customization.</p>
 		</div>
-		<div class="rounded-lg border flex flex-col mt-4">
+		<div class="rounded-lg border flex flex-col mt-4 bg-card dark:bg-background">
 			<div class="p-2">
 				<p class="text-xs text-muted-foreground">Ask anything...</p>
 			</div>

@@ -5,6 +5,9 @@
 	let { class: className, children, ...rest }: HTMLAttributes<HTMLDivElement> = $props();
 </script>
 
-<div class={cn('rounded-lg relative z-10 border bg-background flex flex-col', className)} {...rest}>
+<div
+	class={cn('rounded-lg relative z-10 border bg-card dark:bg-background flex flex-col', className)}
+	{...rest}
+>
 	{@render children?.()}
 </div>
