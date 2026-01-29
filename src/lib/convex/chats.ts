@@ -11,7 +11,7 @@ import { api, internal } from './_generated/api';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { Prompt } from './messages';
 import { asyncMap } from 'convex-helpers';
-import { deserializeStream } from '../utils/stream-transport-protocol';
+import { deserializeStream } from '../utils/stream-transport-protocol/v1';
 import removeMarkdown from 'remove-markdown';
 import { createMatch, type MatchedText } from '../utils/full-text-search';
 

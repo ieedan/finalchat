@@ -2,9 +2,9 @@ import { describe, it, expect, vi, assert } from 'vitest';
 import {
 	createChunkAppender,
 	deserializeStream,
-	type StreamResult
-} from './stream-transport-protocol-v2';
+} from './v2';
 import type { ToolCallPart, ToolResultPart } from 'ai';
+import type { StreamResult } from './types';
 
 describe('custom reasoning protocol', () => {
 	it('should serialize and deserialize chunks correctly', () => {

@@ -1,10 +1,11 @@
 /**
  * V2 revisions
- * - Add a space after the colon so now `td5:hello` would be `td5: hello` this should improve full text search
+ * - Add a space after the colon so now `td5:hello` would be `td5: hello` to improve full text search
  */
 
-import type { ToolCallPart, ReasoningOutput, TextPart, ToolResultPart, ModelMessage } from 'ai';
+import type { ToolCallPart, ReasoningOutput, TextPart, ToolResultPart } from 'ai';
 import { type Result, ok, err } from 'nevereverthrow';
+import { type StreamResult, DeserializeStreamError } from './types';
 
 export const PROTOCOL_VERSION = 'v2';
 
@@ -49,7 +50,7 @@ const reverseTypeMap = Object.fromEntries(
 
 type ProtocolChunkType = (typeof typeMap)[keyof typeof typeMap];
 
-export function serializeChunk(
+function serializeChunk(
 	chunk: TextPart | ReasoningOutput | ToolCallPart | ToolResultPart,
 	firstChunk: boolean
 ) {
@@ -73,15 +74,6 @@ function createChunk(
 	firstChunk: boolean
 ) {
 	return `${firstChunk ? `${PROTOCOL_VERSION}:` : ''}${type}${chunkLength}: ${chunk}`;
-}
-
-export type StreamResult = (TextPart | ReasoningOutput | ToolCallPart | ToolResultPart)[];
-
-class DeserializeStreamError extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = 'DeserializeStreamError';
-	}
 }
 
 export function deserializeStream({
@@ -167,83 +159,35 @@ export function deserializeStream({
 	return ok({ stack, remainingText: null, version });
 }
 
-export function partsToModelMessage(parts: StreamResult): ModelMessage[] {
-	const messages: ModelMessage[] = [];
-
-	let currentMessage:
-		| {
-				role: 'assistant';
-				content: (TextPart | ReasoningOutput)[];
-		  }
-		| undefined = undefined;
-
-	function flushMessage() {
-		if (currentMessage) {
-			messages.push(currentMessage);
-			currentMessage = undefined;
-		}
+export function serializeParts(parts: StreamResult): string {
+	if (parts.length === 0) {
+		return `${PROTOCOL_VERSION}:`;
 	}
+
+	let serialized = '';
+	let firstChunk = true;
 
 	for (const part of parts) {
-		if (part.type === 'tool-result') {
-			flushMessage();
-			// Ensure output is always an object, not a string
-			// If output is a string, wrap it in the expected format
-			const output =
-				typeof part.output === 'string'
-					? { type: 'text' as const, value: part.output }
-					: part.output;
-			messages.push({
-				role: 'tool',
-				content: [
-					{
-						type: 'tool-result',
-						toolCallId: part.toolCallId,
-						toolName: part.toolName,
-						output: output
-					}
-				]
-			} as ModelMessage);
-		} else if (part.type === 'tool-call') {
-			flushMessage();
-			messages.push({
-				role: 'assistant',
-				content: [
-					{
-						type: 'tool-call',
-						toolName: part.toolName,
-						toolCallId: part.toolCallId,
-						input: part.input
-					}
-				]
-			});
-		} else if (part.type === 'text' || part.type === 'reasoning') {
-			flushMessage();
-			if (!currentMessage) {
-				currentMessage = {
-					role: 'assistant',
-					content: []
-				};
-			}
+		// Clone the part to avoid mutating the original when deleting providerOptions
+		const partToSerialize = { ...part };
+		
+		// Serialize each chunk
+		const t = typeMap[part.type];
 
-			// just to satisfy the types
-			if (part.type === 'text') {
-				currentMessage.content.push({
-					type: 'text',
-					text: part.text
-				});
-			} else if (part.type === 'reasoning') {
-				currentMessage.content.push({
-					type: 'reasoning',
-					text: part.text
-				});
+		if (part.type === 'text' || part.type === 'reasoning') {
+			serialized += createChunk(t, part.text.length, part.text, firstChunk);
+		} else {
+			// For tool-call and tool-result, remove providerOptions before serializing
+			const toolPart = partToSerialize as ToolCallPart | ToolResultPart;
+			if ('providerOptions' in toolPart) {
+				delete toolPart.providerOptions;
 			}
+			const chunkStr = JSON.stringify(toolPart);
+			serialized += createChunk(t, chunkStr.length, chunkStr, firstChunk);
 		}
+
+		firstChunk = false;
 	}
 
-	flushMessage();
-
-	JSON.stringify(messages, null, 2);
-
-	return messages;
+	return serialized;
 }

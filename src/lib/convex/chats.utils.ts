@@ -3,7 +3,7 @@ import type { GenericMutationCtx, GenericQueryCtx } from 'convex/server';
 import type { ChatMessageAssistant, ChatMessageUser } from './schema';
 import { asyncMap } from 'convex-helpers';
 import { internal } from './_generated/api';
-import { deserializeStream, type StreamResult } from '../utils/stream-transport-protocol';
+import { deserializeStream, type StreamResult } from '../utils/stream-transport-protocol/v1';
 
 export type MessageWithAttachments =
 	| (ChatMessageUser & {
