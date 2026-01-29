@@ -13,6 +13,22 @@ export type MatchedText = {
  * @param query
  */
 export function createMatch(text: string, query: string): MatchedText {
+	// First, try to match the entire phrase
+	const lowerText = text.toLowerCase();
+	const lowerQuery = query.toLowerCase();
+	const phraseIndex = lowerText.indexOf(lowerQuery);
+
+	if (phraseIndex !== -1) {
+		return {
+			text,
+			word: {
+				start: phraseIndex,
+				end: phraseIndex + query.length
+			}
+		};
+	}
+
+	// Fall back to individual word matching
 	const queryWords = query.split(' ');
 	const textWords = text.split(' ');
 

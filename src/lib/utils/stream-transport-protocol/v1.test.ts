@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, assert } from 'vitest';
-import {
-	createChunkAppender,
-	deserializeStream,
-} from './v1';
+import { createChunkAppender, deserializeStream } from './v1';
 import type { ToolCallPart, ToolResultPart } from 'ai';
 import type { StreamResult } from './types';
 

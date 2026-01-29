@@ -1,4 +1,4 @@
-import type { ReasoningOutput, ToolCallPart, TextPart, ToolResultPart } from "ai";
+import type { ReasoningOutput, ToolCallPart, TextPart, ToolResultPart } from 'ai';
 
 export type StreamResult = (TextPart | ReasoningOutput | ToolCallPart | ToolResultPart)[];
 

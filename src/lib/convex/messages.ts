@@ -11,7 +11,8 @@ import {
 	ToolLoopAgent,
 	type StreamTextResult,
 	type ModelMessage,
-	streamText
+	streamText,
+	smoothStream
 } from 'ai';
 import {
 	getChatMessagesInternal,
@@ -343,12 +344,14 @@ ${systemPrompt}
 					});
 
 					streamResult = await agent.stream({
-						messages: modelMessages
+						messages: modelMessages,
+						experimental_transform: smoothStream()
 					});
 				} else {
 					streamResult = streamText({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
-						messages: modelMessages
+						messages: modelMessages,
+						experimental_transform: smoothStream()
 					});
 				}
 

@@ -170,7 +170,7 @@ export function serializeParts(parts: StreamResult): string {
 	for (const part of parts) {
 		// Clone the part to avoid mutating the original when deleting providerOptions
 		const partToSerialize = { ...part };
-		
+
 		// Serialize each chunk
 		const t = typeMap[part.type];
 
