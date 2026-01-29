@@ -24,6 +24,7 @@
 		"@convex-dev/migrations": "^0.3.1",
 		"@convex-dev/persistent-text-streaming": "^0.3.0",
 		"@convex-dev/r2": "latest",
+		"@convex-dev/rate-limiter": "^0.3.2",
 		"@dotenvx/dotenvx": "^1.52.0",
 		"@eslint/compat": "^2.0.1",
 		"@eslint/js": "^9.39.2",

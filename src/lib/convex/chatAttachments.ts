@@ -1,4 +1,4 @@
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 import { internalMutation, mutation } from './functions';
 import { type R2Callbacks } from '@convex-dev/r2';
 import { internal } from './_generated/api';
@@ -14,17 +14,17 @@ export const { syncMetadata, onSyncMetadata, deleteObject, getMetadata, listMeta
 	r2.clientApi({
 		checkUpload: async (ctx) => {
 			const user = await ctx.auth.getUserIdentity();
-			if (!user) throw new Error('Unauthorized');
+			if (!user) throw new ConvexError('Unauthorized');
 
 			// also check subscription status here if relevant
 		},
 		callbacks,
 		checkDelete: async (ctx, _, key) => {
 			const user = await ctx.auth.getUserIdentity();
-			if (!user) throw new Error('Unauthorized');
+			if (!user) throw new ConvexError('Unauthorized');
 
 			const { userId } = parseUploadKey(key as UploadKey);
-			if (userId !== user.subject) throw new Error('Unauthorized');
+			if (userId !== user.subject) throw new ConvexError('Unauthorized');
 		},
 		onDelete: async (ctx, _, key) => {
 			await ctx.runMutation(internal.chatAttachments.syncRemoval, {
@@ -36,7 +36,7 @@ export const { syncMetadata, onSyncMetadata, deleteObject, getMetadata, listMeta
 export const generateUploadUrl = mutation({
 	handler: async (ctx): Promise<{ key: string; url: string }> => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
 
 		return await r2.generateUploadUrl(createKey(user));
 	}
@@ -48,10 +48,10 @@ export const getFileUrl = query({
 	},
 	handler: async (ctx, args) => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
 
 		const { userId } = parseUploadKey(args.key as UploadKey);
-		if (userId !== user.subject) throw new Error('Unauthorized');
+		if (userId !== user.subject) throw new ConvexError('Unauthorized');
 
 		return await r2.getUrl(args.key, {
 			expiresIn: undefined // never expire, this just makes it easier
@@ -145,12 +145,12 @@ export const remove = mutation({
 	},
 	handler: async (ctx, args) => {
 		const user = await ctx.auth.getUserIdentity();
-		if (!user) throw new Error('Unauthorized');
+		if (!user) throw new ConvexError('Unauthorized');
 
 		for (const id of args.ids) {
 			const attachment = await ctx.db.get(id);
 			if (!attachment || attachment.userId !== user.subject) {
-				throw new Error('Attachment not found or you are not authorized to delete it');
+				throw new ConvexError('Attachment not found or you are not authorized to delete it');
 			}
 
 			// Delete from R2

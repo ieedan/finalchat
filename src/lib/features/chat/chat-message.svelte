@@ -108,7 +108,7 @@
 									(message.meta.stoppedGenerating - message.meta.startedGenerating) as Milliseconds
 								)
 							: null,
-						message.meta.cost ? `$${message.meta.cost}` : null,
+						message.meta.cost !== undefined ? `$${message.meta.cost}` : null,
 						...(!message.meta.imageGen
 							? [
 									media.lg

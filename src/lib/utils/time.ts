@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/utils/types';
+import type { Brand } from './types';
 
 export type Milliseconds = Brand<number, 'milliseconds'>;
 
@@ -53,4 +53,9 @@ export function formatDuration(
 	if (duration < milliseconds.HOUR) return `${transform(duration / milliseconds.MINUTE)}min`;
 
 	return `${duration / milliseconds.HOUR}h`;
+}
+
+export function formatTimeUntil(retryAfter: number): string {
+	const seconds = Math.ceil(retryAfter / 1000);
+	return `${seconds}s`;
 }
