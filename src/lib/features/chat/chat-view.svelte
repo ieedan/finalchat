@@ -250,7 +250,9 @@
 										<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 									{/if}
 									<PromptInput.AttachmentButton />
-									<ReasoningEffortPicker />
+									{#if chatLayoutState.isAdvancedMode}
+										<ReasoningEffortPicker />
+									{/if}
 								</div>
 								<div class="flex items-center gap-2">
 									{#if chatLayoutState.isAdvancedMode}

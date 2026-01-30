@@ -207,7 +207,9 @@
 							<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 						{/if}
 						<PromptInput.AttachmentButton />
-						<ReasoningEffortPicker />
+						{#if chatLayoutState.isAdvancedMode}
+							<ReasoningEffortPicker />
+						{/if}
 					</div>
 					<PromptInput.Submit disabled={chatLayoutState.user === null} />
 				</PromptInput.Footer>

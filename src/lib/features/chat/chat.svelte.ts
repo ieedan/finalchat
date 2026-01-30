@@ -144,7 +144,8 @@ class ChatLayoutState {
 					supportedParameters: model.supported_parameters,
 					inputModalities: model.architecture.input_modalities,
 					outputModalities: model.architecture.output_modalities,
-					reasoningEffort
+					// in basic mode default to whatever the provider default is
+					reasoningEffort: this.isAdvancedMode ? reasoningEffort : undefined
 				}
 			});
 
