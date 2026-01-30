@@ -68,7 +68,7 @@
 				</a>
 				API key to access all models without restrictions.
 			</p>
-			<ApiKeyInput bind:apiKey bind:storage />
+			<ApiKeyInput class="bg-background" bind:apiKey bind:storage />
 		</div>
 		<div class="relative">
 			<div class="absolute inset-0 flex items-center">

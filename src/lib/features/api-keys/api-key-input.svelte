@@ -10,10 +10,14 @@
 	type Props = {
 		apiKey: string;
 		storage: 'Local' | 'Remote';
+		class?: string;
 	};
 
-	let { apiKey = $bindable(''), storage = $bindable<'Local' | 'Remote'>('Local') }: Props =
-		$props();
+	let {
+		apiKey = $bindable(''),
+		storage = $bindable<'Local' | 'Remote'>('Local'),
+		class: className
+	}: Props = $props();
 
 	const storageOptions: { label: string; icon: typeof MonitorIcon; description: string }[] = [
 		{
@@ -35,7 +39,8 @@
 	data-maybe-invalid={apiKey && !apiKey.startsWith('sk-or-')}
 	class={cn(
 		'flex items-center border border-border rounded-md bg-input data-[maybe-invalid=true]:border-amber-500 data-[maybe-invalid=true]:ring-amber-500',
-		'focus-within:ring-2 px-1 focus-within:ring-ring ring-offset-2 ring-offset-background transition-all'
+		'focus-within:ring-2 px-1 focus-within:ring-ring ring-offset-2 ring-offset-background transition-all',
+		className
 	)}
 >
 	<Select.Root type="single" bind:value={storage}>

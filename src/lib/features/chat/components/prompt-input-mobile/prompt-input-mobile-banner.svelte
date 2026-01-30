@@ -7,7 +7,7 @@
 	let {
 		class: className,
 		children,
-		dismissed = $bindable(false),
+		dismissed = false,
 		dismissedByError = true,
 		onDismiss,
 		...rest
@@ -28,7 +28,7 @@
 		? 'closed'
 		: 'open'}
 	class={cn(
-		'ease-in-out border data-[state=closed]:h-0 bg-sidebar -translate-y-7.5 data-[state=closed]:rounded-b-4xl rounded-t-3xl data-[state=open]:h-13 absolute z-0 w-full flex items-start justify-between gap-4 px-4 duration-150',
+		'ease-in-out border overflow-hidden data-[state=closed]:h-0 bg-sidebar -translate-y-7.5 data-[state=closed]:rounded-b-4xl rounded-t-3xl data-[state=open]:h-13 absolute z-0 w-full flex items-start justify-between gap-4 px-4 duration-150',
 		{
 			'translate-y-0': dismissed || (dismissedByError && bannerState.rootState.error !== null)
 		},

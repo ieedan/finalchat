@@ -83,7 +83,7 @@
 			class="flex flex-col gap-4"
 		>
 			<div class="flex flex-col gap-1">
-				<ApiKeyInput bind:storage bind:apiKey />
+				<ApiKeyInput class="bg-background" bind:storage bind:apiKey />
 				<div>
 					{#if apiKeyInfoResource.current}
 						<span class="text-muted-foreground flex h-6 place-items-center text-xs">

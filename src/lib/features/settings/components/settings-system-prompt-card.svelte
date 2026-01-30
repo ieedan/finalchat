@@ -43,7 +43,7 @@
 		<Card.Description>{meta.description}</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<Textarea placeholder="How should I respond?" bind:value={systemPrompt} />
+		<Textarea class="bg-background" placeholder="How should I respond?" bind:value={systemPrompt} />
 	</Card.Content>
 	<Card.Footer class="flex items-center justify-end">
 		<Button onClickPromise={handleSave} disabled={!systemPromptHasChanged}>Save</Button>
