@@ -23,6 +23,8 @@ But to really be the last chat app it can't be closed source and it can't be Saa
 - Upload and generate images
 - Hotkeys for everything
 - Models can read links with custom handlers for GitHub and other common sites
+- Full text search for message contents and chat titles
+- Image model support
 - Built for use on mobile devices (No seriously try it)
 
 ## The stack
