@@ -32,7 +32,7 @@
 	);
 
 	const modelId = new PersistedState('modelId', null);
-	const reasoningEffort = new PersistedState<ReasoningEffort>('reasoningEffort', 'none');
+	const reasoningEffort = new PersistedState<ReasoningEffort>('reasoningEffort', 'default');
 
 	ModelIdCtx.set(
 		box.with(
