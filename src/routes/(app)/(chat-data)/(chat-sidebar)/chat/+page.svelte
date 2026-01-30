@@ -67,6 +67,10 @@
 				)
 			: BASIC_MODELS
 	);
+
+	const modelSupportsReasoning = $derived(
+		chatLayoutState.modelSupportsReasoning(modelId.current)
+	);
 </script>
 
 <div class="w-full h-full flex flex-col px-4 md:items-center md:justify-center md:gap-12">
@@ -124,7 +128,8 @@
 				<PromptInputMobile.NewChat />
 				<PromptInputMobile.PlusSeparator />
 				<PromptInputMobile.ModelPicker models={mobileModels} />
-				{#if chatLayoutState.isAdvancedMode}
+				{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
+					<PromptInputMobile.PlusSeparator />
 					<PromptInputMobile.ReasoningEffortPicker />
 				{/if}
 				<PromptInputMobile.PlusSeparator />
@@ -210,7 +215,7 @@
 							<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 						{/if}
 						<PromptInput.AttachmentButton />
-						{#if chatLayoutState.isAdvancedMode}
+						{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
 							<ReasoningEffortPicker />
 						{/if}
 					</div>

@@ -15,6 +15,7 @@ import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
 import { useCachedQuery, type QueryResult } from '$lib/cache/cached-query.svelte.js';
 import { SvelteSet } from 'svelte/reactivity';
 import type * as OpenRouter from '../models/openrouter';
+import { supportsReasoning } from '../models/openrouter';
 import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 import { BASIC_MODELS, DEFAULT_ENABLED_MODEL_IDS } from '$lib/ai.js';
 import type { Model, ModelId } from './types.js';
@@ -100,6 +101,11 @@ class ChatLayoutState {
 		return this.models.filter((model) => this.favoriteModelIds.includes(model.id));
 	}
 
+	modelSupportsReasoning(modelId: ModelId | null): boolean {
+		const model = this.models.find((m) => m.id === modelId);
+		return model ? supportsReasoning(model) : false;
+	}
+
 	get user() {
 		return this.opts.user;
 	}
@@ -145,8 +151,11 @@ class ChatLayoutState {
 					supportedParameters: model.supported_parameters,
 					inputModalities: model.architecture.input_modalities,
 					outputModalities: model.architecture.output_modalities,
-					// in basic mode use 'default' so backend does not pass reasoning to provider
-					reasoningEffort: this.isAdvancedMode ? reasoningEffort : 'default'
+					// when not advanced mode or model doesn't support reasoning, send 'default'
+					reasoningEffort:
+						this.isAdvancedMode && this.modelSupportsReasoning(modelId)
+							? reasoningEffort
+							: 'default'
 				}
 			});
 

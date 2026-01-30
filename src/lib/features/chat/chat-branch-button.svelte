@@ -47,7 +47,9 @@
 							supportedParameters: model?.supported_parameters ?? [],
 							inputModalities: model?.architecture.input_modalities ?? ['text'],
 							outputModalities: model?.architecture.output_modalities ?? ['text'],
-							reasoningEffort: reasoningEffort.current
+							reasoningEffort: chatLayoutState.modelSupportsReasoning(modelId.current)
+								? reasoningEffort.current
+								: 'default'
 						},
 						apiKey: chatLayoutState.apiKey ?? ''
 					}

@@ -52,6 +52,10 @@
 		chatLayoutState.models.find((model) => model.id === modelId.current)
 	);
 
+	const modelSupportsReasoning = $derived(
+		chatLayoutState.modelSupportsReasoning(modelId.current)
+	);
+
 	const lastAssistantMessage = $derived.by(() => {
 		return chatViewState.chat?.messages.findLast((message) => message.role === 'assistant');
 	});
@@ -162,7 +166,8 @@
 							<PromptInputMobile.NewChat />
 							<PromptInputMobile.PlusSeparator />
 							<PromptInputMobile.ModelPicker models={mobileModels} />
-							{#if chatLayoutState.isAdvancedMode}
+							{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
+								<PromptInputMobile.PlusSeparator />
 								<PromptInputMobile.ReasoningEffortPicker />
 							{/if}
 							<PromptInputMobile.PlusSeparator />
@@ -253,7 +258,7 @@
 										<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 									{/if}
 									<PromptInput.AttachmentButton />
-									{#if chatLayoutState.isAdvancedMode}
+									{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
 										<ReasoningEffortPicker />
 									{/if}
 								</div>
