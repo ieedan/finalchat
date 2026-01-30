@@ -52,9 +52,7 @@
 		chatLayoutState.models.find((model) => model.id === modelId.current)
 	);
 
-	const modelSupportsReasoning = $derived(
-		chatLayoutState.modelSupportsReasoning(modelId.current)
-	);
+	const modelSupportsReasoning = $derived(chatLayoutState.modelSupportsReasoning(modelId.current));
 
 	const lastAssistantMessage = $derived.by(() => {
 		return chatViewState.chat?.messages.findLast((message) => message.role === 'assistant');

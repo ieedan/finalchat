@@ -68,9 +68,7 @@
 			: BASIC_MODELS
 	);
 
-	const modelSupportsReasoning = $derived(
-		chatLayoutState.modelSupportsReasoning(modelId.current)
-	);
+	const modelSupportsReasoning = $derived(chatLayoutState.modelSupportsReasoning(modelId.current));
 </script>
 
 <div class="w-full h-full flex flex-col px-4 md:items-center md:justify-center md:gap-12">

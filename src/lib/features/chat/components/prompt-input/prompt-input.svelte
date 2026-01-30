@@ -19,7 +19,7 @@
 		optimisticClear = true,
 		value = $bindable(''),
 		modelId = $bindable(null),
-		reasoningEffort = $bindable('none'),
+		reasoningEffort = $bindable('default'),
 		generating = false,
 		onUpload,
 		onDeleteAttachment,
