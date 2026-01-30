@@ -506,9 +506,12 @@ export const getGenerationCost = internalAction({
 	args: {
 		genId: v.string(),
 		messageId: v.id('messages'),
-		apiKey: v.string()
+		apiKey: v.string(),
+		retries: v.optional(v.number())
 	},
 	handler: async (ctx, args) => {
+		const maxRetries = 3;
+		const retryDelay = 5000;
 		try {
 			const response = await fetch(`https://openrouter.ai/api/v1/generation?id=${args.genId}`, {
 				method: 'GET',
@@ -516,6 +519,10 @@ export const getGenerationCost = internalAction({
 					Authorization: `Bearer ${args.apiKey}`
 				}
 			});
+
+			if (!response.ok) {
+				throw new Error(`Failed to get generation cost: ${response.status} ${response.statusText}`);
+			}
 
 			const data = await response.json();
 
@@ -526,7 +533,17 @@ export const getGenerationCost = internalAction({
 				cost: totalCost
 			});
 		} catch (error) {
-			console.error(error);
+			if (args.retries ?? 0 >= maxRetries) {
+				console.log(`Failed to get generation cost after ${maxRetries} retries: `, error);
+				return;
+			}
+			console.log(`Retrying in ${retryDelay}ms...`);
+			await ctx.scheduler.runAfter(retryDelay, internal.messages.getGenerationCost, {
+				genId: args.genId,
+				messageId: args.messageId,
+				apiKey: args.apiKey,
+				retries: args.retries ?? 0 + 1
+			});
 		}
 	}
 });
