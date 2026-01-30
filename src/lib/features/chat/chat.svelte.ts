@@ -133,6 +133,7 @@ class ChatLayoutState {
 
 		const model = this.models.find((m) => m.id === modelId);
 		if (!model) throw new Error(`Model with id: ${modelId} not found`);
+
 		try {
 			const { chatId, assistantMessageId } = await this.client.mutation(api.messages.create, {
 				chatId: this.chatId,
@@ -144,8 +145,8 @@ class ChatLayoutState {
 					supportedParameters: model.supported_parameters,
 					inputModalities: model.architecture.input_modalities,
 					outputModalities: model.architecture.output_modalities,
-					// in basic mode default to whatever the provider default is
-					reasoningEffort: this.isAdvancedMode ? reasoningEffort : undefined
+					// in basic mode use 'default' so backend does not pass reasoning to provider
+					reasoningEffort: this.isAdvancedMode ? reasoningEffort : 'default'
 				}
 			});
 

@@ -394,7 +394,7 @@ export const branchFromMessage = mutation({
 		).filter((a) => messages.some((m) => m._id === a.messageId));
 		// copy over the messages with attachments
 		await Promise.all(
-			messages.map(async (m) => {
+			messages.map(async (m, i) => {
 				const ogAttachments = relatedAttachments.filter((a) => a.messageId === m._id);
 				let newMessageId: Id<'messages'>;
 				if (m.role === 'user') {
@@ -404,7 +404,10 @@ export const branchFromMessage = mutation({
 						chatId: newChatId,
 						content: m.content,
 						chatSettings:
-							m._id === args.message._id && args.message.role === 'user'
+							// only override the chat settings for the last user message
+							m._id === args.message._id &&
+							args.message.role === 'user' &&
+							i === messages.length - 1
 								? {
 										modelId: args.message.modelId,
 										supportedParameters: args.message.supportedParameters,

@@ -8,15 +8,15 @@
 		RiBrain4Line as Brain4Icon,
 		RiBrain2Line as Brain2Icon,
 		RiBrain3Line as Brain3Icon,
-		RiBrainAi3Line as BrainAi3Icon
+		RiBrainAi3Line as BrainAi3Icon,
+		RiSettings6Line as Settings6Icon
 	} from 'remixicon-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	const reasoningEffortPickerState = useReasoningEffortPicker();
 
-	// Thinking level icons in order: 3, 2, 1, 3, 4 (brain-3, brain-2, brain, brain-ai-3, brain-4)
-	// brain-4 not in remixicon-svelte, using brain-3 for minimal
 	const options = [
+		{ label: 'Default', value: 'default', icon: Settings6Icon, iconClass: 'text-muted-foreground' },
 		{ label: 'X-High', value: 'xhigh', icon: Brain4Icon },
 		{ label: 'High', value: 'high', icon: BrainAi3Icon },
 		{ label: 'Medium', value: 'medium', icon: BrainIcon },
@@ -58,7 +58,7 @@
 			Reasoning Effort {selectedOption?.label}
 		</Tooltip.Content>
 	</Tooltip.Root>
-	<Select.Content align="start" side="top" class="max-h-[200px] overflow-y-auto">
+	<Select.Content align="start" side="top" class="overflow-y-auto">
 		{#each options as option (option.value)}
 			<Select.Item value={option.value}>
 				<option.icon class={cn('size-4 shrink-0 text-foreground', option.iconClass)} />

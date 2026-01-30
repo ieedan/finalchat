@@ -162,6 +162,9 @@
 							<PromptInputMobile.NewChat />
 							<PromptInputMobile.PlusSeparator />
 							<PromptInputMobile.ModelPicker models={mobileModels} />
+							{#if chatLayoutState.isAdvancedMode}
+								<PromptInputMobile.ReasoningEffortPicker />
+							{/if}
 							<PromptInputMobile.PlusSeparator />
 							<PromptInputMobile.AddAttachment />
 						</PromptInputMobile.Plus>

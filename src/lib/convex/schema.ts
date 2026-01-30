@@ -4,6 +4,7 @@ import { type Infer, v } from 'convex/values';
 import type { Id } from './_generated/dataModel';
 
 export const ReasoningEffort = v.union(
+	v.literal('default'),
 	v.literal('xhigh'),
 	v.literal('high'),
 	v.literal('medium'),

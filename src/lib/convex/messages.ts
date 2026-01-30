@@ -353,15 +353,17 @@ ${systemPrompt}
 					});
 				}
 
-				const providerOptions = last.userMessage.chatSettings.reasoningEffort
-					? {
-							openrouter: {
-								reasoning: {
-									effort: last.userMessage.chatSettings.reasoningEffort
+				const effort = last.userMessage.chatSettings.reasoningEffort;
+				const providerOptions =
+					effort && effort !== 'default'
+						? {
+								openrouter: {
+									reasoning: {
+										effort
+									}
 								}
 							}
-						}
-					: undefined;
+						: undefined;
 
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				let streamResult: StreamTextResult<any, any>;
