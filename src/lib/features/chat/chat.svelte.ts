@@ -128,7 +128,7 @@ class ChatLayoutState {
 		);
 	}
 
-	handleSubmit: OnSubmit = async ({ input, modelId, attachments }) => {
+	handleSubmit: OnSubmit = async ({ input, modelId, attachments, reasoningEffort }) => {
 		if (!this.user) throw new Error('You must be signed in to start chatting!');
 
 		const model = this.models.find((m) => m.id === modelId);
@@ -143,7 +143,8 @@ class ChatLayoutState {
 					attachments,
 					supportedParameters: model.supported_parameters,
 					inputModalities: model.architecture.input_modalities,
-					outputModalities: model.architecture.output_modalities
+					outputModalities: model.architecture.output_modalities,
+					reasoningEffort
 				}
 			});
 

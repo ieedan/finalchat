@@ -9,7 +9,7 @@
 	import { setupConvex } from 'convex-svelte';
 	import { page } from '$app/state';
 	import { jwtDecode } from 'jwt-decode';
-	import { AccessTokenCtx, ModelIdCtx } from '$lib/context.svelte';
+	import { AccessTokenCtx, ModelIdCtx, ReasoningEffortCtx } from '$lib/context.svelte';
 	import { box } from 'svelte-toolbelt';
 	import { PersistedState } from 'runed';
 	import { ConfirmDeleteDialog } from '$lib/components/ui/confirm-delete-dialog';
@@ -18,6 +18,7 @@
 	import { ThemeProvider } from '$lib/components/theme-provider';
 	import Startup from '$lib/components/startup.svelte';
 	import { ModeWatcher } from 'mode-watcher';
+	import type { ReasoningEffort } from '$lib/convex/schema';
 
 	let { children, data } = $props();
 
@@ -31,11 +32,18 @@
 	);
 
 	const modelId = new PersistedState('modelId', null);
+	const reasoningEffort = new PersistedState<ReasoningEffort>('reasoningEffort', 'none');
 
 	ModelIdCtx.set(
 		box.with(
 			() => modelId.current,
 			(v) => (modelId.current = v)
+		)
+	);
+	ReasoningEffortCtx.set(
+		box.with(
+			() => reasoningEffort.current,
+			(v) => (reasoningEffort.current = v)
 		)
 	);
 

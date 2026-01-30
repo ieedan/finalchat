@@ -5,7 +5,7 @@
 	import * as PromptInput from '$lib/features/chat/components/prompt-input';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import ChatMessage from './chat-message.svelte';
-	import { ModelIdCtx } from '$lib/context.svelte';
+	import { ModelIdCtx, ReasoningEffortCtx } from '$lib/context.svelte';
 	import { UseAutoScroll } from '$lib/hooks/use-auto-scroll.svelte';
 	import { onMount } from 'svelte';
 	import { IsMounted, PersistedState } from 'runed';
@@ -22,11 +22,13 @@
 	import * as Empty from '$lib/components/ui/empty';
 	import { Button } from '$lib/components/ui/button';
 	import { BASIC_MODELS } from '$lib/ai.js';
+	import ReasoningEffortPicker from './components/reasoning-effort-picker.svelte';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
 
 	const modelId = ModelIdCtx.get();
+	const reasoningEffort = ReasoningEffortCtx.get();
 
 	let scrollContainer = $state<HTMLElement>();
 
@@ -144,6 +146,7 @@
 					<!-- Mobile prompt input -->
 					<PromptInputMobile.Root
 						bind:modelId={modelId.current}
+						bind:reasoningEffort={reasoningEffort.current}
 						generating={chatViewState.chatQuery.data?.generating}
 						{submitOnEnter}
 						onSubmit={(opts) => {
@@ -197,6 +200,7 @@
 					<!-- Desktop Prompt Input -->
 					<PromptInput.Root
 						bind:modelId={modelId.current}
+						bind:reasoningEffort={reasoningEffort.current}
 						generating={chatViewState.chatQuery.data?.generating}
 						{submitOnEnter}
 						onSubmit={(opts) => {
@@ -246,6 +250,7 @@
 										<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 									{/if}
 									<PromptInput.AttachmentButton />
+									<ReasoningEffortPicker />
 								</div>
 								<div class="flex items-center gap-2">
 									{#if chatLayoutState.isAdvancedMode}

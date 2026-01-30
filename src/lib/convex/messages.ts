@@ -30,6 +30,7 @@ import type { ContextType } from './ai.utils';
 import { truncateRight } from '../utils/strings';
 import { rateLimiter } from './rateLimiter';
 import { formatTimeUntil } from '../utils/time';
+import { ReasoningEffort } from './schema';
 
 export const Prompt = v.object({
 	modelId: v.string(),
@@ -45,7 +46,8 @@ export const Prompt = v.object({
 	),
 	supportedParameters: v.array(v.string()),
 	inputModalities: v.array(v.string()),
-	outputModalities: v.array(v.string())
+	outputModalities: v.array(v.string()),
+	reasoningEffort: v.optional(ReasoningEffort)
 });
 
 export const create = mutation({
@@ -141,7 +143,8 @@ export const create = mutation({
 				modelId: args.prompt.modelId,
 				supportedParameters: args.prompt.supportedParameters,
 				inputModalities: args.prompt.inputModalities,
-				outputModalities: args.prompt.outputModalities
+				outputModalities: args.prompt.outputModalities,
+				reasoningEffort: args.prompt.reasoningEffort
 			}
 		});
 
@@ -350,6 +353,16 @@ ${systemPrompt}
 					});
 				}
 
+				const providerOptions = last.userMessage.chatSettings.reasoningEffort
+					? {
+							openrouter: {
+								reasoning: {
+									effort: last.userMessage.chatSettings.reasoningEffort
+								}
+							}
+						}
+					: undefined;
+
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				let streamResult: StreamTextResult<any, any>;
 				if (last.userMessage.chatSettings.supportedParameters?.includes('tools')) {
@@ -367,7 +380,8 @@ ${systemPrompt}
 							env: {
 								GITHUB_TOKEN: env.GITHUB_TOKEN
 							}
-						} satisfies ContextType
+						} satisfies ContextType,
+						providerOptions
 					});
 
 					streamResult = await agent.stream({
@@ -378,7 +392,8 @@ ${systemPrompt}
 					streamResult = streamText({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
 						messages: modelMessages,
-						experimental_transform: smoothStream()
+						experimental_transform: smoothStream(),
+						providerOptions
 					});
 				}
 

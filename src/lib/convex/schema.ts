@@ -3,6 +3,17 @@ import { defineSchema, defineTable } from 'convex/server';
 import { type Infer, v } from 'convex/values';
 import type { Id } from './_generated/dataModel';
 
+export const ReasoningEffort = v.union(
+	v.literal('xhigh'),
+	v.literal('high'),
+	v.literal('medium'),
+	v.literal('low'),
+	v.literal('minimal'),
+	v.literal('none')
+);
+
+export type ReasoningEffort = Infer<typeof ReasoningEffort>;
+
 export const ChatMessageUser = v.object({
 	userId: v.string(),
 	chatId: v.id('chats'),
@@ -12,7 +23,8 @@ export const ChatMessageUser = v.object({
 		modelId: v.string(),
 		supportedParameters: v.optional(v.array(v.string())),
 		inputModalities: v.optional(v.array(v.string())),
-		outputModalities: v.optional(v.array(v.string()))
+		outputModalities: v.optional(v.array(v.string())),
+		reasoningEffort: v.optional(ReasoningEffort)
 	})
 });
 

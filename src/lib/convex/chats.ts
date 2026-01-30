@@ -14,6 +14,7 @@ import { asyncMap } from 'convex-helpers';
 import { deserializeStream } from '../utils/stream-transport-protocol';
 import removeMarkdown from 'remove-markdown';
 import { createMatch, type MatchedText } from '../utils/full-text-search';
+import { ReasoningEffort } from './schema';
 
 export const getAll = query({
 	args: {},
@@ -337,7 +338,8 @@ export const branchFromMessage = mutation({
 				modelId: v.string(),
 				supportedParameters: v.array(v.string()),
 				inputModalities: v.array(v.string()),
-				outputModalities: v.array(v.string())
+				outputModalities: v.array(v.string()),
+				reasoningEffort: v.optional(ReasoningEffort)
 			}),
 			v.object({
 				_id: v.id('messages'),
@@ -407,7 +409,8 @@ export const branchFromMessage = mutation({
 										modelId: args.message.modelId,
 										supportedParameters: args.message.supportedParameters,
 										inputModalities: args.message.inputModalities,
-										outputModalities: args.message.outputModalities
+										outputModalities: args.message.outputModalities,
+										reasoningEffort: args.message.reasoningEffort
 									}
 								: m.chatSettings
 					});

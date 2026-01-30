@@ -2,7 +2,7 @@
 	import * as PromptInput from '$lib/features/chat/components/prompt-input';
 	import { useChatLayout } from '$lib/features/chat/chat.svelte';
 	import ModelPickerBasic from '$lib/features/models/components/models-picker-basic.svelte';
-	import { ModelIdCtx } from '$lib/context.svelte';
+	import { ModelIdCtx, ReasoningEffortCtx } from '$lib/context.svelte';
 	import { ChatAttachmentUploader } from '$lib/features/chat/chat-attachment-uploader.svelte.js';
 	import { PersistedState } from 'runed';
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
@@ -22,12 +22,14 @@
 	import { cn } from '$lib/utils.js';
 	import { BASIC_MODELS } from '$lib/ai';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import ReasoningEffortPicker from '$lib/features/chat/components/reasoning-effort-picker.svelte';
 
 	let { data } = $props();
 
 	const chatLayoutState = useChatLayout();
 
 	const modelId = ModelIdCtx.get();
+	const reasoningEffort = ReasoningEffortCtx.get();
 
 	const chatAttachmentUploader = new ChatAttachmentUploader();
 
@@ -108,6 +110,7 @@
 		<!-- Mobile Prompt Input -->
 		<PromptInputMobile.Root
 			bind:modelId={modelId.current}
+			bind:reasoningEffort={reasoningEffort.current}
 			onSubmit={chatLayoutState.handleSubmit}
 			{submitOnEnter}
 			class="w-full max-w-2xl md:hidden"
@@ -159,6 +162,7 @@
 		<!-- Desktop Prompt Input -->
 		<PromptInput.Root
 			bind:modelId={modelId.current}
+			bind:reasoningEffort={reasoningEffort.current}
 			onSubmit={chatLayoutState.handleSubmit}
 			{submitOnEnter}
 			class="w-full max-w-2xl hidden md:block"
@@ -203,6 +207,7 @@
 							<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 						{/if}
 						<PromptInput.AttachmentButton />
+						<ReasoningEffortPicker />
 					</div>
 					<PromptInput.Submit disabled={chatLayoutState.user === null} />
 				</PromptInput.Footer>

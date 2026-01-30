@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { ModelIdCtx } from '$lib/context.svelte.js';
+	import { ModelIdCtx, ReasoningEffortCtx } from '$lib/context.svelte.js';
 	import { api } from '$lib/convex/_generated/api';
 	import type { MessageWithAttachments } from '$lib/convex/chats.utils';
 	import { RiGitBranchLine as SplitIcon } from 'remixicon-svelte';
@@ -21,6 +21,7 @@
 	let { message, createdMessages = $bindable() }: Props = $props();
 
 	const modelId = ModelIdCtx.get();
+	const reasoningEffort = ReasoningEffortCtx.get();
 
 	const client = useConvexClient();
 
@@ -45,7 +46,8 @@
 							modelId: modelId.current,
 							supportedParameters: model?.supported_parameters ?? [],
 							inputModalities: model?.architecture.input_modalities ?? ['text'],
-							outputModalities: model?.architecture.output_modalities ?? ['text']
+							outputModalities: model?.architecture.output_modalities ?? ['text'],
+							reasoningEffort: reasoningEffort.current
 						},
 						apiKey: chatLayoutState.apiKey ?? ''
 					}

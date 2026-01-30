@@ -9,6 +9,7 @@
 	import PromptInputBannerDismiss from './prompt-input-banner-dismiss.svelte';
 	import type { ModelId } from '../../types.js';
 	import * as FileDropZone from '$lib/components/ui/file-drop-zone';
+	import type { ReasoningEffort } from '$lib/convex/schema.js';
 
 	let {
 		class: className,
@@ -18,6 +19,7 @@
 		optimisticClear = true,
 		value = $bindable(''),
 		modelId = $bindable(null),
+		reasoningEffort = $bindable('none'),
 		generating = false,
 		onUpload,
 		onDeleteAttachment,
@@ -35,6 +37,7 @@
 		optimisticClear?: boolean;
 		value?: string;
 		modelId?: ModelId | null;
+		reasoningEffort?: ReasoningEffort;
 		attachments?: { url: string; key: string; mediaType: string }[];
 	} = $props();
 
@@ -56,6 +59,10 @@
 		modelId: box.with(
 			() => modelId,
 			(v) => (modelId = v)
+		),
+		reasoningEffort: box.with(
+			() => reasoningEffort,
+			(v) => (reasoningEffort = v)
 		)
 	});
 
