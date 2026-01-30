@@ -82,7 +82,7 @@
 </script>
 
 <Modal.Root bind:open={dialogState.open}>
-	<Modal.Content>
+	<Modal.Content hideClose>
 		<form
 			method="POST"
 			onsubmit={(e) => {
