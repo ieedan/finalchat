@@ -247,6 +247,7 @@
 							scrollToBottom={autoScroll.scrollToBottom}
 						/>
 						<PromptInput.Content>
+							<PromptInput.AttachmentList />
 							<PromptInput.Textarea placeholder="Ask me anything..." />
 							<PromptInput.Footer class="justify-between">
 								<div class="flex items-center gap-2">
