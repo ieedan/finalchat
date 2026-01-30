@@ -8,9 +8,11 @@
 		class: className,
 		children,
 		size = 'default',
+		hideIcon = false,
 		...restProps
 	}: WithoutChild<SelectPrimitive.TriggerProps> & {
 		size?: 'sm' | 'default';
+		hideIcon?: boolean;
 	} = $props();
 </script>
 
@@ -25,5 +27,7 @@
 	{...restProps}
 >
 	{@render children?.()}
-	<ChevronDownIcon class="size-4 opacity-50" />
+	{#if !hideIcon}
+		<ChevronDownIcon class="size-4 opacity-50" />
+	{/if}
 </SelectPrimitive.Trigger>

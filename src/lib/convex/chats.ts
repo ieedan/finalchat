@@ -14,6 +14,7 @@ import { asyncMap } from 'convex-helpers';
 import { deserializeStream } from '../utils/stream-transport-protocol';
 import removeMarkdown from 'remove-markdown';
 import { createMatch, type MatchedText } from '../utils/full-text-search';
+import { ReasoningEffort } from './schema';
 
 export const getAll = query({
 	args: {},
@@ -337,7 +338,8 @@ export const branchFromMessage = mutation({
 				modelId: v.string(),
 				supportedParameters: v.array(v.string()),
 				inputModalities: v.array(v.string()),
-				outputModalities: v.array(v.string())
+				outputModalities: v.array(v.string()),
+				reasoningEffort: v.optional(ReasoningEffort)
 			}),
 			v.object({
 				_id: v.id('messages'),
@@ -392,7 +394,7 @@ export const branchFromMessage = mutation({
 		).filter((a) => messages.some((m) => m._id === a.messageId));
 		// copy over the messages with attachments
 		await Promise.all(
-			messages.map(async (m) => {
+			messages.map(async (m, i) => {
 				const ogAttachments = relatedAttachments.filter((a) => a.messageId === m._id);
 				let newMessageId: Id<'messages'>;
 				if (m.role === 'user') {
@@ -402,12 +404,16 @@ export const branchFromMessage = mutation({
 						chatId: newChatId,
 						content: m.content,
 						chatSettings:
-							m._id === args.message._id && args.message.role === 'user'
+							// only override the chat settings for the last user message
+							m._id === args.message._id &&
+							args.message.role === 'user' &&
+							i === messages.length - 1
 								? {
 										modelId: args.message.modelId,
 										supportedParameters: args.message.supportedParameters,
 										inputModalities: args.message.inputModalities,
-										outputModalities: args.message.outputModalities
+										outputModalities: args.message.outputModalities,
+										reasoningEffort: args.message.reasoningEffort
 									}
 								: m.chatSettings
 					});

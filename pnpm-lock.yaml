@@ -164,8 +164,8 @@ importers:
         specifier: ^3.4.1
         version: 3.4.1(prettier@3.8.1)(svelte@5.48.2)
       remixicon-svelte:
-        specifier: ^0.0.3
-        version: 0.0.3(svelte@5.48.2)
+        specifier: ^0.0.5
+        version: 0.0.5(svelte@5.48.2)
       remove-markdown:
         specifier: ^0.6.3
         version: 0.6.3
@@ -3353,8 +3353,8 @@ packages:
   regex@6.0.1:
     resolution: {integrity: sha512-uorlqlzAKjKQZ5P+kTJr3eeJGSVroLKoHmquUj4zHWuR+hEyNqlXsSKlYYF5F4NI6nl7tWCs0apKJ0lmfsXAPA==}
 
-  remixicon-svelte@0.0.3:
-    resolution: {integrity: sha512-Fv4F92ADVUZmwLLJuxw2lvBjwFA7Ep94Al+4zVPt3xRgpN2yI/UVbObdMJ3qj1/T5ebp8OTnKjEmUNM7mRX3JQ==}
+  remixicon-svelte@0.0.5:
+    resolution: {integrity: sha512-a7tnkBeA6P/ItRc2Q/jOgF+Xoh6Fj7hKrr/E6ZUCmOM4XBFi+mBDR95hqdRHWVf2s8sK85ycGXg+AAFZv87s+Q==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -7341,7 +7341,7 @@ snapshots:
     dependencies:
       regex-utilities: 2.3.0
 
-  remixicon-svelte@0.0.3(svelte@5.48.2):
+  remixicon-svelte@0.0.5(svelte@5.48.2):
     dependencies:
       svelte: 5.48.2
 

@@ -6,11 +6,13 @@ import type { Model, ModelId } from '../../types';
 import { SvelteMap } from 'svelte/reactivity';
 import imageCompression from 'browser-image-compression';
 import { IsMobile } from '$lib/hooks/is-mobile.svelte';
+import type { ReasoningEffort } from '$lib/convex/schema';
 
 export type OnSubmit = (opts: {
 	input: string;
 	modelId: ModelId;
 	attachments: { url: string; key: string; mediaType: string }[];
+	reasoningEffort: ReasoningEffort;
 }) => Promise<void>;
 
 type PromptInputRootStateOptions = ReadableBoxedValues<{
@@ -24,6 +26,7 @@ type PromptInputRootStateOptions = ReadableBoxedValues<{
 	WritableBoxedValues<{
 		value: string;
 		modelId: ModelId | null;
+		reasoningEffort: ReasoningEffort;
 		attachments: { url: string; key: string; mediaType: string }[];
 	}>;
 
@@ -97,7 +100,8 @@ class PromptInputRootState {
 			await this.opts.onSubmit.current({
 				input,
 				modelId: this.opts.modelId.current!,
-				attachments: this.opts.attachments.current
+				attachments: this.opts.attachments.current,
+				reasoningEffort: this.opts.reasoningEffort.current
 			});
 
 			this.opts.value.current = '';
@@ -256,6 +260,10 @@ class ModelPickerState {
 	}
 }
 
+class ReasoningEffortPickerState {
+	constructor(readonly rootState: PromptInputRootState) {}
+}
+
 export const PromptInputCtx = new Context<PromptInputRootState>('prompt-input-root-state');
 const BannerCtx = new Context<PromptInputBannerState>('prompt-input-banner-state');
 
@@ -289,4 +297,8 @@ export function usePromptInputBannerDismiss(props: PromptInputBannerDismissState
 
 export function useModelPicker(props: ModelPickerStateOptions) {
 	return new ModelPickerState(props, PromptInputCtx.get());
+}
+
+export function useReasoningEffortPicker() {
+	return new ReasoningEffortPickerState(PromptInputCtx.get());
 }
