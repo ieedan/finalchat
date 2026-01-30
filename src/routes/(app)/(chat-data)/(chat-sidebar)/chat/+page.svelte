@@ -8,14 +8,15 @@
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
-	import { FinalChat, Github } from '$lib/components/logos';
+	import { FinalChat } from '$lib/components/logos';
 	import {
 		RiArrowRightLine as ArrowRightIcon,
 		RiChatNewLine as MessageSquarePlusIcon,
 		RiRobot2Line as RobotIcon,
 		RiLayoutLeftLine as PanelLeftIcon,
 		RiSendPlaneLine as SendIcon,
-		RiSearchLine as SearchIcon
+		RiSearchLine as SearchIcon,
+		RiGithubLine as GithubLogo
 	} from 'remixicon-svelte';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import { cn } from '$lib/utils.js';
@@ -29,6 +30,14 @@
 	const modelId = ModelIdCtx.get();
 
 	const chatAttachmentUploader = new ChatAttachmentUploader();
+
+	const userDismissedApiKeyBanner = new PersistedState<boolean>(
+		'user-dismissed-api-key-banner',
+		false
+	);
+	const apiKeyBannerDismissed = $derived(
+		chatLayoutState.apiKey !== null || userDismissedApiKeyBanner.current
+	);
 
 	// svelte-ignore state_referenced_locally
 	let query = $state<string>(data.query ?? '');
@@ -125,14 +134,16 @@
 					</PromptInputMobile.BannerContent>
 				</PromptInputMobile.Banner>
 				{#if chatLayoutState.user !== null}
-					<PromptInputMobile.Banner dismissedByError dismissed={chatLayoutState.apiKey !== null}>
+					<PromptInputMobile.Banner
+						dismissedByError
+						dismissed={apiKeyBannerDismissed}
+						onDismiss={() => (userDismissedApiKeyBanner.current = true)}
+					>
 						<PromptInputMobile.BannerContent>
 							<p>
-								You're currently limited to free models. <a
-									href="/settings"
-									class="font-medium underline">Setup API key</a
-								>.
+								<a href="/settings" class="font-medium underline">Setup API key</a>
 							</p>
+							<PromptInput.BannerDismiss />
 						</PromptInputMobile.BannerContent>
 					</PromptInputMobile.Banner>
 				{/if}
@@ -165,7 +176,11 @@
 				</PromptInput.BannerContent>
 			</PromptInput.Banner>
 			{#if chatLayoutState.user !== null}
-				<PromptInput.Banner dismissedByError dismissed={chatLayoutState.apiKey !== null}>
+				<PromptInput.Banner
+					dismissedByError
+					dismissed={apiKeyBannerDismissed}
+					onDismiss={() => (userDismissedApiKeyBanner.current = true)}
+				>
 					<PromptInput.BannerContent>
 						<p>
 							You're currently limited to free models. <a
@@ -173,6 +188,7 @@
 								class="font-medium underline">Setup API key</a
 							>.
 						</p>
+						<PromptInputMobile.BannerDismiss />
 					</PromptInput.BannerContent>
 				</PromptInput.Banner>
 			{/if}
@@ -203,6 +219,6 @@
 		variant="ghost"
 		size="icon"
 	>
-		<Github />
+		<GithubLogo />
 	</Button>
 </div>

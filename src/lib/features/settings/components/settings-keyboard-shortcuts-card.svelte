@@ -66,7 +66,7 @@
 				>
 				<Kbd.Group class="gap-1">
 					{#each shortcut.keys as key (key)}
-						<Kbd.Root class="bg-input border">{key}</Kbd.Root>
+						<Kbd.Root class="bg-background border">{key}</Kbd.Root>
 					{/each}
 				</Kbd.Group>
 			</div>

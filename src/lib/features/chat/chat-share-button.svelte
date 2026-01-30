@@ -49,7 +49,7 @@
 		<Drawer.Content>
 			<RadioGroup.Root
 				bind:value
-				class="border border-border rounded-lg gap-0 bg-input"
+				class="border border-border rounded-lg gap-0 bg-background"
 				onValueChange={updatePublic}
 			>
 				{@render option({
@@ -109,7 +109,7 @@
 				>
 					<img src="/chat/{chat._id}/og.png" alt="OG" class="w-full aspect-video object-fit" />
 				</a>
-				<Snippet class="bg-input" text={shareUrl} />
+				<Snippet class="bg-background" text={shareUrl} />
 			{/if}
 		</Drawer.Content>
 	</Drawer.Root>
@@ -119,7 +119,7 @@
 		<Popover.Content align="end" {animated} class="w-sm flex flex-col gap-2">
 			<RadioGroup.Root
 				bind:value
-				class="border border-border rounded-lg gap-0 bg-input"
+				class="border border-border rounded-lg gap-0 bg-background"
 				onValueChange={updatePublic}
 			>
 				{@render option({
@@ -145,7 +145,7 @@
 				>
 					<img src="/chat/{chat._id}/og.png" alt="OG" class="w-full aspect-video object-fit" />
 				</a>
-				<Snippet class="bg-input" text={shareUrl} />
+				<Snippet class="bg-background" text={shareUrl} />
 			{/if}
 		</Popover.Content>
 	</Popover.Root>

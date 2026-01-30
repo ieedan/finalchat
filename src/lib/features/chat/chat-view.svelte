@@ -65,6 +65,14 @@
 				)
 			: BASIC_MODELS
 	);
+
+	const userDismissedApiKeyBanner = new PersistedState<boolean>(
+		'user-dismissed-api-key-banner',
+		false
+	);
+	const apiKeyBannerDismissed = $derived(
+		chatLayoutState.apiKey !== null || userDismissedApiKeyBanner.current
+	);
 </script>
 
 {#if chatViewState.chat !== null}
@@ -166,15 +174,14 @@
 							{#if chatLayoutState.user !== null}
 								<PromptInputMobile.Banner
 									dismissedByError
-									dismissed={chatLayoutState.apiKey !== null}
+									dismissed={apiKeyBannerDismissed}
+									onDismiss={() => (userDismissedApiKeyBanner.current = true)}
 								>
 									<PromptInputMobile.BannerContent>
 										<p>
-											You're currently limited to free models. <a
-												href="/settings"
-												class="font-medium underline">Setup API key</a
-											>.
+											<a href="/settings" class="font-medium underline">Setup API key</a>
 										</p>
+										<PromptInputMobile.BannerDismiss />
 									</PromptInputMobile.BannerContent>
 								</PromptInputMobile.Banner>
 							{/if}
@@ -209,7 +216,11 @@
 							</PromptInput.BannerContent>
 						</PromptInput.Banner>
 						{#if chatLayoutState.user !== null}
-							<PromptInput.Banner dismissedByError dismissed={chatLayoutState.apiKey !== null}>
+							<PromptInput.Banner
+								dismissedByError
+								dismissed={apiKeyBannerDismissed}
+								onDismiss={() => (userDismissedApiKeyBanner.current = true)}
+							>
 								<PromptInput.BannerContent>
 									<p>
 										You're currently limited to free models. <a
@@ -217,6 +228,7 @@
 											class="font-medium underline">Setup API key</a
 										>.
 									</p>
+									<PromptInputMobile.BannerDismiss />
 								</PromptInput.BannerContent>
 							</PromptInput.Banner>
 						{/if}

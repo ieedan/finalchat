@@ -73,7 +73,7 @@
 {#snippet inputBar()}
 	<div class="px-1.5 pb-1.5">
 		<div
-			class="flex items-center gap-1.5 rounded-md border border-border bg-input/80 p-1.5 shrink-0"
+			class="flex items-center gap-1.5 rounded-md border border-border bg-background/80 p-1.5 shrink-0"
 		>
 			<div class="h-4 flex-1 rounded bg-background/80 min-w-0"></div>
 			<div class="size-3.5 shrink-0 rounded-sm bg-primary"></div>
