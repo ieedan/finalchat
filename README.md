@@ -5,7 +5,7 @@
 <h1 align="center">Finalchat</h1>
 <p align="center">The last chat app you'll ever need.</p>
 
-https://github.com/user-attachments/assets/cd81fecd-e510-408c-86dc-db49ee8307ed
+https://github.com/user-attachments/assets/0e1decc0-a99d-4b31-ad8a-8d1cb43afd48
 
 I built this because I wanted a chat app that was fast, free, and wonderful to use on both desktop and mobile.
 
