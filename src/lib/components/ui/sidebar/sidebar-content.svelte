@@ -21,7 +21,7 @@
 >
 	<div
 		class={cn(
-			'absolute z-20 h-10 bg-sidebar mask-b-from-25% top-0 w-full opacity-0 transition-opacity ease-in-out',
+			'absolute z-20 pointer-events-none h-10 bg-sidebar bg-ease-to-b from-sidebar top-0 w-full opacity-0 transition-opacity ease-in-out',
 			!scrollState.arrived.top && 'opacity-100'
 		)}
 	></div>
@@ -30,7 +30,7 @@
 	</div>
 	<div
 		class={cn(
-			'absolute z-20 h-10 bg-sidebar mask-t-from-25% -bottom-px w-full opacity-0 transition-opacity ease-in-out',
+			'absolute z-20 pointer-events-none h-10 bg-ease-to-t from-sidebar bottom-0 w-full opacity-0 transition-opacity ease-in-out',
 			!scrollState.arrived.bottom && 'opacity-100'
 		)}
 	></div>

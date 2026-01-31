@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
+@plugin 'tw-easing-gradients';
 
 @source "../../node_modules/svelte-streamdown/**/*";
 
