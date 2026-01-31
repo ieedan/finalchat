@@ -59,7 +59,7 @@
 	>
 		<PlusIcon />
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content align="start" sideOffset={5} class="rounded-3xl p-2 min-w-[250px]">
+	<DropdownMenu.Content align="start" sideOffset={5} class="rounded-3xl p-2 max-w-[250px]">
 		{@render children?.()}
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
