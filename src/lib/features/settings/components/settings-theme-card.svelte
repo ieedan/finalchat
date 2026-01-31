@@ -53,18 +53,18 @@
 	{@const lineW3 = compact ? 'w-6' : 'w-10'}
 	<div class={cn(conversationAreaBase, compact && 'rounded-none')}>
 		<div class="flex justify-end">
-			<div class={cn(bubbleMaxW, 'rounded-sm bg-muted/80', bubblePadding)}>
-				<div class={cn(lineH, lineW1, 'rounded-full bg-muted-foreground/30')}></div>
+			<div class={cn(bubbleMaxW, 'rounded-sm bg-muted/80 overflow-hidden min-w-0', bubblePadding)}>
+				<div class={cn(lineH, lineW1, 'max-w-full rounded-full bg-muted-foreground/30')}></div>
 			</div>
 		</div>
 		<div class="flex justify-start">
-			<div class={cn(bubbleMaxW, 'rounded-sm bg-muted/60', bubblePadding)}>
-				<div class={cn(lineH, lineW2, 'rounded-full bg-muted-foreground/25')}></div>
+			<div class={cn(bubbleMaxW, 'rounded-sm bg-muted/60 overflow-hidden min-w-0', bubblePadding)}>
+				<div class={cn(lineH, lineW2, 'max-w-full rounded-full bg-muted-foreground/25')}></div>
 			</div>
 		</div>
 		<div class="flex justify-end">
-			<div class={cn(bubbleMaxW, 'rounded-sm bg-muted/80', bubblePadding)}>
-				<div class={cn(lineH, lineW3, 'rounded-full bg-muted-foreground/30')}></div>
+			<div class={cn(bubbleMaxW, 'rounded-sm bg-muted/80 overflow-hidden min-w-0', bubblePadding)}>
+				<div class={cn(lineH, lineW3, 'max-w-full rounded-full bg-muted-foreground/30')}></div>
 			</div>
 		</div>
 	</div>
