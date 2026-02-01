@@ -4,7 +4,6 @@
 	import '@fontsource-variable/atkinson-hyperlegible-mono';
 	import '@fontsource-variable/atkinson-hyperlegible-next';
 	import '@fontsource-variable/geist-mono';
-	import favicon from '$lib/assets/favicon.svg';
 	import { env } from '$lib/env.client';
 	import { setupConvex } from 'convex-svelte';
 	import { page } from '$app/state';
@@ -63,10 +62,6 @@
 
 	const metaTags = $derived(deepMerge(data.baseMetaTags, page.data.pageMetaTags));
 </script>
-
-<svelte:head>
-	<link rel="icon" href={favicon} />
-</svelte:head>
 
 <MetaTags {...metaTags} />
 
