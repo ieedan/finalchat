@@ -271,6 +271,8 @@ export const streamMessage = httpAction(async (ctx, request) => {
 		streamId,
 		async (ctx, _request, _streamId, append) => {
 			let last: ReturnType<typeof getLastUserAndAssistantMessages> | null = null;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			let streamResult: StreamTextResult<any, any> | null = null;
 			try {
 				const { messages, chat } = await ctx.runQuery(internal.messages.getMessagesForChat, {
 					chatId
@@ -365,8 +367,6 @@ ${systemPrompt}
 							}
 						: undefined;
 
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				let streamResult: StreamTextResult<any, any>;
 				if (last.userMessage.chatSettings.supportedParameters?.includes('tools')) {
 					const agent = new ToolLoopAgent({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
@@ -484,14 +484,22 @@ ${systemPrompt}
 						apiKey: apiKeyToUse
 					});
 				}
-			} catch (error) {
+			} catch {
 				if (!last) return;
+				if (!streamResult) return;
+
+				let error: unknown | null = null;
+				for await (const chunk of streamResult.fullStream) {
+					if (chunk.type === 'error') {
+						error = chunk.error; // only take the last error
+					}
+				}
+
 				await ctx.runMutation(internal.messages.updateMessageError, {
 					messageId: last.assistantMessage._id,
-					error:
-						error instanceof AISDKError
-							? error.message
-							: 'There was an error generating the response'
+					error: AISDKError.isInstance(error)
+						? error.message
+						: 'There was an error generating the response'
 				});
 			}
 		}
