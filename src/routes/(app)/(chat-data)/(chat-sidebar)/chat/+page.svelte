@@ -10,6 +10,7 @@
 	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { FinalChat } from '$lib/components/logos';
 	import {
+		RiAlertLine as AlertIcon,
 		RiArrowRightLine as ArrowRightIcon,
 		RiChatNewLine as MessageSquarePlusIcon,
 		RiRobot2Line as RobotIcon,
@@ -23,6 +24,7 @@
 	import { BASIC_MODELS } from '$lib/ai';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import ReasoningEffortPicker from '$lib/features/chat/components/reasoning-effort-picker.svelte';
+	import { supportsImages } from '$lib/features/models/openrouter';
 
 	let { data } = $props();
 
@@ -69,6 +71,13 @@
 	);
 
 	const modelSupportsReasoning = $derived(chatLayoutState.modelSupportsReasoning(modelId.current));
+	const selectedModel = $derived(
+		chatLayoutState.models.find((model) => model.id === modelId.current)
+	);
+	const showImageUnsupportedBanner = $derived.by(() => {
+		const model = selectedModel;
+		return attachmentsList.current.length > 0 && model ? !supportsImages(model) : false;
+	});
 </script>
 
 <div class="w-full h-full flex flex-col px-4 md:items-center md:justify-center md:gap-12">
@@ -156,6 +165,17 @@
 						</PromptInputMobile.BannerContent>
 					</PromptInputMobile.Banner>
 				{/if}
+				<PromptInputMobile.Banner dismissedByError={false} dismissed={!showImageUnsupportedBanner}>
+					<PromptInputMobile.BannerContent>
+						<div class="flex items-center gap-2">
+							<AlertIcon class="size-4 text-destructive shrink-0" />
+							<p class="text-sm text-destructive">
+								This model doesn't support images. Remove attachments or switch models to avoid
+								errors.
+							</p>
+						</div>
+					</PromptInputMobile.BannerContent>
+				</PromptInputMobile.Banner>
 				<PromptInputMobile.InputWrapper>
 					<PromptInputMobile.AttachmentList />
 					<PromptInputMobile.Input placeholder="Ask me anything..." />
@@ -202,6 +222,17 @@
 					</PromptInput.BannerContent>
 				</PromptInput.Banner>
 			{/if}
+			<PromptInput.Banner dismissedByError={false} dismissed={!showImageUnsupportedBanner}>
+				<PromptInput.BannerContent>
+					<div class="flex items-center gap-2">
+						<AlertIcon class="size-4 text-destructive shrink-0" />
+						<p class="text-sm text-destructive">
+							This model doesn't support images. Remove attachments or switch models to avoid
+							errors.
+						</p>
+					</div>
+				</PromptInput.BannerContent>
+			</PromptInput.Banner>
 			<PromptInput.Content>
 				<PromptInput.AttachmentList />
 				<PromptInput.Textarea placeholder="Ask me anything..." />

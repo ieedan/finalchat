@@ -95,6 +95,7 @@
 			}}
 		>
 			{#snippet child({ props: { class: _, ...props } })}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					data-active={page.url.pathname.includes(`/chat/${chat._id}`)}
 					class="group/menu-button hover:bg-sidebar-accent focus-within:bg-sidebar-accent rounded-md flex items-center gap-2 h-8.5 data-[active=true]:bg-sidebar-accent"
