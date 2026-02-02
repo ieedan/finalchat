@@ -29,16 +29,16 @@
 		return removeMarkdown(text);
 	};
 
-	const userText = getUserMessageText(userMessage);
-	const assistantText = getAssistantMessageText(assistantMessage);
+	const userText = $derived(getUserMessageText(userMessage));
+	const assistantText = $derived(getAssistantMessageText(assistantMessage));
 
 	const truncateText = (text: string, maxLength: number): string => {
 		if (text.length <= maxLength) return text;
 		return text.slice(0, maxLength - 3) + '...';
 	};
 
-	const displayUserText = truncateText(userText, 200);
-	const displayAssistantText = truncateText(assistantText, 400);
+	const displayUserText = $derived(truncateText(userText, 200));
+	const displayAssistantText = $derived(truncateText(assistantText, 400));
 </script>
 
 <div

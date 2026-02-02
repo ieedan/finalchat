@@ -10,7 +10,9 @@
 	let { children, defaultFontPreset }: Props = $props();
 
 	setupThemeProvider({
-		defaultFontPreset
+		get defaultFontPreset() {
+			return defaultFontPreset;
+		}
 	});
 </script>
 

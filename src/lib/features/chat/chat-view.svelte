@@ -15,6 +15,7 @@
 	import ShareButton from './chat-share-button.svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import {
+		RiAlertLine as AlertIcon,
 		RiEyeLine as EyeIcon,
 		RiChatOffLine as MessageCircleOffIcon,
 		RiArrowLeftLine as ArrowLeftIcon
@@ -23,6 +24,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { BASIC_MODELS } from '$lib/ai.js';
 	import ReasoningEffortPicker from './components/reasoning-effort-picker.svelte';
+	import { supportsImages } from '$lib/features/models/openrouter';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -53,6 +55,10 @@
 	);
 
 	const modelSupportsReasoning = $derived(chatLayoutState.modelSupportsReasoning(modelId.current));
+	const showImageUnsupportedBanner = $derived.by(() => {
+		const model = selectedModel;
+		return attachmentsList.current.length > 0 && model ? !supportsImages(model) : false;
+	});
 
 	const lastAssistantMessage = $derived.by(() => {
 		return chatViewState.chat?.messages.findLast((message) => message.role === 'assistant');
@@ -194,6 +200,20 @@
 									</PromptInputMobile.BannerContent>
 								</PromptInputMobile.Banner>
 							{/if}
+							<PromptInputMobile.Banner
+								dismissedByError={false}
+								dismissed={!showImageUnsupportedBanner}
+							>
+								<PromptInputMobile.BannerContent>
+									<div class="flex items-center gap-2">
+										<AlertIcon class="size-4 text-destructive shrink-0" />
+										<p class="text-sm text-destructive">
+											This model doesn't support images. Remove attachments or switch models to
+											avoid errors.
+										</p>
+									</div>
+								</PromptInputMobile.BannerContent>
+							</PromptInputMobile.Banner>
 							<PromptInputMobile.InputWrapper>
 								<PromptInputMobile.AttachmentList />
 								<PromptInputMobile.Input placeholder="Ask me anything..." />
@@ -242,6 +262,17 @@
 								</PromptInput.BannerContent>
 							</PromptInput.Banner>
 						{/if}
+						<PromptInput.Banner dismissedByError={false} dismissed={!showImageUnsupportedBanner}>
+							<PromptInput.BannerContent>
+								<div class="flex items-center gap-2">
+									<AlertIcon class="size-4 text-destructive shrink-0" />
+									<p class="text-sm text-destructive">
+										This model doesn't support images. Remove attachments or switch models to avoid
+										errors.
+									</p>
+								</div>
+							</PromptInput.BannerContent>
+						</PromptInput.Banner>
 						<PromptInput.ScrollToBottom
 							isNearBottom={autoScroll.isNearBottom}
 							scrollToBottom={autoScroll.scrollToBottom}
