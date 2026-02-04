@@ -21,7 +21,12 @@ import {
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
 import { fetchLinkContentTool } from './ai.utils.js';
-import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
+import {
+	createChunkAppender,
+	partsToModelMessage,
+	serializeParts,
+	type StreamResult
+} from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';
@@ -402,12 +407,27 @@ ${systemPrompt}
 				const { fullStream, totalUsage } = streamResult;
 
 				let openRouterGenId: string | undefined = undefined;
-				let content = '';
+				const storageParts: StreamResult = [];
+
+				const appendStoragePart = (part: StreamResult[number]) => {
+					if (part.type === 'text' || part.type === 'reasoning') {
+						const last = storageParts[storageParts.length - 1];
+						if (
+							last &&
+							(last.type === 'text' || last.type === 'reasoning') &&
+							last.type === part.type
+						) {
+							last.text += part.text;
+							return;
+						}
+					}
+
+					storageParts.push(part);
+				};
 
 				const appender = createChunkAppender({
 					append: (chunk) => {
 						append(chunk);
-						content += chunk;
 					}
 				});
 
@@ -416,19 +436,26 @@ ${systemPrompt}
 				for await (const chunk of fullStream) {
 					if (chunk.type === 'text-delta') {
 						openRouterGenId = chunk.id;
-						appender.append({ type: 'text', text: chunk.text });
+						const part = { type: 'text' as const, text: chunk.text };
+						appender.append(part);
+						appendStoragePart(part);
 					} else if (chunk.type === 'reasoning-delta') {
-						appender.append({ type: 'reasoning', text: chunk.text });
+						const part = { type: 'reasoning' as const, text: chunk.text };
+						appender.append(part);
+						appendStoragePart(part);
 					} else if (chunk.type === 'tool-call') {
 						appender.append(chunk);
+						appendStoragePart(chunk);
 					} else if (chunk.type === 'tool-result') {
-						appender.append({
+						const part = {
 							type: 'tool-result',
 							toolName: chunk.toolName,
 							toolCallId: chunk.toolCallId,
 							// @ts-expect-error - TODO: for some reason the output is unknown
 							output: chunk.output
-						});
+						};
+						appender.append(part);
+						appendStoragePart(part);
 					} else if (chunk.type === 'file') {
 						const file = chunk.file;
 						if (file.mediaType.startsWith('image/')) {
@@ -464,6 +491,8 @@ ${systemPrompt}
 				if (uploadPromises.length > 0) {
 					await Promise.all(uploadPromises);
 				}
+
+				const content = storageParts.length > 0 ? serializeParts(storageParts) : '';
 
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
