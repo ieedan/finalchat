@@ -1,10 +1,14 @@
-import { err, type Result } from 'nevereverthrow';
+import { err, ok, type Result } from 'nevereverthrow';
 import { DeserializeStreamError, type StreamResult } from './types';
 import { deserializeStream as deserializeStreamV1 } from './v1';
-import { deserializeStream as deserializeStreamV2, createChunkAppender } from './v2';
+import {
+	deserializeStream as deserializeStreamV2,
+	createChunkAppender,
+	serializeParts
+} from './v2';
 import type { ModelMessage, ReasoningOutput, TextPart } from 'ai';
 
-export { createChunkAppender, type StreamResult };
+export { createChunkAppender, type StreamResult, serializeParts };
 
 export function deserializeStream({
 	text,
@@ -115,4 +119,14 @@ export function partsToModelMessage(parts: StreamResult): ModelMessage[] {
 	JSON.stringify(messages, null, 2);
 
 	return messages;
+}
+
+export function repackStream(context: string): Result<string, DeserializeStreamError> {
+	const partsResult = deserializeStream({ text: context });
+	if (partsResult.isErr()) {
+		return err(partsResult.error);
+	}
+
+	const parts = partsResult.value.stack;
+	return ok(serializeParts(parts));
 }
