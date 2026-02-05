@@ -21,7 +21,11 @@ import {
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
 import { fetchLinkContentTool } from './ai.utils.js';
-import { createChunkAppender, partsToModelMessage } from '../utils/stream-transport-protocol';
+import {
+	createChunkAppender,
+	partsToModelMessage,
+	repackStream
+} from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';
@@ -465,9 +469,11 @@ ${systemPrompt}
 					await Promise.all(uploadPromises);
 				}
 
+				const repackedContent = repackStream(content).expect('Failed to repack stream');
+
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
-					content,
+					content: repackedContent,
 					meta: {
 						generationId: openRouterGenId,
 						tokenUsage: usage.totalTokens,
