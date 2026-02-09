@@ -168,21 +168,21 @@
 				placeholder="Search models..."
 				bind:value={search}
 				onkeydown={(e) => {
-					if (e.metaKey && e.key === 'ArrowRight') {
+					if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowRight') {
 						e.preventDefault();
 						e.stopPropagation();
 						mode = 'grid';
-					} else if (e.metaKey && e.key === 'ArrowLeft') {
+					} else if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowLeft') {
 						e.preventDefault();
 						e.stopPropagation();
 						mode = 'list';
-					} else if (e.metaKey && e.key === 'u') {
+					} else if ((e.metaKey || e.ctrlKey) && e.key === 'u') {
 						e.preventDefault();
 						e.stopPropagation();
 						if (internalModelId) {
 							handleToggleFavorite(internalModelId);
 						}
-					} else if (e.metaKey && e.key === 'k') {
+					} else if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 						e.preventDefault();
 						e.stopPropagation();
 						actionsMenuOpen = !actionsMenuOpen;

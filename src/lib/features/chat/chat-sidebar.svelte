@@ -66,8 +66,8 @@ this has to be out here because the sidebar isn't rendered all the time on mobil
 	</div>
 {/if}
 
-<Sidebar.Root variant="inset" class="py-2 px-.5">
-	<Sidebar.Header class="pt-[2px]">
+<Sidebar.Root variant="inset" class="px-.5">
+	<Sidebar.Header class="pt-2.5">
 		<div class="flex items-center justify-center h-9">
 			<a href="/chat" class="text-2xl font-bold">
 				<FinalChat class="size-6" />
