@@ -41,6 +41,8 @@
 
 	const sharePath = $derived(`/chat/${chat._id}`);
 	const shareUrl = $derived(new URL(sharePath, page.url.origin).toString());
+	const markdownSharePath = $derived(`/chat/${chat._id}.md`);
+	const markdownShareUrl = $derived(new URL(markdownSharePath, page.url.origin).toString());
 </script>
 
 {#if isMobile.current}
@@ -89,6 +91,7 @@
 							Share
 						</Button>
 					</a.div>
+					{@render shareWithAgent()}
 				{:else}
 					<a.div
 						initial={{ opacity: 0, scale: 0.95 }}
@@ -110,6 +113,7 @@
 					<img src="/chat/{chat._id}/og.png" alt="OG" class="w-full aspect-video object-fit" />
 				</a>
 				<Snippet class="bg-background" text={shareUrl} />
+				{@render shareWithAgent()}
 			{/if}
 		</Drawer.Content>
 	</Drawer.Root>
@@ -146,10 +150,26 @@
 					<img src="/chat/{chat._id}/og.png" alt="OG" class="w-full aspect-video object-fit" />
 				</a>
 				<Snippet class="bg-background" text={shareUrl} />
+				{@render shareWithAgent()}
 			{/if}
 		</Popover.Content>
 	</Popover.Root>
 {/if}
+
+{#snippet shareWithAgent()}
+	<div class="relative py-1">
+		<Separator />
+		<span
+			class="text-muted-foreground bg-popover text-xs px-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+		>
+			OR
+		</span>
+	</div>
+	<div class="space-y-1.5">
+		<p class="text-sm text-muted-foreground">Share with your agent</p>
+		<Snippet class="bg-background" text={markdownShareUrl} />
+	</div>
+{/snippet}
 
 {#snippet option({
 	icon: Icon,
