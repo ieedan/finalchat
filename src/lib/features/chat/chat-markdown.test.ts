@@ -81,12 +81,8 @@ describe('chat markdown formatter', () => {
 		expect(markdown).toContain('"link": "https://example.com"');
 		expect(markdown).toContain('#### Result');
 		expect(markdown).toContain('"value": "# Example content"');
-		expect(markdown).toContain(
-			'![Attachment 1](https://files.example.com/user-image.png)'
-		);
-		expect(markdown).toContain(
-			'![Attachment 1](https://files.example.com/assistant-image.png)'
-		);
+		expect(markdown).toContain('![Attachment 1](https://files.example.com/user-image.png)');
+		expect(markdown).toContain('![Attachment 1](https://files.example.com/assistant-image.png)');
 	});
 
 	it('renders standalone tool results and generating assistant placeholder text', () => {
