@@ -160,7 +160,7 @@
 	<div class="relative py-1">
 		<Separator />
 		<span
-			class="text-muted-foreground bg-background text-xs px-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+			class="text-muted-foreground bg-popover text-xs px-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
 		>
 			OR
 		</span>
