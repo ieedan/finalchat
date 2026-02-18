@@ -73,6 +73,7 @@ describe('chat markdown formatter', () => {
 		const markdown = renderConversationMarkdown(chat);
 
 		expect(markdown).toContain('# Tooling and Attachments');
+		expect(markdown).not.toContain('Chat ID');
 		expect(markdown).toContain('## 1. User');
 		expect(markdown).toContain('## 2. Assistant');
 		expect(markdown).toContain('### Tool Call: `fetchLinkContent`');

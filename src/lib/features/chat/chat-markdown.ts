@@ -34,11 +34,7 @@ export type MarkdownConversation = {
 const MESSAGE_SEPARATOR = '\n\n---\n\n';
 
 export function renderConversationMarkdown(chat: MarkdownConversation): string {
-	const header = [
-		`# ${chat.title}`,
-		`> Chat ID: \`${chat._id}\``,
-		`> Messages: ${chat.messages.length}`
-	].join('\n\n');
+	const header = [`# ${chat.title}`, `> Messages: ${chat.messages.length}`].join('\n\n');
 
 	const messageSections = chat.messages.map((message, index) =>
 		renderMessageMarkdown(message, index + 1)
