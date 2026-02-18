@@ -100,7 +100,10 @@ describe('chat markdown formatter', () => {
 							type: 'tool-result',
 							toolName: 'fetchLinkContent',
 							toolCallId: 'tool-2',
-							output: 'Done'
+							output: {
+								type: 'text',
+								value: 'Done'
+							}
 						}
 					],
 					attachments: [],
@@ -120,7 +123,7 @@ describe('chat markdown formatter', () => {
 		const markdown = renderConversationMarkdown(chat);
 
 		expect(markdown).toContain('### Tool Result: `fetchLinkContent`');
-		expect(markdown).toContain('Done');
+		expect(markdown).toContain('"value": "Done"');
 		expect(markdown).toContain('_Response is still generating._');
 	});
 
