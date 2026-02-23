@@ -1,0 +1,35 @@
+{
+	"$schema": "https://getbizi.dev/schemas/task.config.json",
+	"tasks": {
+		"lint": {
+			"command": "pnpm lint"
+		},
+		"format": {
+			"command": "pnpm format"
+		},
+		"check": {
+			"command": "pnpm check"
+		},
+		"test": {
+			"command": "pnpm test"
+		},
+		"build": {
+			"command": "pnpm build"
+		},
+		"build:local": {
+			"command": "pnpm build:local"
+		},
+		"dev": {
+			"tasks": {
+				"convex": {
+					"color": "blue",
+					"command": "pnpm dotenvx run -f .env.local -- pnpm dev:convex"
+				},
+				"app": {
+					"color": "green",
+					"command": "pnpm dotenvx run -f .env.local -- pnpm dev:vite"
+				}
+			}
+		}
+	}
+}
