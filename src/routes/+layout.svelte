@@ -53,9 +53,12 @@
 		// if expired
 		if (claims.exp && claims.exp * 1000 < Date.now()) {
 			const response = await fetch('/auth/refresh');
+			if (!response.ok) return null;
 			const data = await response.json();
-			accessTokenCtx.current = data.accessToken;
-			return accessToken;
+			const next = data.accessToken as string | undefined;
+			if (!next) return null;
+			accessTokenCtx.current = next;
+			return next;
 		}
 		return accessToken;
 	});
