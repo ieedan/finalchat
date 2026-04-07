@@ -73,8 +73,8 @@ class FileDropZoneState {
 		const fileName = file.name.toLowerCase();
 
 		const isAcceptable = acceptedTypes.some((pattern) => {
-			// check extension like .mp4
-			if (fileType.startsWith('.')) {
+			// Accept attribute entries like `.pdf` when MIME is missing or wrong
+			if (pattern.startsWith('.')) {
 				return fileName.endsWith(pattern);
 			}
 

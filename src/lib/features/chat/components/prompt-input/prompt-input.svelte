@@ -10,6 +10,7 @@
 	import type { ModelId } from '../../types.js';
 	import * as FileDropZone from '$lib/components/ui/file-drop-zone';
 	import type { ReasoningEffort } from '$lib/convex/schema.js';
+	import { CHAT_ATTACHMENT_ACCEPT } from '$lib/utils/chat-attachment-types';
 
 	let {
 		class: className,
@@ -72,7 +73,7 @@
 
 <FileDropZone.Root
 	onUpload={promptInputState.onUpload}
-	accept={FileDropZone.ACCEPT_IMAGE}
+	accept={CHAT_ATTACHMENT_ACCEPT}
 	{maxFiles}
 	{fileCount}
 	onFileRejected={(opts) => {

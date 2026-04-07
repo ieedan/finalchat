@@ -11,6 +11,8 @@ import {
 	ToolLoopAgent,
 	type StreamTextResult,
 	type ModelMessage,
+	type ImagePart,
+	type FilePart,
 	streamText,
 	smoothStream
 } from 'ai';
@@ -320,7 +322,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 												...message.attachments.map((attachment) => ({
 													type: 'file' as const,
 													data: attachment.url,
-													mediaType: 'image'
+													mediaType: attachment.mediaType
 												}))
 											]
 										}
@@ -329,13 +331,16 @@ export const streamMessage = httpAction(async (ctx, request) => {
 						];
 					}
 
-					const imageParts = message.attachments?.map(
-						(attachment) =>
-							({
-								type: 'image',
-								image: attachment.url
-							}) as const
-					);
+					const attachmentParts: (ImagePart | FilePart)[] =
+						message.attachments?.map((attachment) =>
+							attachment.mediaType.startsWith('image/')
+								? ({ type: 'image', image: attachment.url } satisfies ImagePart)
+								: ({
+										type: 'file',
+										data: attachment.url,
+										mediaType: attachment.mediaType
+									} satisfies FilePart)
+						) ?? [];
 
 					return {
 						role: message.role,
@@ -344,9 +349,9 @@ export const streamMessage = httpAction(async (ctx, request) => {
 								type: 'text',
 								text: message.content ?? ''
 							},
-							...(imageParts ?? [])
+							...attachmentParts
 						]
-					};
+					} satisfies ModelMessage;
 				});
 
 				if (systemPrompt) {

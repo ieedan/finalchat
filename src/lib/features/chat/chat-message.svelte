@@ -11,7 +11,7 @@
 	import ChatBranchButton from './chat-branch-button.svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel.js';
 	import { useMedia } from '$lib/hooks/use-media.svelte';
-	import ChatImageAttachment from './chat-image-attachment.svelte';
+	import ChatAttachmentDisplay from './chat-attachment-display.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	const chatMessageVariants = tv({
@@ -75,7 +75,7 @@
 		{#if message.attachments}
 			<div class="w-full justify-end flex items-center gap-2">
 				{#each message.attachments as attachment (attachment.key)}
-					<ChatImageAttachment {attachment} size="sm" />
+					<ChatAttachmentDisplay {attachment} size="sm" />
 				{/each}
 			</div>
 		{/if}

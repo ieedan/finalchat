@@ -2,6 +2,7 @@ import { api } from '$lib/convex/_generated/api';
 import { useUploadFile } from '@convex-dev/r2/svelte';
 import { useConvexClient } from 'convex-svelte';
 import type { ConvexClient } from 'convex/browser';
+import { guessMediaTypeFromFileName } from '$lib/utils/chat-attachment-types';
 
 export class ChatAttachmentUploader {
 	private uploadFile: ReturnType<typeof useUploadFile>;
@@ -22,7 +23,8 @@ export class ChatAttachmentUploader {
 	async upload(file: File): Promise<{ url: string; key: string; mediaType: string }> {
 		const key = await this.uploadFile(file);
 		const url = await this.client.query(api.chatAttachments.getFileUrl, { key });
-		return { url, key, mediaType: file.type };
+		const mediaType = file.type || guessMediaTypeFromFileName(file.name) || 'application/octet-stream';
+		return { url, key, mediaType };
 	}
 
 	async uploadMany(files: File[]) {
