@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { usePromptInput, type ChatPromptAttachment, type OnSubmit } from '../prompt-input/prompt-input.svelte.js';
+	import {
+		usePromptInput,
+		type ChatPromptAttachment,
+		type OnSubmit
+	} from '../prompt-input/prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
 	import type { ModelId } from '../../types.js';
 	import * as FileDropZone from '$lib/components/ui/file-drop-zone';

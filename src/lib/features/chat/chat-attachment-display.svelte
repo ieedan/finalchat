@@ -1,7 +1,10 @@
 <script lang="ts">
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { cn } from '$lib/utils';
-	import { fallbackAttachmentDisplayName, isImageAttachmentMediaType } from '$lib/utils/chat-attachment-types';
+	import {
+		fallbackAttachmentDisplayName,
+		isImageAttachmentMediaType
+	} from '$lib/utils/chat-attachment-types';
 	import { tv } from 'tailwind-variants';
 	import ChatNonImageAttachmentRow from './chat-non-image-attachment-row.svelte';
 

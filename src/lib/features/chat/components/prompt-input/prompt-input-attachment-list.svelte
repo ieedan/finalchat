@@ -43,7 +43,9 @@
 		<div
 			class={cn(
 				'relative shrink-0',
-				isImageAttachmentMediaType(mediaType) ? 'size-12' : 'max-w-[min(18rem,calc(100vw-2rem))] min-w-[10rem]'
+				isImageAttachmentMediaType(mediaType)
+					? 'size-12'
+					: 'max-w-[min(18rem,calc(100vw-2rem))] min-w-[10rem]'
 			)}
 			data-state="uploaded"
 		>
@@ -83,7 +85,9 @@
 		<animated.div
 			class={cn(
 				'relative shrink-0 animate-pulse',
-				isImageAttachmentMediaType(mime) ? 'size-12' : 'max-w-[min(18rem,calc(100vw-2rem))] min-w-[10rem]'
+				isImageAttachmentMediaType(mime)
+					? 'size-12'
+					: 'max-w-[min(18rem,calc(100vw-2rem))] min-w-[10rem]'
 			)}
 			initial={{ scale: 0.75, opacity: 0, y: 10 }}
 			animate={{ scale: 1, opacity: 1, y: 0 }}
