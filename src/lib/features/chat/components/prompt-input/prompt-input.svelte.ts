@@ -8,10 +8,17 @@ import imageCompression from 'browser-image-compression';
 import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 import type { ReasoningEffort } from '$lib/convex/schema';
 
+export type ChatPromptAttachment = {
+	url: string;
+	key: string;
+	mediaType: string;
+	fileName?: string;
+};
+
 export type OnSubmit = (opts: {
 	input: string;
 	modelId: ModelId;
-	attachments: { url: string; key: string; mediaType: string }[];
+	attachments: ChatPromptAttachment[];
 	reasoningEffort: ReasoningEffort;
 }) => Promise<void>;
 
@@ -27,7 +34,7 @@ type PromptInputRootStateOptions = ReadableBoxedValues<{
 		value: string;
 		modelId: ModelId | null;
 		reasoningEffort: ReasoningEffort;
-		attachments: { url: string; key: string; mediaType: string }[];
+		attachments: ChatPromptAttachment[];
 	}>;
 
 class PromptInputRootState {
@@ -44,7 +51,7 @@ class PromptInputRootState {
 
 	async onUpload(files: File[]) {
 		try {
-			// add the pending files
+			const compressedBatch: File[] = [];
 			for (const file of files) {
 				let compressedFile: File = file;
 				if (file.type.startsWith('image/')) {
@@ -55,11 +62,10 @@ class PromptInputRootState {
 				}
 
 				this.uploadingAttachments.set(file.name, compressedFile);
+				compressedBatch.push(compressedFile);
 			}
 
-			const uploadedImages = await this.opts.onUpload.current?.(
-				this.uploadingAttachments.values().toArray()
-			);
+			const uploadedImages = await this.opts.onUpload.current?.(compressedBatch);
 
 			// remove the pending files
 			for (const file of files) {
@@ -68,10 +74,11 @@ class PromptInputRootState {
 
 			this.opts.attachments.current = [
 				...this.opts.attachments.current,
-				...uploadedImages.map((uploadedImage) => ({
+				...uploadedImages.map((uploadedImage, i) => ({
 					url: uploadedImage.url,
 					key: uploadedImage.key,
-					mediaType: uploadedImage.mediaType
+					mediaType: uploadedImage.mediaType,
+					fileName: files[i]?.name
 				}))
 			];
 		} catch (error) {

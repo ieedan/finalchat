@@ -92,7 +92,8 @@ export const create = internalMutation({
 		messageId: v.id('messages'),
 		key: v.string(),
 		userId: v.string(),
-		mediaType: v.string()
+		mediaType: v.string(),
+		fileName: v.optional(v.string())
 	},
 	handler: async (ctx, args) => {
 		await ctx.db.insert('chatAttachments', {
@@ -100,7 +101,8 @@ export const create = internalMutation({
 			messageId: args.messageId,
 			key: args.key,
 			userId: args.userId,
-			mediaType: args.mediaType
+			mediaType: args.mediaType,
+			...(args.fileName !== undefined ? { fileName: args.fileName } : {})
 		});
 	}
 });

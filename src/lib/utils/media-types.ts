@@ -32,3 +32,18 @@ export function getImageFileExtension(
 
 	return imageMediaTypes[normalizedMediaType] ?? null;
 }
+
+const commonNonImageExtensions: Record<string, string> = {
+	'application/pdf': '.pdf',
+	'text/plain': '.txt',
+	'text/markdown': '.md',
+	'text/csv': '.csv',
+	'application/json': '.json'
+};
+
+/** Download filename suffix for any attachment media type (images + other chat files). */
+export function getAttachmentFileExtension(mediaType: string): string | null {
+	const imageExt = getImageFileExtension(mediaType);
+	if (imageExt) return imageExt;
+	return commonNonImageExtensions[mediaType.toLowerCase().trim()] ?? null;
+}

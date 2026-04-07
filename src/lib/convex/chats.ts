@@ -436,7 +436,8 @@ export const branchFromMessage = mutation({
 							chatId: newChatId,
 							userId: user.subject,
 							key: a.key,
-							mediaType: a.mediaType
+							mediaType: a.mediaType,
+							...(a.fileName !== undefined ? { fileName: a.fileName } : {})
 						})
 					)
 				);

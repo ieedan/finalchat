@@ -4,6 +4,12 @@
 	import { usePromptInputAttachmentList } from '../prompt-input/prompt-input.svelte.js';
 	import { RiCloseLine as XIcon } from 'remixicon-svelte';
 	import { animated } from 'animated-svelte';
+	import {
+		fallbackAttachmentDisplayName,
+		guessMediaTypeFromFileName,
+		isImageAttachmentMediaType
+	} from '$lib/utils/chat-attachment-types';
+	import ChatNonImageAttachmentRow from '$lib/features/chat/chat-non-image-attachment-row.svelte';
 
 	let { class: className, ...rest }: HTMLAttributes<HTMLDivElement> = $props();
 
@@ -26,38 +32,88 @@
 
 <div
 	class={cn(
-		'flex items-center w-full gap-2 h-0 transition-all bg-accent/50 px-3 border-transparent',
-		'data-[has-attachments=true]:py-2 data-[has-attachments=true]:h-18 data-[has-attachments=true]:border-b data-[has-attachments=true]:border-border',
+		'flex w-full flex-wrap items-center gap-2 min-h-0 transition-all bg-accent/50 px-3 border-transparent',
+		'data-[has-attachments=true]:py-2 data-[has-attachments=true]:min-h-[4.75rem] data-[has-attachments=true]:border-b data-[has-attachments=true]:border-border',
 		className
 	)}
 	data-has-attachments={hasAttachments}
 	{...rest}
 >
-	{#each uploadedAttachments as { url, key } (key)}
-		<div class="size-12 rounded-sm border relative" data-state="uploaded">
+	{#each uploadedAttachments as { url, key, mediaType, fileName } (key)}
+		<div
+			class={cn(
+				'relative shrink-0',
+				isImageAttachmentMediaType(mediaType)
+					? 'size-12'
+					: 'max-w-[min(18rem,calc(100vw-2rem))] min-w-[10rem]'
+			)}
+			data-state="uploaded"
+		>
 			<button
 				type="button"
-				class="absolute cursor-pointer bg-background flex items-center justify-center -top-1.5 -right-1.5 rounded-full border border-border size-5"
+				class="absolute z-20 flex size-5 cursor-pointer items-center justify-center rounded-full border border-border bg-background -top-1.5 -right-1.5"
 				onclick={() => attachmentListState.rootState.deleteAttachment(key)}
 			>
 				<XIcon class="size-3.5" />
 			</button>
-			<a href={url} target="_blank" rel="noopener noreferrer">
-				<img src={url} alt="Attachment" class="size-full object-cover rounded-sm" />
+			<a
+				href={url}
+				target="_blank"
+				rel="noopener noreferrer"
+				class={cn(
+					isImageAttachmentMediaType(mediaType)
+						? 'flex size-12 overflow-hidden rounded-md border border-border'
+						: 'block w-full overflow-hidden rounded-xl border border-border'
+				)}
+			>
+				{#if isImageAttachmentMediaType(mediaType)}
+					<img src={url} alt="" class="size-full object-cover" />
+				{:else}
+					<ChatNonImageAttachmentRow
+						compact
+						fileName={fileName ?? fallbackAttachmentDisplayName(mediaType)}
+						{mediaType}
+						class="border-0 bg-background/80 shadow-none"
+					/>
+				{/if}
 			</a>
 		</div>
 	{/each}
 	{#each attachmentListState.rootState.uploadingAttachments as [name, file] (name)}
 		{@const url = URL.createObjectURL(file)}
+		{@const effectiveMime = file.type || guessMediaTypeFromFileName(file.name) || ''}
 		<animated.div
-			class="size-12 rounded-sm border relative animate-pulse"
+			class={cn(
+				'relative shrink-0 animate-pulse',
+				isImageAttachmentMediaType(effectiveMime)
+					? 'size-12'
+					: 'max-w-[min(18rem,calc(100vw-2rem))] min-w-[10rem]'
+			)}
 			initial={{ scale: 0.75, opacity: 0, y: 10 }}
 			animate={{ scale: 1, opacity: 1, y: 0 }}
 			transition={{ duration: 0.15, delay: 0, timingFunction: 'ease-out' }}
 			data-state="uploading"
 		>
-			<a href={url} target="_blank" rel="noopener noreferrer">
-				<img src={url} alt="Attachment" class="size-full object-cover rounded-sm" />
+			<a
+				href={url}
+				target="_blank"
+				rel="noopener noreferrer"
+				class={cn(
+					isImageAttachmentMediaType(effectiveMime)
+						? 'flex size-12 overflow-hidden rounded-md border border-border'
+						: 'block w-full overflow-hidden rounded-xl border border-border'
+				)}
+			>
+				{#if isImageAttachmentMediaType(effectiveMime)}
+					<img src={url} alt="" class="size-full object-cover" />
+				{:else}
+					<ChatNonImageAttachmentRow
+						compact
+						fileName={file.name}
+						mediaType={effectiveMime || 'application/octet-stream'}
+						class="border-0 bg-background/80 shadow-none"
+					/>
+				{/if}
 			</a>
 		</animated.div>
 	{/each}

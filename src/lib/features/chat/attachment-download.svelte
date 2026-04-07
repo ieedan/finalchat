@@ -2,7 +2,7 @@
 	import { Button, type ButtonVariant, type ButtonSize } from '$lib/components/ui/button';
 	import { AccessTokenCtx } from '$lib/context.svelte';
 	import { env } from '$lib/env.client';
-	import { getImageFileExtension } from '$lib/utils/media-types';
+	import { getAttachmentFileExtension } from '$lib/utils/media-types';
 	import { RiDownload2Line as DownloadIcon } from 'remixicon-svelte';
 
 	let {
@@ -22,7 +22,7 @@
 	const accessToken = AccessTokenCtx.get();
 
 	const resolvedFilename = $derived(
-		filename ?? `attachment${getImageFileExtension(mediaType) ?? '.file'}`
+		filename ?? `attachment${getAttachmentFileExtension(mediaType) ?? '.file'}`
 	);
 
 	async function handleDownload() {

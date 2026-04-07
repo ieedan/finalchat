@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { usePromptInput, type OnSubmit } from './prompt-input.svelte.js';
+	import {
+		usePromptInput,
+		type ChatPromptAttachment,
+		type OnSubmit
+	} from './prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
 	import { RiAlertLine as AlertIcon } from 'remixicon-svelte';
 	import PromptInputBannerContent from './prompt-input-banner-content.svelte';
@@ -10,6 +14,7 @@
 	import type { ModelId } from '../../types.js';
 	import * as FileDropZone from '$lib/components/ui/file-drop-zone';
 	import type { ReasoningEffort } from '$lib/convex/schema.js';
+	import { CHAT_ATTACHMENT_ACCEPT } from '$lib/utils/chat-attachment-types';
 
 	let {
 		class: className,
@@ -38,7 +43,7 @@
 		value?: string;
 		modelId?: ModelId | null;
 		reasoningEffort?: ReasoningEffort;
-		attachments?: { url: string; key: string; mediaType: string }[];
+		attachments?: ChatPromptAttachment[];
 	} = $props();
 
 	const promptInputState = usePromptInput({
@@ -72,7 +77,7 @@
 
 <FileDropZone.Root
 	onUpload={promptInputState.onUpload}
-	accept={FileDropZone.ACCEPT_IMAGE}
+	accept={CHAT_ATTACHMENT_ACCEPT}
 	{maxFiles}
 	{fileCount}
 	onFileRejected={(opts) => {

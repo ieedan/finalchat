@@ -107,7 +107,8 @@ export default defineSchema({
 		chatId: v.id('chats'),
 		messageId: v.id('messages'),
 		key: v.string(),
-		mediaType: v.string()
+		mediaType: v.string(),
+		fileName: v.optional(v.string())
 	})
 		.index('by_chat', ['chatId'])
 		.index('by_message', ['messageId'])
