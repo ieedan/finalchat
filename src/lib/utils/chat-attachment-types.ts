@@ -1,3 +1,5 @@
+import { getAttachmentFileExtension } from './media-types';
+
 /**
  * Chat attachments use AI SDK user content parts: {@link ImagePart} and {@link FilePart}.
  * Allowlist common types multimodal models accept; extend as providers add support.
@@ -70,4 +72,10 @@ export function attachmentTypeLabel(mediaType: string): string {
 	if (lower === 'application/json') return 'JSON';
 	const sub = lower.split('/')[1];
 	return sub ? sub.toUpperCase() : 'File';
+}
+
+/** When the original filename is unknown (e.g. legacy rows), show a sensible default. */
+export function fallbackAttachmentDisplayName(mediaType: string): string {
+	const ext = getAttachmentFileExtension(mediaType);
+	return ext ? `attachment${ext}` : 'attachment';
 }

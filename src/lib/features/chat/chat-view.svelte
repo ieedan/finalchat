@@ -43,10 +43,9 @@
 
 	const chatAttachmentUploader = new ChatAttachmentUploader();
 
-	const attachmentsList = new PersistedState<{ url: string; key: string; mediaType: string }[]>(
-		'chat-attachments',
-		[]
-	);
+	const attachmentsList = new PersistedState<
+		{ url: string; key: string; mediaType: string; fileName?: string }[]
+	>('chat-attachments', []);
 
 	const sidebar = Sidebar.useSidebar();
 

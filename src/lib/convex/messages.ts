@@ -46,7 +46,8 @@ export const Prompt = v.object({
 			v.object({
 				url: v.string(),
 				key: v.string(),
-				mediaType: v.string()
+				mediaType: v.string(),
+				fileName: v.optional(v.string())
 			})
 		)
 	),
@@ -163,7 +164,8 @@ export const create = mutation({
 						messageId: userMessageId,
 						key: attachment.key,
 						userId: user.subject,
-						mediaType: attachment.mediaType
+						mediaType: attachment.mediaType,
+						fileName: attachment.fileName
 					});
 				})
 			);

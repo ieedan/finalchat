@@ -46,10 +46,9 @@
 	// svelte-ignore state_referenced_locally
 	let query = $state<string>(data.query ?? '');
 
-	const attachmentsList = new PersistedState<{ url: string; key: string; mediaType: string }[]>(
-		'new-chat-attachments',
-		[]
-	);
+	const attachmentsList = new PersistedState<
+		{ url: string; key: string; mediaType: string; fileName?: string }[]
+	>('new-chat-attachments', []);
 
 	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
 

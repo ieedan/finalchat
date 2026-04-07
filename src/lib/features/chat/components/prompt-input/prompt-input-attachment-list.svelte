@@ -5,11 +5,11 @@
 	import { RiCloseLine as XIcon } from 'remixicon-svelte';
 	import { animated } from 'animated-svelte';
 	import {
-		attachmentTypeLabel,
+		fallbackAttachmentDisplayName,
 		guessMediaTypeFromFileName,
 		isImageAttachmentMediaType
 	} from '$lib/utils/chat-attachment-types';
-	import { RiFileLine as FileIcon } from 'remixicon-svelte';
+	import ChatNonImageAttachmentRow from '$lib/features/chat/chat-non-image-attachment-row.svelte';
 
 	let { class: className, ...rest }: HTMLAttributes<HTMLDivElement> = $props();
 
@@ -32,32 +32,47 @@
 
 <div
 	class={cn(
-		'flex items-center gap-2 h-0 transition-all bg-accent/50 rounded-t-lg px-3 border-transparent',
-		'data-[has-attachments=true]:py-2 data-[has-attachments=true]:h-18 data-[has-attachments=true]:border-b data-[has-attachments=true]:border-border',
+		'flex flex-wrap items-center gap-2 min-h-0 transition-all bg-accent/50 rounded-t-lg px-3 border-transparent',
+		'data-[has-attachments=true]:py-2 data-[has-attachments=true]:min-h-[4.75rem] data-[has-attachments=true]:border-b data-[has-attachments=true]:border-border',
 		className
 	)}
 	data-has-attachments={hasAttachments}
 	{...rest}
 >
-	{#each uploadedAttachments as { url, key, mediaType } (key)}
-		<div class="size-12 rounded-sm border relative overflow-hidden" data-state="uploaded">
+	{#each uploadedAttachments as { url, key, mediaType, fileName } (key)}
+		<div
+			class={cn(
+				'relative shrink-0',
+				isImageAttachmentMediaType(mediaType) ? 'size-12' : 'max-w-[min(18rem,calc(100vw-2rem))] min-w-[10rem]'
+			)}
+			data-state="uploaded"
+		>
 			<button
 				type="button"
-				class="absolute cursor-pointer bg-background flex items-center justify-center -top-1.5 -right-1.5 rounded-full border border-border size-5 z-10"
+				class="absolute z-20 flex size-5 cursor-pointer items-center justify-center rounded-full border border-border bg-background -top-1.5 -right-1.5"
 				onclick={() => attachmentListState.rootState.deleteAttachment(key)}
 			>
 				<XIcon class="size-3.5" />
 			</button>
-			<a href={url} target="_blank" rel="noopener noreferrer" class="size-full flex">
+			<a
+				href={url}
+				target="_blank"
+				rel="noopener noreferrer"
+				class={cn(
+					isImageAttachmentMediaType(mediaType)
+						? 'flex size-12 overflow-hidden rounded-md border border-border'
+						: 'block w-full overflow-hidden rounded-xl border border-border'
+				)}
+			>
 				{#if isImageAttachmentMediaType(mediaType)}
-					<img src={url} alt="" class="size-full object-cover rounded-sm" />
+					<img src={url} alt="" class="size-full object-cover" />
 				{:else}
-					<div
-						class="text-muted-foreground bg-muted flex size-full flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 text-[9px] font-medium leading-none text-center"
-					>
-						<FileIcon class="size-4 shrink-0 opacity-80" />
-						<span class="line-clamp-2">{attachmentTypeLabel(mediaType)}</span>
-					</div>
+					<ChatNonImageAttachmentRow
+						compact
+						fileName={fileName ?? fallbackAttachmentDisplayName(mediaType)}
+						{mediaType}
+						class="border-0 bg-background/80 shadow-none"
+					/>
 				{/if}
 			</a>
 		</div>
@@ -66,22 +81,34 @@
 		{@const url = URL.createObjectURL(file)}
 		{@const mime = file.type || guessMediaTypeFromFileName(file.name) || ''}
 		<animated.div
-			class="size-12 rounded-sm border relative animate-pulse overflow-hidden"
+			class={cn(
+				'relative shrink-0 animate-pulse',
+				isImageAttachmentMediaType(mime) ? 'size-12' : 'max-w-[min(18rem,calc(100vw-2rem))] min-w-[10rem]'
+			)}
 			initial={{ scale: 0.75, opacity: 0, y: 10 }}
 			animate={{ scale: 1, opacity: 1, y: 0 }}
 			transition={{ duration: 0.15, delay: 0, timingFunction: 'ease-out' }}
 			data-state="uploading"
 		>
-			<a href={url} target="_blank" rel="noopener noreferrer" class="size-full flex">
+			<a
+				href={url}
+				target="_blank"
+				rel="noopener noreferrer"
+				class={cn(
+					isImageAttachmentMediaType(mime)
+						? 'flex size-12 overflow-hidden rounded-md border border-border'
+						: 'block w-full overflow-hidden rounded-xl border border-border'
+				)}
+			>
 				{#if isImageAttachmentMediaType(mime)}
-					<img src={url} alt="" class="size-full object-cover rounded-sm" />
+					<img src={url} alt="" class="size-full object-cover" />
 				{:else}
-					<div
-						class="text-muted-foreground bg-muted flex size-full flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 text-[9px] font-medium leading-none text-center"
-					>
-						<FileIcon class="size-4 shrink-0 opacity-80" />
-						<span class="line-clamp-2">{attachmentTypeLabel(mime || 'File')}</span>
-					</div>
+					<ChatNonImageAttachmentRow
+						compact
+						fileName={file.name}
+						mediaType={mime || 'application/octet-stream'}
+						class="border-0 bg-background/80 shadow-none"
+					/>
 				{/if}
 			</a>
 		</animated.div>
