@@ -210,7 +210,10 @@
 					<Command.Group>
 						{#each favoriteModels as model (model.id)}
 							<Command.Item
-								class="flex items-center justify-between gap-4"
+								class={cn(
+									'flex items-center justify-between gap-4',
+									'[content-visibility:auto] [contain-intrinsic-height:2rem]'
+								)}
 								value={model.id}
 								onSelect={() => handleSelect(model.id)}
 							>
@@ -246,7 +249,10 @@
 						>
 							{#each models as model (model.id)}
 								<Command.Item
-									class="flex items-center justify-center relative border border-border rounded-md gap-4 size-32"
+									class={cn(
+										'flex items-center justify-center relative border border-border rounded-md gap-4 size-32',
+										'[content-visibility:auto] [contain-intrinsic-size:8rem_8rem]'
+									)}
 									value={model.id}
 									onSelect={() => handleSelect(model.id)}
 								>
