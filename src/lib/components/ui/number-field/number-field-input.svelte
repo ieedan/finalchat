@@ -2,10 +2,13 @@
 	import { cn } from '$lib/utils.js';
 	import { useNumberFieldInput } from './number-field.svelte.js';
 	import type { NumberFieldInputProps } from './types.js';
+	import { mergeProps } from 'bits-ui';
 
 	let { ref = $bindable(null), class: className, ...rest }: NumberFieldInputProps = $props();
 
 	const inputState = useNumberFieldInput();
+
+	const mergedProps = $derived(mergeProps(inputState.props, rest));
 </script>
 
 <input
@@ -16,8 +19,7 @@
 	bind:this={ref}
 	data-slot="number-field-input"
 	bind:value={inputState.rootState.opts.value.current}
-	{...inputState.props}
-	{...rest}
+	{...mergedProps}
 />
 
 <style>

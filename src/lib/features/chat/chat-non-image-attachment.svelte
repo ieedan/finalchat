@@ -21,7 +21,7 @@
 
 <div
 	class={cn(
-		'text-foreground flex w-full min-w-0 items-center rounded-xl border border-border bg-card shadow-sm',
+		'text-foreground flex w-full min-w-0 items-center rounded-xl border border-border shadow-sm',
 		compact ? 'gap-2 px-2.5 py-1.5' : 'gap-3 px-3 py-2.5',
 		className
 	)}

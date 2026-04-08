@@ -20,11 +20,10 @@
 	import { animated as a } from 'animated-svelte';
 
 	type Props = {
-		animated?: boolean;
 		chat: Doc<'chats'>;
 	};
 
-	let { animated = false, chat }: Props = $props();
+	let { chat }: Props = $props();
 
 	let value = $derived<'private' | 'public'>(chat.public ? 'public' : 'private');
 
@@ -120,7 +119,7 @@
 {:else}
 	<Popover.Root>
 		<Popover.Trigger class={cn(buttonVariants({ variant: 'outline' }))}>Share</Popover.Trigger>
-		<Popover.Content align="end" {animated} class="w-sm flex flex-col gap-2">
+		<Popover.Content align="end" class="w-sm flex flex-col gap-2">
 			<RadioGroup.Root
 				bind:value
 				class="border border-border rounded-lg gap-0 bg-background"

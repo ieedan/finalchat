@@ -11,6 +11,11 @@ const config = {
 			remoteFunctions: true
 		},
 		adapter: adapter()
+	},
+	compilerOptions: {
+		experimental: {
+			async: true
+		}
 	}
 };
 

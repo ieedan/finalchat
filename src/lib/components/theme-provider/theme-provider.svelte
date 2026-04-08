@@ -1,18 +1,25 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { setupThemeProvider } from './theme-provider-state.svelte';
+	import { box } from 'svelte-toolbelt';
 
 	type Props = {
 		children: Snippet;
 		defaultFontPreset?: string | null;
+		animate: boolean;
 	};
 
-	let { children, defaultFontPreset }: Props = $props();
+	let { children, defaultFontPreset, animate }: Props = $props();
 
 	setupThemeProvider({
-		get defaultFontPreset() {
-			return defaultFontPreset;
-		}
+		defaultFontPreset: box.with(
+			() => defaultFontPreset,
+			(v) => (defaultFontPreset = v)
+		),
+		animate: box.with(
+			() => animate,
+			(v) => (animate = v)
+		)
 	});
 </script>
 

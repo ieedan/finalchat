@@ -1,9 +1,5 @@
 <script lang="ts">
 	import './layout.css';
-	import '@fontsource-variable/ibm-plex-sans';
-	import '@fontsource-variable/atkinson-hyperlegible-mono';
-	import '@fontsource-variable/atkinson-hyperlegible-next';
-	import '@fontsource-variable/geist-mono';
 	import { env } from '$lib/env.client';
 	import { setupConvex } from 'convex-svelte';
 	import { page } from '$app/state';
@@ -70,9 +66,9 @@
 
 <ModeWatcher />
 <Startup />
-<ConfirmDeleteDialog />
 <Toaster position="bottom-right" />
 
-<ThemeProvider defaultFontPreset={page.data.fontPreset}>
+<ThemeProvider animate={true} defaultFontPreset={page.data.fontPreset}>
+	<ConfirmDeleteDialog />
 	{@render children()}
 </ThemeProvider>

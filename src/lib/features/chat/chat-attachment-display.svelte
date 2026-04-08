@@ -6,7 +6,7 @@
 		isImageAttachmentMediaType
 	} from '$lib/utils/chat-attachment-types';
 	import { tv } from 'tailwind-variants';
-	import ChatNonImageAttachmentRow from './chat-non-image-attachment-row.svelte';
+	import ChatNonImageAttachment from './chat-non-image-attachment.svelte';
 
 	const variants = tv({
 		base: 'rounded-xl overflow-hidden max-w-md w-full relative',
@@ -48,7 +48,7 @@
 		<!-- svelte-ignore a11y_missing_attribute -->
 		<img src={attachment.url} class="object-cover" alt="" data-key={attachment.key} />
 	{:else}
-		<ChatNonImageAttachmentRow
+		<ChatNonImageAttachment
 			fileName={displayFileName}
 			mediaType={attachment.mediaType}
 			class="shadow-none"

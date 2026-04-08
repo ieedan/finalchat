@@ -13,7 +13,7 @@ export const DEFAULT_AGE_GROUPS = {
 		.subtract({ days: 30 })
 		.toDate(getLocalTimeZone())
 		.valueOf(),
-	Other: null
+	'Older than 30 days': null
 } as const satisfies AgeGroups;
 
 export function getAgedGroups<T, Group extends AgeGroups>(

@@ -12,7 +12,8 @@ export default defineConfig({
 		action: '$lib/actions',
 		util: '$lib/utils',
 		lib: '$lib',
-		layout: '$lib/components/layout'
+		layout: '$lib/components/layout',
+		component: '$lib/components'
 	},
 	transforms: [prettier()]
 });
