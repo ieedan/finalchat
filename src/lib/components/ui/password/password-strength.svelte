@@ -1,19 +1,21 @@
 <script lang="ts">
 	import { tv } from 'tailwind-variants';
-	import { usePasswordStrength } from './password.svelte.js';
-	import type { PasswordStrengthProps } from './types.js';
+	import { usePasswordStrength } from '$lib/components/ui/password/password.svelte.js';
+	import type { PasswordStrengthProps } from '$lib/components/ui/password/types.js';
 	import { Meter } from 'bits-ui';
 	import { cn } from '$lib/utils.js';
+	import { box } from 'svelte-toolbelt';
 
 	let { strength = $bindable(), class: className }: PasswordStrengthProps = $props();
 
-	const state = usePasswordStrength();
-
-	const score = $derived(state.strength.score);
-
-	$effect(() => {
-		strength = state.strength;
+	usePasswordStrength({
+		strength: box.with(
+			() => strength,
+			(v) => (strength = v)
+		)
 	});
+
+	const score = $derived(strength?.score ?? 0);
 
 	const color = tv({
 		base: '',
@@ -30,7 +32,7 @@
 </script>
 
 <Meter.Root
-	value={state.strength.score}
+	value={score}
 	class={cn('bg-accent relative h-[6px] w-full gap-1 overflow-hidden rounded-full', className)}
 	min={0}
 	max={4}

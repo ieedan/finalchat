@@ -166,7 +166,7 @@ class ChatLayoutState {
 			}
 		} catch (error) {
 			if (error instanceof ConvexError) {
-				throw new Error(error.data);
+				throw new Error(error.data, { cause: error });
 			}
 
 			throw error;

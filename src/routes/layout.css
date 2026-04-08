@@ -3,6 +3,11 @@
 @import 'tw-animate-css';
 @plugin 'tw-easing-gradients';
 
+@import '@fontsource-variable/ibm-plex-sans';
+@import '@fontsource-variable/atkinson-hyperlegible-mono';
+@import '@fontsource-variable/atkinson-hyperlegible-next';
+@import '@fontsource-variable/geist-mono';
+
 @source "../../node_modules/svelte-streamdown/**/*";
 
 @custom-variant dark (&:is(.dark *));

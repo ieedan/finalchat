@@ -17,7 +17,7 @@
 
 	const getAssistantMessageText = (message: MessageWithAttachments | undefined): string => {
 		if (!message || message.role !== 'assistant') return '';
-		let text = '';
+		let text;
 		if (message.parts) {
 			text = message.parts
 				.filter((p) => p.type === 'text')

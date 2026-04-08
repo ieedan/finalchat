@@ -88,7 +88,6 @@ export const create = mutation({
 			}
 		}
 
-		let isChatOwner: boolean;
 		let chatId: Id<'chats'>;
 		if (!args.chatId) {
 			chatId = await ctx.db.insert('chats', {
@@ -105,8 +104,6 @@ export const create = mutation({
 					apiKey: args.apiKey
 				});
 			}
-
-			isChatOwner = true;
 		} else {
 			chatId = args.chatId;
 			await ctx.db.patch(chatId, {
@@ -114,7 +111,7 @@ export const create = mutation({
 			});
 
 			const chat = await ctx.runQuery(internal.chats.internalGet, { chatId });
-			isChatOwner = chat?.userId === user.subject;
+			const isChatOwner = chat?.userId === user.subject;
 
 			if (!isChatOwner) {
 				const lastMessages = getLastUserAndAssistantMessages(chat.messages);
