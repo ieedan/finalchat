@@ -36,18 +36,15 @@
 	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
 	import { toast } from 'svelte-sonner';
 	import { formatNumberShort } from '$lib/utils/number-format';
-
-	type Props = {
-		animated?: boolean;
-	};
-
-	let { animated = false }: Props = $props();
+	import { useTheme } from '$lib/components/theme-provider';
 
 	const chatLayoutState = useChatLayout();
 
 	const modelPickerState = useModelPicker({
 		models: box.with(() => chatLayoutState.models)
 	});
+
+	const theme = useTheme();
 
 	let search = $state('');
 
@@ -157,7 +154,7 @@
 		<span class="truncate">{selectedModel.name}</span>
 		<ChevronDownIcon class="size-4" />
 	</Popover.Trigger>
-	<Popover.Content class="p-0 w-fit" align="start" {animated} side="top">
+	<Popover.Content class="p-0 w-fit" align="start" side="top">
 		<Command.Root
 			bind:value={internalModelId}
 			columns={mode === 'list' ? undefined : 5}
@@ -196,7 +193,7 @@
 			<Command.List
 				class={cn(
 					'h-[136px] max-h-none md:w-[300px]',
-					animated && 'transition-[height,width]',
+					theme.animate && 'transition-[height,width]',
 					mode === 'grid' && 'h-[498px] md:w-[416px] lg:w-[688px]'
 				)}
 			>
@@ -344,7 +341,7 @@
 									<Kbd.Root>K</Kbd.Root>
 								</Kbd.Group>
 							</DropdownMenu.Trigger>
-							<DropdownMenu.Content align="end" side="top" {animated}>
+							<DropdownMenu.Content align="end" side="top">
 								<DropdownMenu.Group>
 									<DropdownMenu.Item onSelect={() => handleToggleFavorite(activeModel.id)}>
 										<span

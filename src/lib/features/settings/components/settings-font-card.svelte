@@ -1,20 +1,11 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { useThemeProvider } from '$lib/components/theme-provider/theme-provider-state.svelte';
+	import { useTheme } from '$lib/components/theme-provider/theme-provider-state.svelte';
 	import { FONT_PRESETS } from '$lib/components/theme-provider/fonts';
 	import { RadioGroup as RadioGroupPrimitive } from 'bits-ui';
 	import { cn } from '$lib/utils';
 	import Streamdown from '$lib/features/chat/components/streamdown.svelte';
 	import { useSettingsSetting, type Setting } from '../settings.svelte';
-
-	const themeProvider = useThemeProvider();
-
-	let selectedPreset = $derived(themeProvider.fontPreset.name);
-
-	function handlePresetChange(presetName: string) {
-		const preset = FONT_PRESETS.find((p) => p.name === presetName);
-		if (preset) themeProvider.selectFontPreset(preset);
-	}
 
 	const previewContent = `Here's an example of how text will look with this font.
 
@@ -29,6 +20,15 @@ function greet(name: string) {
 		title: 'Font',
 		description: 'Choose a font preset for the interface and code.'
 	};
+
+	const themeProvider = useTheme();
+
+	let selectedPreset = $derived(themeProvider.fontPreset.name);
+
+	function handlePresetChange(presetName: string) {
+		const preset = FONT_PRESETS.find((p) => p.name === presetName);
+		if (preset) themeProvider.selectFontPreset(preset);
+	}
 
 	const settingState = useSettingsSetting(meta);
 </script>

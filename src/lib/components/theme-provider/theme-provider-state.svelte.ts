@@ -1,10 +1,12 @@
 import { Context } from 'runed';
 import type { FontPreset } from './types';
 import { FONT_PRESETS } from './fonts';
+import type { ReadableBoxedValues } from 'svelte-toolbelt';
 
-type ThemeProviderOptions = {
+type ThemeProviderOptions = ReadableBoxedValues<{
 	defaultFontPreset?: string | null;
-};
+	animate: boolean;
+}>;
 
 const FONT_PRESET_COOKIE = 'theme-font-preset';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
@@ -19,7 +21,7 @@ class ThemeProviderState {
 	constructor(readonly opts: ThemeProviderOptions) {
 		// Initialize from server-provided default (from cookie read server-side)
 		if (opts.defaultFontPreset) {
-			const preset = FONT_PRESETS.find((p) => p.name === opts.defaultFontPreset);
+			const preset = FONT_PRESETS.find((p) => p.name === opts.defaultFontPreset?.current);
 			if (preset) this.#fontPreset = preset;
 		}
 
@@ -40,6 +42,10 @@ class ThemeProviderState {
 		const defaultPreset = FONT_PRESETS.find((p) => p.default) ?? FONT_PRESETS[0];
 		return this.#fontPreset ?? defaultPreset;
 	}
+
+	get animate() {
+		return this.opts.animate.current;
+	}
 }
 
 const ThemeProviderCtx = new Context<ThemeProviderState>('theme-provider-state');
@@ -48,6 +54,6 @@ export function setupThemeProvider(opts: ThemeProviderOptions) {
 	return ThemeProviderCtx.set(new ThemeProviderState(opts));
 }
 
-export function useThemeProvider() {
+export function useTheme() {
 	return ThemeProviderCtx.get();
 }

@@ -70,9 +70,9 @@
 
 <ModeWatcher />
 <Startup />
-<ConfirmDeleteDialog />
 <Toaster position="bottom-right" />
 
-<ThemeProvider defaultFontPreset={page.data.fontPreset}>
+<ThemeProvider animate={true} defaultFontPreset={page.data.fontPreset}>
+	<ConfirmDeleteDialog />
 	{@render children()}
 </ThemeProvider>

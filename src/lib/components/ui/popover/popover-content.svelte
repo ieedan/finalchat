@@ -3,6 +3,7 @@
 	import PopoverPortal from './popover-portal.svelte';
 	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';
 	import type { ComponentProps } from 'svelte';
+	import { useTheme } from '$lib/components/theme-provider';
 
 	let {
 		ref = $bindable(null),
@@ -10,12 +11,12 @@
 		sideOffset = 4,
 		align = 'center',
 		portalProps,
-		animated = true,
 		...restProps
 	}: PopoverPrimitive.ContentProps & {
 		portalProps?: WithoutChildrenOrChild<ComponentProps<typeof PopoverPortal>>;
-		animated?: boolean;
 	} = $props();
+
+	const theme = useTheme();
 </script>
 
 <PopoverPortal {...portalProps}>
@@ -27,7 +28,7 @@
 		class={cn(
 			'bg-popover text-popover-foreground origin-(--bits-popover-content-transform-origin) outline-hidden z-50 w-72 rounded-md border p-4 shadow-md',
 			// animations
-			animated &&
+			theme.animate &&
 				'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-end-2 data-[side=right]:slide-in-from-start-2 data-[side=top]:slide-in-from-bottom-2',
 			className
 		)}

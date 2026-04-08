@@ -32,12 +32,7 @@
 		}
 	}}
 >
-	<Dialog.Content
-		withOverlay={false}
-		showCloseButton={false}
-		animated={false}
-		class="w-fit top-1/4"
-	>
+	<Dialog.Content withOverlay={false} showCloseButton={false} class="w-fit top-1/4">
 		<form
 			class="flex flex-col gap-1"
 			onsubmit={(e) => {

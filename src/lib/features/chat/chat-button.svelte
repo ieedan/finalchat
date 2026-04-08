@@ -98,7 +98,7 @@
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					data-active={page.url.pathname.includes(`/chat/${chat._id}`)}
-					class="group/menu-button hover:bg-sidebar-accent focus-within:bg-sidebar-accent rounded-md flex items-center gap-2 h-8.5 data-[active=true]:bg-sidebar-accent"
+					class="group/menu-button relative hover:bg-sidebar-accent focus-within:bg-sidebar-accent rounded-md flex items-center gap-2 h-8.5 data-[active=true]:bg-sidebar-accent"
 					onpointerover={() => {
 						warm(client, api.chats.get, {
 							chatId: chat._id
@@ -113,7 +113,10 @@
 					<a
 						{...props}
 						href="/chat/{chat._id}"
-						class="flex min-w-0 flex-1 items-center gap-2 pl-3 h-full outline-none"
+						class={cn(
+							'flex min-w-0 flex-1 items-center gap-2 pl-3 h-full outline-none',
+							renamingMode === 'view' && 'pr-11'
+						)}
 					>
 						{#if chat.generating}
 							<Spinner />
@@ -150,10 +153,9 @@
 					{#if renamingMode === 'view'}
 						<div
 							class={cn(
-								'flex shrink-0 h-full items-center opacity-0 group-data-[active=true]/menu-button:opacity-100 group-hover/menu-button:opacity-100',
-								{
-									'opacity-100': dropdownOpen
-								}
+								// Fixed slot (out of flex flow) so the title never reflows on hover/menu/focus — avoids ellipsis jumping.
+								'pointer-events-none absolute inset-y-0 right-0 z-10 flex w-9 items-center justify-center opacity-0 transition-none group-data-[active=true]/menu-button:pointer-events-auto group-data-[active=true]/menu-button:opacity-100 group-hover/menu-button:pointer-events-auto group-hover/menu-button:opacity-100 group-focus-within/menu-button:pointer-events-auto group-focus-within/menu-button:opacity-100',
+								dropdownOpen && 'pointer-events-auto opacity-100'
 							)}
 						>
 							<DropdownMenu.Root bind:open={dropdownOpen}>
@@ -161,12 +163,12 @@
 									tabindex={-1}
 									data-open={dropdownOpen}
 									class={cn(
-										'inline-flex group-hover/menu-button:w-9 group-data-[active=true]/menu-button:w-9 bg-sidebar-accent data-[open=true]:w-9! w-0 h-full items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+										'inline-flex h-full w-full items-center justify-center rounded-md bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
 									)}
 								>
 									<Ellipsis class="size-4 shrink-0" />
 								</DropdownMenu.Trigger>
-								<DropdownMenu.Content align="end" side="bottom" animated={false}>
+								<DropdownMenu.Content align="end" side="bottom">
 									<DropdownMenu.Item onSelect={() => togglePinned()}>
 										{#if !chat.pinned}
 											<PinIcon class="size-4!" />
