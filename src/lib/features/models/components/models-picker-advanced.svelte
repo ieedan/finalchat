@@ -93,10 +93,14 @@
 				if (!lab) return acc;
 
 				acc[lab.name] = acc[lab.name] || [];
-				acc[lab.name].push({ ...model, lab });
+				acc[lab.name].push({
+					...model,
+					lab,
+					isFavorite: chatLayoutState.favoriteModelIds.includes(model.id)
+				});
 				return acc;
 			},
-			{} as Record<string, (Model & { lab: Lab })[]>
+			{} as Record<string, (Model & { lab: Lab; isFavorite: boolean })[]>
 		);
 
 		if (searchDebounced.current.trim() === '')
@@ -136,6 +140,10 @@
 	const modelIdClipboard = new UseClipboard();
 
 	let commandInputRef = $state<HTMLInputElement | null>(null);
+
+	const favoriteModels = $derived(
+		sortedModels.filter((model) => chatLayoutState.favoriteModelIds.includes(model.id))
+	);
 </script>
 
 <svelte:window
@@ -200,7 +208,7 @@
 				<Command.Empty>No models found.</Command.Empty>
 				{#if !gridMode}
 					<Command.Group>
-						{#each sortedModels.filter( (model) => chatLayoutState.favoriteModelIds.includes(model.id) ) as model (model.id)}
+						{#each favoriteModels as model (model.id)}
 							<Command.Item
 								class="flex items-center justify-between gap-4"
 								value={model.id}
@@ -237,7 +245,6 @@
 							)}
 						>
 							{#each models as model (model.id)}
-								{@const isFavorite = chatLayoutState.favoriteModelIds.includes(model.id)}
 								<Command.Item
 									class="flex items-center justify-center relative border border-border rounded-md gap-4 size-32"
 									value={model.id}
@@ -262,7 +269,7 @@
 										</div>
 									</div>
 									<div class="absolute top-2 right-2">
-										{#if isFavorite}
+										{#if model.isFavorite}
 											<StarIcon class="size-3.5 text-yellow-500 fill-yellow-500" />
 										{/if}
 									</div>
