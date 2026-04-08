@@ -9,7 +9,7 @@
 		guessMediaTypeFromFileName,
 		isImageAttachmentMediaType
 	} from '$lib/utils/chat-attachment-types';
-	import ChatNonImageAttachmentRow from '$lib/features/chat/chat-non-image-attachment-row.svelte';
+	import ChatNonImageAttachment from '$lib/features/chat/chat-non-image-attachment.svelte';
 
 	let { class: className, ...rest }: HTMLAttributes<HTMLDivElement> = $props();
 
@@ -69,7 +69,7 @@
 				{#if isImageAttachmentMediaType(mediaType)}
 					<img src={url} alt="" class="size-full object-cover" />
 				{:else}
-					<ChatNonImageAttachmentRow
+					<ChatNonImageAttachment
 						compact
 						fileName={fileName ?? fallbackAttachmentDisplayName(mediaType)}
 						{mediaType}
@@ -107,7 +107,7 @@
 				{#if isImageAttachmentMediaType(mime)}
 					<img src={url} alt="" class="size-full object-cover" />
 				{:else}
-					<ChatNonImageAttachmentRow
+					<ChatNonImageAttachment
 						compact
 						fileName={file.name}
 						mediaType={mime || 'application/octet-stream'}
