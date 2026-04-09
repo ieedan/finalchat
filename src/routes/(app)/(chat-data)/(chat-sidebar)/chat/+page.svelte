@@ -62,28 +62,37 @@
 	});
 </script>
 
-<div class="w-full h-full flex flex-col px-4 md:items-center md:justify-center md:gap-12">
+<div class="relative h-full w-full min-h-0 flex flex-col px-4">
+	<!-- Mobile logo (in flow + fixed centering); hidden on desktop — desktop uses absolute copy below -->
 	<div
 		class={cn(
 			'flex flex-col gap-8 flex-1 justify-center items-center',
-			// mobile
 			'fixed left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2',
-			// desktop
-			'md:flex-none md:static md:translate-0'
+			'md:hidden'
 		)}
 	>
 		<div class="flex w-full items-center flex-col justify-center">
 			<FinalChat class="size-20" />
 		</div>
 	</div>
-	<div class="flex flex-col gap-4 w-full items-center pb-2 sm:pb-4 md:pb-0 mt-auto md:mt-0">
+
+	<!-- Desktop logo: above viewport center, does not affect composer centering -->
+	<div
+		class="pointer-events-none absolute top-1/2 left-1/2 z-10 hidden -translate-x-1/2 translate-y-[calc(-50%-10.5rem)] md:block"
+	>
+		<div class="pointer-events-auto flex flex-col items-center justify-center">
+			<FinalChat class="size-20" />
+		</div>
+	</div>
+
+	<div class="mt-auto flex w-full flex-col items-center gap-4 pb-2 sm:pb-4 md:hidden">
 		<!-- Mobile Prompt Input -->
 		<PromptInputMobile.Root
 			bind:modelId={modelId.current}
 			bind:reasoningEffort={reasoningEffort.current}
 			onSubmit={chatLayoutState.handleSubmit}
 			{submitOnEnter}
-			class="w-full max-w-2xl md:hidden"
+			class="w-full max-w-2xl"
 			optimisticClear={false}
 			onUpload={chatAttachmentUploader.uploadMany}
 			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
@@ -143,14 +152,16 @@
 
 			<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
 		</PromptInputMobile.Root>
+	</div>
 
-		<!-- Desktop Prompt Input -->
+	<!-- Desktop prompt: true viewport center (logo is positioned independently) -->
+	<div class="absolute top-1/2 left-4 right-4 z-10 hidden -translate-y-1/2 md:block">
 		<PromptInput.Root
 			bind:modelId={modelId.current}
 			bind:reasoningEffort={reasoningEffort.current}
 			onSubmit={chatLayoutState.handleSubmit}
 			{submitOnEnter}
-			class="w-full max-w-2xl hidden md:block"
+			class="mx-auto w-full max-w-2xl"
 			optimisticClear={false}
 			onUpload={chatAttachmentUploader.uploadMany}
 			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
