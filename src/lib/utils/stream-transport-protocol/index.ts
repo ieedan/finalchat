@@ -6,7 +6,9 @@ import {
 	createChunkAppender,
 	serializeParts
 } from './v2';
-import type { ModelMessage, ReasoningOutput, TextPart } from 'ai';
+import type { ModelMessage, ReasoningOutput, TextPart, ToolResultPart } from 'ai';
+
+type ToolResultOutput = ToolResultPart['output'];
 
 export { createChunkAppender, type StreamResult, serializeParts };
 
@@ -60,12 +62,6 @@ export function partsToModelMessage(parts: StreamResult): ModelMessage[] {
 	for (const part of parts) {
 		if (part.type === 'tool-result') {
 			flushMessage();
-			// Ensure output is always an object, not a string
-			// If output is a string, wrap it in the expected format
-			const output =
-				typeof part.output === 'string'
-					? { type: 'text' as const, value: part.output }
-					: part.output;
 			messages.push({
 				role: 'tool',
 				content: [
@@ -73,10 +69,10 @@ export function partsToModelMessage(parts: StreamResult): ModelMessage[] {
 						type: 'tool-result',
 						toolCallId: part.toolCallId,
 						toolName: part.toolName,
-						output: output
+						output: normalizeToolResultOutput(part.output)
 					}
 				]
-			} as ModelMessage);
+			} satisfies ModelMessage);
 		} else if (part.type === 'tool-call') {
 			flushMessage();
 			messages.push({
@@ -116,9 +112,50 @@ export function partsToModelMessage(parts: StreamResult): ModelMessage[] {
 
 	flushMessage();
 
-	JSON.stringify(messages, null, 2);
-
 	return messages;
+}
+
+function normalizeToolResultOutput(raw: unknown): ToolResultOutput {
+	if (typeof raw === 'string') {
+		return { type: 'text', value: raw };
+	}
+	if (raw !== null && typeof raw === 'object' && !Array.isArray(raw) && 'type' in raw) {
+		const typed = raw as { type: unknown };
+		if (
+			typed.type === 'text' &&
+			'value' in raw &&
+			typeof (raw as { value: unknown }).value === 'string'
+		) {
+			return raw as ToolResultOutput;
+		}
+		if (typed.type === 'json' && 'value' in raw) {
+			return raw as ToolResultOutput;
+		}
+		if (typed.type === 'execution-denied') {
+			return raw as ToolResultOutput;
+		}
+		if (
+			typed.type === 'error-text' &&
+			'value' in raw &&
+			typeof (raw as { value: unknown }).value === 'string'
+		) {
+			return raw as ToolResultOutput;
+		}
+		if (typed.type === 'error-json' && 'value' in raw) {
+			return raw as ToolResultOutput;
+		}
+		if (
+			typed.type === 'content' &&
+			'value' in raw &&
+			Array.isArray((raw as { value: unknown }).value)
+		) {
+			return raw as ToolResultOutput;
+		}
+	}
+	return {
+		type: 'json',
+		value: JSON.parse(JSON.stringify(raw)) as Extract<ToolResultOutput, { type: 'json' }>['value']
+	};
 }
 
 export function repackStream(context: string): Result<string, DeserializeStreamError> {
