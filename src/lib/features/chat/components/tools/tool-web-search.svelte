@@ -5,6 +5,7 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import { onDestroy } from 'svelte';
 	import type { WebSearchHit, WebSearchTool } from './types.js';
+	import GlobalLine from 'remixicon-svelte/icons/global-line';
 
 	type Props = {
 		tool: WebSearchTool;
@@ -44,6 +45,17 @@
 	}
 
 	onDestroy(() => clearCloseTimer());
+
+	const activeImage = $derived.by(() => {
+		if (!activeResult?.image) return null;
+
+		if (activeResult.image.startsWith('https://') || activeResult.image.startsWith('http://')) {
+			return activeResult.image;
+		}
+
+		// sometimes images are relative paths, so we need to make them absolute
+		return new URL(activeResult.image, new URL(activeResult.url).origin).toString();
+	});
 </script>
 
 {#if tool.result}
@@ -55,7 +67,7 @@
 			results
 			<Popover.Root bind:open={previewOpen}>
 				<Avatar.Group class="-space-x-1.5">
-					{#each results.filter((r) => r.favicon) as result, i (i)}
+					{#each results as result, i (i)}
 						<button
 							type="button"
 							class="inline-flex rounded-full border-0 bg-background p-0 shadow-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -66,6 +78,9 @@
 						>
 							<Avatar.Root class="size-4">
 								<Avatar.Image src={result.favicon} />
+								<Avatar.Fallback>
+									<GlobalLine class="size-4" />
+								</Avatar.Fallback>
 							</Avatar.Root>
 						</button>
 					{/each}
@@ -83,6 +98,9 @@
 							<div class="flex items-center gap-2">
 								<Avatar.Root class="size-4">
 									<Avatar.Image src={activeResult.favicon} />
+									<Avatar.Fallback>
+										<GlobalLine class="size-4" />
+									</Avatar.Fallback>
 								</Avatar.Root>
 								<span class="text-xs text-muted-foreground truncate">
 									{activeResult.url}
@@ -96,11 +114,13 @@
 							>
 								{activeResult.title}
 							</a>
-							<img
-								src={activeResult.image}
-								alt={activeResult.title}
-								class="w-full h-48 object-cover rounded-md"
-							/>
+							{#if activeImage}
+								<img
+									src={activeImage}
+									alt={activeResult.title}
+									class="w-full h-48 object-cover rounded-md"
+								/>
+							{/if}
 						</div>
 					{/if}
 				</Popover.Content>
