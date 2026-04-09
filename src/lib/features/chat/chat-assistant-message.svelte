@@ -5,7 +5,7 @@
 	import Streamdown from './components/streamdown.svelte';
 	import ShinyText from '$lib/components/animations/shiny-text.svelte';
 	import ChatToolPart from './chat-tool-part.svelte';
-	import type { ToolResultPart } from 'ai';
+	import type { ChatToolMerged } from './components/tools';
 	import type { Doc } from '$lib/convex/_generated/dataModel';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import ChatImageAttachment from './chat-image-attachment.svelte';
@@ -40,7 +40,7 @@
 			{@const toolCallResult = message.parts.find(
 				(p) => p.type === 'tool-result' && p.toolCallId === part.toolCallId
 			)}
-			<ChatToolPart tool={{ ...part, result: toolCallResult as ToolResultPart }} />
+			<ChatToolPart tool={{ ...part, result: toolCallResult } as ChatToolMerged} />
 		{/if}
 	{/each}
 	{#if message.attachments.length > 0}

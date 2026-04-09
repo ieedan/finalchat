@@ -60,6 +60,7 @@
 		"deepmerge": "^4.3.1",
 		"eslint": "^10.2.0",
 		"eslint-plugin-svelte": "^3.17.0",
+		"exa-js": "^2.11.0",
 		"fuzzysort": "^3.1.0",
 		"globals": "^17.4.0",
 		"jsrepo": "^3.7.0",

@@ -4,6 +4,10 @@ import { tool } from 'ai';
 import type { ActionCtx } from './_generated/server';
 import { api } from './_generated/api';
 import type { Id } from './_generated/dataModel';
+import Exa from 'exa-js';
+import { env } from '../env.convex';
+
+const exa = new Exa(env.EXA_API_KEY);
 
 export type ContextType = {
 	env: {
@@ -273,5 +277,22 @@ export const getChat = tool({
 	execute: async ({ chatId }, { experimental_context }) => {
 		const context = experimental_context as ContextType;
 		return await context.ctx.runQuery(api.chats.get, { chatId: chatId as Id<'chats'> });
+	}
+});
+
+export const webSearch = tool({
+	description: 'Search the web for information',
+	inputSchema: z.object({
+		query: z.string(),
+		excludeDomains: z.optional(z.array(z.string()))
+	}),
+	execute: async ({ query, excludeDomains }) => {
+		const result = await exa.search(query, {
+			type: 'instant',
+			excludeDomains: excludeDomains ?? [],
+			numResults: 4
+		});
+
+		return result.results;
 	}
 });

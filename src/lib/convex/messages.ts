@@ -22,7 +22,7 @@ import {
 	type MessageWithAttachments
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
-import { chatSearchTool, fetchLinkContentTool, getChat } from './ai.utils.js';
+import { chatSearchTool, fetchLinkContentTool, getChat, webSearch } from './ai.utils.js';
 import {
 	createChunkAppender,
 	partsToModelMessage,
@@ -383,6 +383,7 @@ ${systemPrompt}
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
 						tools: {
 							fetchLinkContent: fetchLinkContentTool,
+							webSearch: webSearch,
 							...(memoryEnabled ? { chatSearch: chatSearchTool, getChat } : {})
 						},
 						stopWhen: [
