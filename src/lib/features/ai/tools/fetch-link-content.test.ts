@@ -1,13 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { ActionCtx } from './_generated/server';
-import type { Id } from './_generated/dataModel';
-import { githubLinkHandler, svelteDevLinkHandler, type ContextType } from './ai.utils.js';
+import { githubLinkHandler, svelteDevLinkHandler } from './fetch-link-content.js';
+import type { ContextType } from './types.js';
 
 const testHandlerOpts: { experimental_context: ContextType } = {
 	experimental_context: {
 		env: { GITHUB_TOKEN: undefined },
-		ctx: {} as ActionCtx,
-		chatId: 'test_chat_id' as Id<'chats'>
+		ctx: {} as ContextType['ctx'],
+		chatId: 'test_chat_id' as ContextType['chatId']
 	}
 };
 

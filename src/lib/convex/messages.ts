@@ -22,7 +22,12 @@ import {
 	type MessageWithAttachments
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
-import { chatSearchTool, fetchLinkContentTool, getChat, webSearch } from './ai.utils.js';
+import {
+	chatSearchTool,
+	fetchLinkContentTool,
+	getChat,
+	webSearch
+} from '../features/ai/tools/index.js';
 import {
 	createChunkAppender,
 	partsToModelMessage,
@@ -32,7 +37,7 @@ import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
 import { createKey } from './chatAttachments.utils';
 import { env } from '../env.convex';
-import type { ContextType } from './ai.utils';
+import type { ContextType } from '../features/ai/tools/index.js';
 import { truncateRight } from '../utils/strings';
 import { rateLimiter } from './rateLimiter';
 import { formatTimeUntil } from '../utils/time';
