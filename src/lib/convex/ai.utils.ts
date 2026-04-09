@@ -281,7 +281,8 @@ export const getChat = tool({
 });
 
 export const webSearch = tool({
-	description: 'Search the web for information',
+	description:
+		'Search the web for information. The tool response includes todaysDate (ISO 8601, UTC) from the server at request time—use it to interpret "today", "this week", and recent events.',
 	inputSchema: z.object({
 		query: z.string(),
 		excludeDomains: z.optional(z.array(z.string()))
@@ -293,6 +294,10 @@ export const webSearch = tool({
 			numResults: 4
 		});
 
-		return result.results;
+		return {
+			// return todaysDate so that the AI knows what today is
+			todaysDate: new Date().toISOString(),
+			results: result.results
+		};
 	}
 });

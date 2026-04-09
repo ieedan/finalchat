@@ -40,7 +40,10 @@
 			{@const toolCallResult = message.parts.find(
 				(p) => p.type === 'tool-result' && p.toolCallId === part.toolCallId
 			)}
-			<ChatToolPart tool={{ ...part, result: toolCallResult } as ChatToolMerged} />
+			<ChatToolPart
+				tool={{ ...part, result: toolCallResult } as ChatToolMerged}
+				{animationEnabled}
+			/>
 		{/if}
 	{/each}
 	{#if message.attachments.length > 0}

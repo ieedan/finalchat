@@ -18,6 +18,12 @@ export type ChatTool = ToolCallPart & {
 
 export type WebSearchHit = SearchResult<{ text: true }>;
 
+/** Web search tool output; includes server UTC time for grounding "recent" queries. */
+export type WebSearchToolOutput = {
+	todaysDate: string;
+	results: WebSearchHit[];
+};
+
 export type ChatSearchHit = {
 	_id: Id<'chats'>;
 	matchedTitle: MatchedText;
@@ -34,7 +40,7 @@ export type WebSearchTool = ChatTool & {
 	input: { query: string; excludeDomains?: string[] };
 	result:
 		| (ChatToolResultPart & {
-				output: WebSearchHit[];
+				output: WebSearchToolOutput;
 		  })
 		| undefined;
 };

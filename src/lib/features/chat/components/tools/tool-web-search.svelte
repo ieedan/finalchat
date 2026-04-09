@@ -12,7 +12,7 @@
 
 	let { tool }: Props = $props();
 
-	const results = $derived<WebSearchHit[]>(tool.result?.output ?? []);
+	const results = $derived<WebSearchHit[]>(tool.result?.output?.results ?? []);
 
 	let previewOpen = $state(false);
 	let anchorEl = $state<HTMLElement | null>(null);

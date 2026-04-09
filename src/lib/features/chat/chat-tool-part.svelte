@@ -10,15 +10,26 @@
 		type WebSearchTool
 	} from './components/tools';
 	import type { ChatTool } from './components/tools/types';
+	import { animated } from 'animated-svelte';
 
 	type Props = {
 		tool: ChatTool;
+		animationEnabled?: boolean;
 	};
 
-	let { tool }: Props = $props();
+	let { tool, animationEnabled = true }: Props = $props();
 </script>
 
-<div class="pb-2 max-w-full">
+<animated.div
+	initial={animationEnabled ? { opacity: 0, y: 10 } : false}
+	animate={{ opacity: 1, y: 0 }}
+	exit={{ opacity: 0, y: 10 }}
+	transition={{
+		duration: animationEnabled ? 0.2 : 0,
+		timingFunction: 'ease-out'
+	}}
+	class="pb-2 max-w-full"
+>
 	{#if tool.toolName === 'fetchLinkContent'}
 		<ToolFetchLinkContent tool={tool as FetchLinkContentTool} />
 	{:else if tool.toolName === 'webSearch'}
@@ -28,4 +39,4 @@
 	{:else if tool.toolName === 'getChat'}
 		<ToolGetChat tool={tool as GetChatTool} />
 	{/if}
-</div>
+</animated.div>
