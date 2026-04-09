@@ -73,7 +73,8 @@ export default defineSchema({
 		),
 		favoriteModelIds: v.optional(v.array(v.string())),
 		systemPrompt: v.optional(v.string()),
-		submitOnEnter: v.optional(v.boolean())
+		submitOnEnter: v.optional(v.boolean()),
+		memoryEnabled: v.optional(v.boolean())
 	}).index('by_user', ['userId']),
 	apiKeys: defineTable({
 		userId: v.optional(v.string()),

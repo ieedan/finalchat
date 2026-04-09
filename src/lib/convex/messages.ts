@@ -22,7 +22,7 @@ import {
 	type MessageWithAttachments
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
-import { fetchLinkContentTool } from './ai.utils.js';
+import { chatSearchTool, fetchLinkContentTool, getChat } from './ai.utils.js';
 import {
 	createChunkAppender,
 	partsToModelMessage,
@@ -279,9 +279,12 @@ export const streamMessage = httpAction(async (ctx, request) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			let streamResult: StreamTextResult<any, any> | null = null;
 			try {
-				const { messages, chat } = await ctx.runQuery(internal.messages.getMessagesForChat, {
-					chatId
-				});
+				const { messages, chat, memoryEnabled } = await ctx.runQuery(
+					internal.messages.getMessagesForChat,
+					{
+						chatId
+					}
+				);
 
 				last = getLastUserAndAssistantMessages(messages);
 				if (!last) {
@@ -379,7 +382,8 @@ ${systemPrompt}
 					const agent = new ToolLoopAgent({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
 						tools: {
-							fetchLinkContent: fetchLinkContentTool
+							fetchLinkContent: fetchLinkContentTool,
+							...(memoryEnabled ? { chatSearch: chatSearchTool, getChat } : {})
 						},
 						stopWhen: [
 							({ steps }) => {
@@ -389,7 +393,9 @@ ${systemPrompt}
 						experimental_context: {
 							env: {
 								GITHUB_TOKEN: env.GITHUB_TOKEN
-							}
+							},
+							ctx,
+							chatId: chat._id
 						} satisfies ContextType,
 						providerOptions
 					});
@@ -615,15 +621,25 @@ export const getMessagesForChat = internalQuery({
 	handler: async (
 		ctx,
 		args
-	): Promise<{ chat: Doc<'chats'>; messages: MessageWithAttachments[] }> => {
+	): Promise<{
+		chat: Doc<'chats'>;
+		messages: MessageWithAttachments[];
+		memoryEnabled: boolean;
+	}> => {
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat) throw new ConvexError('Chat not found');
 
 		const messages = await getChatMessagesInternal(ctx, args.chatId);
+		const userSettings = await ctx.db
+			.query('userSettings')
+			.withIndex('by_user', (q) => q.eq('userId', chat.userId))
+			.first();
+		const memoryEnabled = userSettings?.memoryEnabled ?? false;
 
 		return {
 			chat,
-			messages
+			messages,
+			memoryEnabled
 		};
 	}
 });
