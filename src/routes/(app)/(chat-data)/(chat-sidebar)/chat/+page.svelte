@@ -7,10 +7,7 @@
 	import { PersistedState } from 'runed';
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 	import { FinalChat } from '$lib/components/logos';
-	import {
-		RiAlertLine as AlertIcon,
-		RiGithubLine as GithubLogo
-	} from 'remixicon-svelte';
+	import { RiAlertLine as AlertIcon, RiGithubLine as GithubLogo } from 'remixicon-svelte';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import { cn } from '$lib/utils.js';
 	import { BASIC_MODELS } from '$lib/ai';
