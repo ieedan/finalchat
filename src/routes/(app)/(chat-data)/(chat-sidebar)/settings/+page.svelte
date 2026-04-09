@@ -5,6 +5,7 @@
 	import SettingsUserCard from '$lib/features/settings/components/settings-user-card.svelte';
 	import SettingsSearchInput from '$lib/features/settings/components/settings-search-input.svelte';
 	import SettingsSystemPromptCard from '$lib/features/settings/components/settings-system-prompt-card.svelte';
+	import SettingsMemoryCard from '$lib/features/settings/components/settings-memory-card.svelte';
 	import SettingsModeCard from '$lib/features/settings/components/settings-mode-card.svelte';
 	import SettingsSubmitBehaviorCard from '$lib/features/settings/components/settings-submit-behavior-card.svelte';
 	import SettingsFontCard from '$lib/features/settings/components/settings-font-card.svelte';
@@ -20,6 +21,7 @@
 <SettingsKeyboardShortcutsCard class="md:flex hidden" />
 <SettingsApiKeyCard />
 <SettingsSystemPromptCard />
+<SettingsMemoryCard />
 <SettingsSubmitBehaviorCard />
 <SettingsModeCard />
 <SettingsThemeCard />

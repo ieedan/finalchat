@@ -143,3 +143,26 @@ export const updateSubmitOnEnter = mutation({
 		});
 	}
 });
+
+export const updateMemoryEnabled = mutation({
+	args: {
+		memoryEnabled: v.boolean()
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return;
+
+		const userSettings = await getUserSettings(ctx, user);
+		if (!userSettings) {
+			await ctx.db.insert('userSettings', {
+				userId: user.subject,
+				memoryEnabled: args.memoryEnabled
+			});
+			return;
+		}
+
+		await ctx.db.patch(userSettings._id, {
+			memoryEnabled: args.memoryEnabled
+		});
+	}
+});
