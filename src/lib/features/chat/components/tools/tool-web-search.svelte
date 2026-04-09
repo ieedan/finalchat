@@ -71,7 +71,7 @@
 						<button
 							type="button"
 							class="inline-flex rounded-full border-0 bg-background p-0 shadow-none focus-visible:ring-2 focus-visible:ring-ring"
-							aria-expanded={previewOpen && activeResult === result}
+							aria-expanded={previewOpen && activeResult?.url === result.url}
 							aria-haspopup="dialog"
 							onpointerenter={(e) => openPreview(e.currentTarget, result)}
 							onpointerleave={scheduleClose}
