@@ -9,6 +9,8 @@ import { env } from '../env.convex';
 
 const exa = new Exa(env.EXA_API_KEY);
 
+const MARKDOWN_NEW_ORIGIN = 'https://markdown.new';
+
 export type ContextType = {
 	env: {
 		GITHUB_TOKEN: string | undefined;
@@ -34,26 +36,81 @@ export const fetchLinkContentTool = tool({
 				}
 			}
 
-			const response = await fetch(link, {
-				method: 'GET',
-				signal: abortSignal
-			});
-			if (!response.ok) {
-				throw new ConvexError(`${response.status} ${response.statusText}`);
+			if (link.startsWith(`${MARKDOWN_NEW_ORIGIN}/`)) {
+				throw new ConvexError('Refusing to fetch markdown.new recursively');
 			}
-			const contentType = response.headers.get('content-type');
-			const allowedTypes = ['text/plain', 'text/markdown'];
-			if (allowedTypes.some((type) => contentType?.includes(type))) {
-				return await response.text();
+
+			let text = await tryFetchMarkdownDirect(link, abortSignal);
+			if (text !== null) return text;
+
+			for (const variant of markdownPathVariants(link)) {
+				text = await tryFetchMarkdownDirect(variant, abortSignal);
+				if (text !== null) return text;
 			}
-			throw new ConvexError(
-				'Link response was not markdown. Maybe you need to add .md or .mdx to the end of the link?'
-			);
+
+			return await fetchViaMarkdownNew(link, abortSignal);
 		} catch (error) {
 			return `Error reading link content: ${error instanceof Error ? error.message : error}`;
 		}
 	}
 });
+
+function isMarkdownLikeContentType(contentType: string | null): boolean {
+	if (!contentType) return false;
+	const ct = contentType.toLowerCase();
+	return ['text/plain', 'text/markdown', 'text/x-markdown'].some((t) => ct.includes(t));
+}
+
+async function tryFetchMarkdownDirect(
+	url: string,
+	abortSignal: AbortSignal | undefined
+): Promise<string | null> {
+	const response = await fetch(url, { method: 'GET', signal: abortSignal });
+	if (!response.ok) return null;
+	if (!isMarkdownLikeContentType(response.headers.get('content-type'))) return null;
+	return await response.text();
+}
+
+/** Tries pathname.md and pathname.mdx for doc sites that expose raw markdown beside HTML. */
+function markdownPathVariants(link: string): string[] {
+	try {
+		const base = new URL(link);
+		let pathname = base.pathname;
+		if (pathname.length > 1 && pathname.endsWith('/')) {
+			pathname = pathname.slice(0, -1);
+		}
+		if (!pathname || pathname === '/') {
+			return [];
+		}
+		const lower = pathname.toLowerCase();
+		if (lower.endsWith('.md') || lower.endsWith('.mdx') || lower.endsWith('.markdown')) {
+			return [];
+		}
+		return ['.md', '.mdx'].map((ext) => {
+			const u = new URL(link);
+			u.pathname = pathname + ext;
+			return u.toString();
+		});
+	} catch {
+		return [];
+	}
+}
+
+async function fetchViaMarkdownNew(
+	link: string,
+	abortSignal: AbortSignal | undefined
+): Promise<string> {
+	// Prepends https://markdown.new/ to the URL; Accept returns markdown (not HTML UI).
+	const response = await fetch(`${MARKDOWN_NEW_ORIGIN}/${link}`, {
+		method: 'GET',
+		headers: { Accept: 'text/markdown' },
+		signal: abortSignal
+	});
+	if (!response.ok) {
+		throw new ConvexError(`markdown.new: ${response.status} ${response.statusText}`);
+	}
+	return await response.text();
+}
 
 type CustomLinkHandler = {
 	matches: (link: string) => boolean;
