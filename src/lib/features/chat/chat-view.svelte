@@ -18,8 +18,12 @@
 		RiAlertLine as AlertIcon,
 		RiEyeLine as EyeIcon,
 		RiChatOffLine as MessageCircleOffIcon,
-		RiArrowLeftLine as ArrowLeftIcon
+		RiArrowLeftLine as ArrowLeftIcon,
+		RiPencilLine as PencilIcon
 	} from 'remixicon-svelte';
+	import * as Rename from '$lib/components/ui/rename';
+	import { useConvexClient } from 'convex-svelte';
+	import { api } from '$lib/convex/_generated/api';
 	import * as Empty from '$lib/components/ui/empty';
 	import { Button } from '$lib/components/ui/button';
 	import { BASIC_MODELS } from '$lib/ai.js';
@@ -48,6 +52,24 @@
 	>('chat-attachments', []);
 
 	const sidebar = Sidebar.useSidebar();
+	const convex = useConvexClient();
+
+	let headerTitleRenameMode = $state<'view' | 'edit'>('view');
+
+	async function renameChatTitle(title: string) {
+		const chat = chatViewState.chatQuery.data;
+		if (!chat) return title;
+		if (title.trim().length === 0) {
+			return chat.title;
+		}
+
+		await convex.mutation(api.chats.updateTitle, {
+			chatId: chat._id,
+			title
+		});
+
+		return title;
+	}
 
 	const selectedModel = $derived(
 		chatLayoutState.models.find((model) => model.id === modelId.current)
@@ -93,9 +115,44 @@
 						data-visible={sidebar.isMobile || !sidebar.open}
 						class="size-9 data-[visible=false]:w-0 transition-all duration-200"
 					></div>
-					<span class="text-foreground text-sm truncate min-w-0">
-						{chatViewState.chatQuery.data?.title}
-					</span>
+					{#if chatViewState.chatQuery.data}
+						{#if isChatOwner}
+							<Rename.Provider>
+								<div
+									class={cn(
+										'hidden md:flex md:items-center gap-1 min-w-0 max-w-full',
+										headerTitleRenameMode === 'edit' ? 'flex-1' : 'w-fit'
+									)}
+								>
+									<Rename.Root
+										this="span"
+										value={chatViewState.chatQuery.data.title}
+										class="text-foreground text-sm rounded-none border-none outline-none focus:ring-0! data-[mode=view]:truncate data-[mode=view]:min-w-0"
+										fallbackSelectionBehavior="all"
+										blurBehavior="exit"
+										onSave={renameChatTitle}
+										bind:mode={headerTitleRenameMode}
+									/>
+									{#if headerTitleRenameMode === 'view'}
+										<Rename.Edit
+											variant="ghost"
+											size="icon-xs"
+											class="shrink-0 size-8 text-muted-foreground hover:text-foreground"
+											aria-label="Rename chat"
+										>
+											<PencilIcon class="size-3.5" />
+										</Rename.Edit>
+									{/if}
+								</div>
+							</Rename.Provider>
+						{:else}
+							<span
+								class="hidden md:block text-foreground text-sm truncate min-w-0 max-w-full w-fit"
+							>
+								{chatViewState.chatQuery.data.title}
+							</span>
+						{/if}
+					{/if}
 				</div>
 				<div class="flex items-center gap-2">
 					{#if chatViewState.chatQuery.data}

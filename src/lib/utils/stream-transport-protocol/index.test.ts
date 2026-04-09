@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, assert } from 'vitest';
-import { deserializeStream } from './index';
+import { deserializeStream, partsToModelMessage } from './index';
 import { createChunkAppender as createChunkAppenderV1 } from './v1';
 import { createChunkAppender as createChunkAppenderV2 } from './v2';
 import type { ToolCallPart, ToolResultPart } from 'ai';
@@ -65,6 +65,57 @@ describe('stream transport protocol index', () => {
 				{ type: 'text', text: 'Nice! Ok now I will do this,' },
 				toolCall,
 				toolResult
+			]);
+		});
+	});
+
+	describe('partsToModelMessage', () => {
+		it('wraps raw persisted tool output in { type: "json", value } for AI SDK prompts', () => {
+			const parts = [
+				{
+					type: 'tool-call',
+					toolName: 'webSearch',
+					toolCallId: 'call_1',
+					input: { query: 'test' }
+				},
+				{
+					type: 'tool-result',
+					toolName: 'webSearch',
+					toolCallId: 'call_1',
+					// Serialized assistant streams store executor return values as plain JSON
+					output: { todaysDate: '2026-04-09T00:00:00.000Z', results: [{ title: 'x', url: 'y' }] }
+				}
+			] as StreamResult;
+
+			expect(partsToModelMessage(parts)).toEqual([
+				{
+					role: 'assistant',
+					content: [
+						{
+							type: 'tool-call',
+							toolName: 'webSearch',
+							toolCallId: 'call_1',
+							input: { query: 'test' }
+						}
+					]
+				},
+				{
+					role: 'tool',
+					content: [
+						{
+							type: 'tool-result',
+							toolCallId: 'call_1',
+							toolName: 'webSearch',
+							output: {
+								type: 'json',
+								value: {
+									todaysDate: '2026-04-09T00:00:00.000Z',
+									results: [{ title: 'x', url: 'y' }]
+								}
+							}
+						}
+					]
+				}
 			]);
 		});
 	});

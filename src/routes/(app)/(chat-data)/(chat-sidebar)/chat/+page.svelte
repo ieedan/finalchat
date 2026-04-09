@@ -6,19 +6,8 @@
 	import { ChatAttachmentUploader } from '$lib/features/chat/chat-attachment-uploader.svelte.js';
 	import { PersistedState } from 'runed';
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
-	import * as Kbd from '$lib/components/ui/kbd';
-	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { FinalChat } from '$lib/components/logos';
-	import {
-		RiAlertLine as AlertIcon,
-		RiArrowRightLine as ArrowRightIcon,
-		RiChatNewLine as MessageSquarePlusIcon,
-		RiRobot2Line as RobotIcon,
-		RiLayoutLeftLine as PanelLeftIcon,
-		RiSendPlaneLine as SendIcon,
-		RiSearchLine as SearchIcon,
-		RiGithubLine as GithubLogo
-	} from 'remixicon-svelte';
+	import { RiAlertLine as AlertIcon, RiGithubLine as GithubLogo } from 'remixicon-svelte';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
 	import { cn } from '$lib/utils.js';
 	import { BASIC_MODELS } from '$lib/ai';
@@ -52,15 +41,6 @@
 
 	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
 
-	const shortcuts = $derived([
-		{ name: 'New Chat', keys: [cmdOrCtrl, '⇧', 'O'], icon: MessageSquarePlusIcon },
-		{ name: 'Model Picker', keys: [cmdOrCtrl, '⇧', 'M'], icon: RobotIcon },
-		{ name: 'Search', keys: [cmdOrCtrl, 'K'], icon: SearchIcon },
-		{ name: 'Go to Chat', keys: [cmdOrCtrl, 'G'], icon: ArrowRightIcon },
-		{ name: 'Sidebar', keys: [cmdOrCtrl, 'B'], icon: PanelLeftIcon },
-		{ name: 'Submit', keys: submitOnEnter ? ['Enter'] : [cmdOrCtrl, 'Enter'], icon: SendIcon }
-	]);
-
 	const mobileModels = $derived(
 		chatLayoutState.isAdvancedMode
 			? chatLayoutState.models.filter((model) =>
@@ -79,51 +59,37 @@
 	});
 </script>
 
-<div class="w-full h-full flex flex-col px-4 md:items-center md:justify-center md:gap-12">
+<div class="relative h-full w-full min-h-0 flex flex-col px-4">
+	<!-- Mobile logo (in flow + fixed centering); hidden on desktop — desktop uses absolute copy below -->
 	<div
 		class={cn(
 			'flex flex-col gap-8 flex-1 justify-center items-center',
-			// mobile
 			'fixed left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2',
-			// desktop
-			'md:flex-none md:static md:translate-0'
+			'md:hidden'
 		)}
 	>
 		<div class="flex w-full items-center flex-col justify-center">
 			<FinalChat class="size-20" />
 		</div>
-		{#if chatLayoutState.isAdvancedMode}
-			<div class="md:flex flex-col gap-0 w-full max-w-sm hidden">
-				{#each shortcuts as shortcut (shortcut.name)}
-					<div class="flex items-center justify-between gap-8 px-3 py-2.5 rounded-lg group">
-						<div class="flex items-center gap-3">
-							<div class="flex items-center justify-center size-5 rounded-xs bg-muted/50">
-								<shortcut.icon class="size-4 text-primary" />
-							</div>
-							<span class="text-sm font-medium text-muted-foreground">
-								{shortcut.name}
-							</span>
-						</div>
-						<Kbd.Group class="gap-1">
-							{#each shortcut.keys as key (key)}
-								<Kbd.Root class="rounded-xs">
-									{key}
-								</Kbd.Root>
-							{/each}
-						</Kbd.Group>
-					</div>
-				{/each}
-			</div>
-		{/if}
 	</div>
-	<div class="flex flex-col gap-4 w-full items-center pb-2 sm:pb-4 md:pb-0 mt-auto md:mt-0">
+
+	<!-- Desktop logo: above viewport center, does not affect composer centering -->
+	<div
+		class="pointer-events-none absolute top-1/2 left-1/2 z-10 hidden -translate-x-1/2 translate-y-[calc(-50%-10.5rem)] md:block"
+	>
+		<div class="pointer-events-auto flex flex-col items-center justify-center">
+			<FinalChat class="size-20" />
+		</div>
+	</div>
+
+	<div class="mt-auto flex w-full flex-col items-center gap-4 pb-2 sm:pb-4 md:hidden">
 		<!-- Mobile Prompt Input -->
 		<PromptInputMobile.Root
 			bind:modelId={modelId.current}
 			bind:reasoningEffort={reasoningEffort.current}
 			onSubmit={chatLayoutState.handleSubmit}
 			{submitOnEnter}
-			class="w-full max-w-2xl md:hidden"
+			class="w-full max-w-2xl"
 			optimisticClear={false}
 			onUpload={chatAttachmentUploader.uploadMany}
 			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
@@ -183,14 +149,16 @@
 
 			<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
 		</PromptInputMobile.Root>
+	</div>
 
-		<!-- Desktop Prompt Input -->
+	<!-- Desktop prompt: true viewport center (logo is positioned independently) -->
+	<div class="absolute top-1/2 left-4 right-4 z-10 hidden -translate-y-1/2 md:block">
 		<PromptInput.Root
 			bind:modelId={modelId.current}
 			bind:reasoningEffort={reasoningEffort.current}
 			onSubmit={chatLayoutState.handleSubmit}
 			{submitOnEnter}
-			class="w-full max-w-2xl hidden md:block"
+			class="mx-auto w-full max-w-2xl"
 			optimisticClear={false}
 			onUpload={chatAttachmentUploader.uploadMany}
 			onDeleteAttachment={chatAttachmentUploader.deleteAttachment}

@@ -39,10 +39,9 @@
 			bind:value={textareaState.rootState.opts.value.current}
 			bind:this={ref}
 			class={cn(
-				'p-3 outline-none resize-none disabled:cursor-not-allowed disabled:opacity-50',
+				'min-h-12 md:min-h-16 p-3 outline-none resize-none disabled:cursor-not-allowed disabled:opacity-50',
 				className
 			)}
-			style="height: 48px;"
 			{autofocus}
 			{...textareaProps}
 			{...textareaState.props}
