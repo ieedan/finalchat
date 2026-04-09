@@ -1,11 +1,16 @@
 import { ConvexError } from 'convex/values';
 import { z } from 'zod';
 import { tool } from 'ai';
+import type { ActionCtx } from './_generated/server';
+import { api } from './_generated/api';
+import type { Id } from './_generated/dataModel';
 
 export type ContextType = {
 	env: {
 		GITHUB_TOKEN: string | undefined;
 	};
+	ctx: ActionCtx;
+	chatId: Id<'chats'>;
 };
 
 export const fetchLinkContentTool = tool({
@@ -48,12 +53,12 @@ export const fetchLinkContentTool = tool({
 
 type CustomLinkHandler = {
 	matches: (link: string) => boolean;
-	handler: (link: string, opts?: { experimental_context: ContextType }) => Promise<string>;
+	handler: (link: string, opts: { experimental_context: ContextType }) => Promise<string>;
 };
 
 export const githubLinkHandler: CustomLinkHandler = {
 	matches: (link) => link.startsWith('https://github.com'),
-	handler: async (link, opts = { experimental_context: { env: { GITHUB_TOKEN: undefined } } }) => {
+	handler: async (link, opts) => {
 		const env = opts.experimental_context.env;
 		try {
 			const url = new URL(link);
@@ -241,3 +246,32 @@ export const svelteDevLinkHandler: CustomLinkHandler = {
 		}
 	}
 };
+
+export const chatSearchTool = tool({
+	description: 'Search previous chats with the user',
+	inputSchema: z.object({
+		query: z.string(),
+		excludeChatIds: z.optional(z.array(z.string()))
+	}),
+	execute: async ({ query, excludeChatIds }, { experimental_context }) => {
+		const context = experimental_context as ContextType;
+
+		const results = await context.ctx.runQuery(api.chats.search, {
+			query,
+			excludeChatIds: [context.chatId, ...(excludeChatIds ?? [])] as Id<'chats'>[]
+		});
+
+		return results;
+	}
+});
+
+export const getChat = tool({
+	description: 'Get a chat by its ID',
+	inputSchema: z.object({
+		chatId: z.string()
+	}),
+	execute: async ({ chatId }, { experimental_context }) => {
+		const context = experimental_context as ContextType;
+		return await context.ctx.runQuery(api.chats.get, { chatId: chatId as Id<'chats'> });
+	}
+});

@@ -22,7 +22,7 @@ import {
 	type MessageWithAttachments
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
-import { fetchLinkContentTool } from './ai.utils.js';
+import { chatSearchTool, fetchLinkContentTool, getChat } from './ai.utils.js';
 import {
 	createChunkAppender,
 	partsToModelMessage,
@@ -379,7 +379,9 @@ ${systemPrompt}
 					const agent = new ToolLoopAgent({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
 						tools: {
-							fetchLinkContent: fetchLinkContentTool
+							fetchLinkContent: fetchLinkContentTool,
+							chatSearch: chatSearchTool,
+							getChat: getChat
 						},
 						stopWhen: [
 							({ steps }) => {
@@ -389,7 +391,9 @@ ${systemPrompt}
 						experimental_context: {
 							env: {
 								GITHUB_TOKEN: env.GITHUB_TOKEN
-							}
+							},
+							ctx,
+							chatId: chat._id
 						} satisfies ContextType,
 						providerOptions
 					});

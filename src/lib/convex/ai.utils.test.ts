@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { githubLinkHandler, svelteDevLinkHandler } from './ai.utils.js';
+import type { ActionCtx } from './_generated/server';
+import type { Id } from './_generated/dataModel';
+import { githubLinkHandler, svelteDevLinkHandler, type ContextType } from './ai.utils.js';
+
+const testHandlerOpts: { experimental_context: ContextType } = {
+	experimental_context: {
+		env: { GITHUB_TOKEN: undefined },
+		ctx: {} as ActionCtx,
+		chatId: 'test_chat_id' as Id<'chats'>
+	}
+};
 
 // Store original fetch before any stubbing
 const originalFetch = typeof globalThis.fetch !== 'undefined' ? globalThis.fetch : undefined;
@@ -54,7 +64,10 @@ describe('githubLinkHandler', () => {
 					text: async () => mockReadmeContent
 				} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('# owner/repo');
 			expect(result).toContain('A test repository');
@@ -111,7 +124,10 @@ describe('githubLinkHandler', () => {
 					status: 404
 				} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('# owner/repo');
 			expect(result).toContain('No description');
@@ -127,7 +143,10 @@ describe('githubLinkHandler', () => {
 				statusText: 'Not Found'
 			} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('Error fetching repo: 404 Not Found');
 		});
@@ -157,7 +176,8 @@ describe('githubLinkHandler', () => {
 				} as Response);
 
 			const result = await githubLinkHandler.handler(
-				'https://github.com/owner/repo/blob/main/src/test.ts'
+				'https://github.com/owner/repo/blob/main/src/test.ts',
+				testHandlerOpts
 			);
 
 			expect(result).toContain('# test.ts');
@@ -200,7 +220,8 @@ describe('githubLinkHandler', () => {
 				} as Response);
 
 			const result = await githubLinkHandler.handler(
-				'https://github.com/owner/repo/blob/develop/src/lib/utils/file.js'
+				'https://github.com/owner/repo/blob/develop/src/lib/utils/file.js',
+				testHandlerOpts
 			);
 
 			expect(result).toContain('# file.js');
@@ -216,7 +237,8 @@ describe('githubLinkHandler', () => {
 			} as Response);
 
 			const result = await githubLinkHandler.handler(
-				'https://github.com/owner/repo/blob/main/src/test.ts'
+				'https://github.com/owner/repo/blob/main/src/test.ts',
+				testHandlerOpts
 			);
 
 			expect(result).toContain('Error fetching file: 404 Not Found');
@@ -244,7 +266,8 @@ describe('githubLinkHandler', () => {
 				} as Response);
 
 			const result = await githubLinkHandler.handler(
-				'https://github.com/owner/repo/blob/main/src/test.ts'
+				'https://github.com/owner/repo/blob/main/src/test.ts',
+				testHandlerOpts
 			);
 
 			expect(result).toContain('Error fetching file content: 404 Not Found');
@@ -262,7 +285,10 @@ describe('githubLinkHandler', () => {
 				json: async () => mockDirData
 			} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo/blob/main/src');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo/blob/main/src',
+				testHandlerOpts
+			);
 
 			expect(result).toBe('URL points to a directory, not a file');
 		});
@@ -315,7 +341,10 @@ describe('githubLinkHandler', () => {
 					json: async () => mockComments
 				} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo/issues/123');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo/issues/123',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('# Issue #123: Test Issue');
 			expect(result).toContain('**State:** open');
@@ -361,7 +390,10 @@ describe('githubLinkHandler', () => {
 					json: async () => []
 				} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo/issues/456');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo/issues/456',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('# Issue #456: Another Issue');
 			expect(result).toContain('**State:** closed');
@@ -377,7 +409,10 @@ describe('githubLinkHandler', () => {
 				statusText: 'Not Found'
 			} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo/issues/999');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo/issues/999',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('Error fetching issue: 404 Not Found');
 		});
@@ -427,7 +462,10 @@ describe('githubLinkHandler', () => {
 					json: async () => mockComments
 				} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo/pull/789');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo/pull/789',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('# Pull Request #789: Test PR');
 			expect(result).toContain('**State:** closed');
@@ -445,7 +483,10 @@ describe('githubLinkHandler', () => {
 				statusText: 'Not Found'
 			} as Response);
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo/pull/999');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo/pull/999',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('Error fetching PR: 404 Not Found');
 		});
@@ -453,13 +494,16 @@ describe('githubLinkHandler', () => {
 
 	describe('handler - error cases', () => {
 		it('should handle invalid URL (too short)', async () => {
-			const result = await githubLinkHandler.handler('https://github.com/owner');
+			const result = await githubLinkHandler.handler('https://github.com/owner', testHandlerOpts);
 
 			expect(result).toBe('Invalid GitHub URL: must include owner and repository name');
 		});
 
 		it('should handle unsupported URL format', async () => {
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo/wiki');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo/wiki',
+				testHandlerOpts
+			);
 
 			expect(result).toBe(
 				'Unsupported GitHub URL format. Supported: repo homepage, files, issues, and pull requests.'
@@ -469,13 +513,16 @@ describe('githubLinkHandler', () => {
 		it('should handle network errors', async () => {
 			vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'));
 
-			const result = await githubLinkHandler.handler('https://github.com/owner/repo');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/owner/repo',
+				testHandlerOpts
+			);
 
 			expect(result).toContain('Error processing GitHub link: Network error');
 		});
 
 		it('should handle invalid URL format', async () => {
-			const result = await githubLinkHandler.handler('not-a-valid-url');
+			const result = await githubLinkHandler.handler('not-a-valid-url', testHandlerOpts);
 
 			expect(result).toContain('Error processing GitHub link');
 		});
@@ -503,7 +550,10 @@ describe('githubLinkHandler', () => {
 				console.warn('Skipping integration test: fetch is not available');
 				return;
 			}
-			const result = await githubLinkHandler.handler('https://github.com/huntabyte/shadcn-svelte');
+			const result = await githubLinkHandler.handler(
+				'https://github.com/huntabyte/shadcn-svelte',
+				testHandlerOpts
+			);
 
 			// Check structure, not exact content
 			expect(result).toContain('# huntabyte/shadcn-svelte');
@@ -526,7 +576,8 @@ describe('githubLinkHandler', () => {
 				return;
 			}
 			const result = await githubLinkHandler.handler(
-				'https://github.com/huntabyte/shadcn-svelte/issues/2484'
+				'https://github.com/huntabyte/shadcn-svelte/issues/2484',
+				testHandlerOpts
 			);
 
 			// Check structure, not exact content
@@ -550,7 +601,8 @@ describe('githubLinkHandler', () => {
 				return;
 			}
 			const result = await githubLinkHandler.handler(
-				'https://github.com/huntabyte/shadcn-svelte/pull/2471'
+				'https://github.com/huntabyte/shadcn-svelte/pull/2471',
+				testHandlerOpts
 			);
 
 			// Check structure, not exact content
@@ -574,7 +626,8 @@ describe('githubLinkHandler', () => {
 				return;
 			}
 			const result = await githubLinkHandler.handler(
-				'https://github.com/huntabyte/shadcn-svelte/blob/main/CONTRIBUTING.md'
+				'https://github.com/huntabyte/shadcn-svelte/blob/main/CONTRIBUTING.md',
+				testHandlerOpts
 			);
 
 			// Check structure, not exact content
@@ -621,7 +674,8 @@ describe('githubLinkHandler', () => {
 				} as Response);
 
 				const result = await svelteDevLinkHandler.handler(
-					'https://svelte.dev/docs/kit/remote-functions'
+					'https://svelte.dev/docs/kit/remote-functions',
+					testHandlerOpts
 				);
 
 				expect(result).toBe(mockContent);
@@ -638,7 +692,8 @@ describe('githubLinkHandler', () => {
 				} as Response);
 
 				const result = await svelteDevLinkHandler.handler(
-					'https://svelte.dev/docs/kit/remote-functions/'
+					'https://svelte.dev/docs/kit/remote-functions/',
+					testHandlerOpts
 				);
 
 				expect(result).toBe(mockContent);
@@ -653,7 +708,8 @@ describe('githubLinkHandler', () => {
 				} as Response);
 
 				const result = await svelteDevLinkHandler.handler(
-					'https://svelte.dev/docs/kit/remote-functions'
+					'https://svelte.dev/docs/kit/remote-functions',
+					testHandlerOpts
 				);
 
 				expect(result).toContain('Error fetching llms.txt: 404 Not Found');
@@ -663,7 +719,8 @@ describe('githubLinkHandler', () => {
 				vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'));
 
 				const result = await svelteDevLinkHandler.handler(
-					'https://svelte.dev/docs/kit/remote-functions'
+					'https://svelte.dev/docs/kit/remote-functions',
+					testHandlerOpts
 				);
 
 				expect(result).toContain('Error processing Svelte.dev link: Network error');
@@ -691,7 +748,8 @@ describe('githubLinkHandler', () => {
 					return;
 				}
 				const result = await svelteDevLinkHandler.handler(
-					'https://svelte.dev/docs/kit/remote-functions'
+					'https://svelte.dev/docs/kit/remote-functions',
+					testHandlerOpts
 				);
 
 				// Should have some content (llms.txt is already formatted)

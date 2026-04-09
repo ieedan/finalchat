@@ -34,7 +34,8 @@ export const getAll = query({
 
 export const search = query({
 	args: {
-		query: v.string()
+		query: v.string(),
+		excludeChatIds: v.optional(v.array(v.id('chats')))
 	},
 	handler: async (
 		ctx,
@@ -71,7 +72,9 @@ export const search = query({
 				.collect()
 		]);
 
-		const allResults = [...chatResults, ...messageResults];
+		const allResults = [...chatResults, ...messageResults].filter(
+			(result) => !args.excludeChatIds?.includes('chatId' in result ? result.chatId : result._id)
+		);
 
 		allResults.forEach((result) => {
 			if ('chatId' in result) {
