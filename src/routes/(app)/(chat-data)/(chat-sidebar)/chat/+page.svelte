@@ -6,17 +6,9 @@
 	import { ChatAttachmentUploader } from '$lib/features/chat/chat-attachment-uploader.svelte.js';
 	import { PersistedState } from 'runed';
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
-	import * as Kbd from '$lib/components/ui/kbd';
-	import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
 	import { FinalChat } from '$lib/components/logos';
 	import {
 		RiAlertLine as AlertIcon,
-		RiArrowRightLine as ArrowRightIcon,
-		RiChatNewLine as MessageSquarePlusIcon,
-		RiRobot2Line as RobotIcon,
-		RiLayoutLeftLine as PanelLeftIcon,
-		RiSendPlaneLine as SendIcon,
-		RiSearchLine as SearchIcon,
 		RiGithubLine as GithubLogo
 	} from 'remixicon-svelte';
 	import * as PromptInputMobile from '$lib/features/chat/components/prompt-input-mobile';
@@ -52,15 +44,6 @@
 
 	const submitOnEnter = $derived(chatLayoutState.userSettingsQuery.data?.submitOnEnter ?? false);
 
-	const shortcuts = $derived([
-		{ name: 'New Chat', keys: [cmdOrCtrl, '⇧', 'O'], icon: MessageSquarePlusIcon },
-		{ name: 'Model Picker', keys: [cmdOrCtrl, '⇧', 'M'], icon: RobotIcon },
-		{ name: 'Search', keys: [cmdOrCtrl, 'K'], icon: SearchIcon },
-		{ name: 'Go to Chat', keys: [cmdOrCtrl, 'G'], icon: ArrowRightIcon },
-		{ name: 'Sidebar', keys: [cmdOrCtrl, 'B'], icon: PanelLeftIcon },
-		{ name: 'Submit', keys: submitOnEnter ? ['Enter'] : [cmdOrCtrl, 'Enter'], icon: SendIcon }
-	]);
-
 	const mobileModels = $derived(
 		chatLayoutState.isAdvancedMode
 			? chatLayoutState.models.filter((model) =>
@@ -92,29 +75,6 @@
 		<div class="flex w-full items-center flex-col justify-center">
 			<FinalChat class="size-20" />
 		</div>
-		{#if chatLayoutState.isAdvancedMode}
-			<div class="md:flex flex-col gap-0 w-full max-w-sm hidden">
-				{#each shortcuts as shortcut (shortcut.name)}
-					<div class="flex items-center justify-between gap-8 px-3 py-2.5 rounded-lg group">
-						<div class="flex items-center gap-3">
-							<div class="flex items-center justify-center size-5 rounded-xs bg-muted/50">
-								<shortcut.icon class="size-4 text-primary" />
-							</div>
-							<span class="text-sm font-medium text-muted-foreground">
-								{shortcut.name}
-							</span>
-						</div>
-						<Kbd.Group class="gap-1">
-							{#each shortcut.keys as key (key)}
-								<Kbd.Root class="rounded-xs">
-									{key}
-								</Kbd.Root>
-							{/each}
-						</Kbd.Group>
-					</div>
-				{/each}
-			</div>
-		{/if}
 	</div>
 	<div class="flex flex-col gap-4 w-full items-center pb-2 sm:pb-4 md:pb-0 mt-auto md:mt-0">
 		<!-- Mobile Prompt Input -->
