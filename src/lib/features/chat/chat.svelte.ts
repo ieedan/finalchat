@@ -58,6 +58,7 @@ class ChatLayoutState {
 		this.localApiKey = useLocalApiKey();
 
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleStop = this.handleStop.bind(this);
 	}
 
 	get isAdvancedMode() {
@@ -132,6 +133,13 @@ class ChatLayoutState {
 		return (
 			this.localApiKey.current ?? this.apiKeysQuery.current?.key ?? this.opts.apiKey?.key ?? null
 		);
+	}
+
+	async handleStop() {
+		if (!this.chatId) return;
+		await this.client.mutation(api.chats.stopGenerating, {
+			chatId: this.chatId
+		});
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments, reasoningEffort }) => {

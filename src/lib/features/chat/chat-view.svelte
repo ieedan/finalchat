@@ -217,6 +217,7 @@
 							autoScroll.scrollToBottom(false, 'instant');
 							return chatLayoutState.handleSubmit(opts);
 						}}
+						onStop={chatLayoutState.handleStop}
 						onUpload={chatAttachmentUploader.uploadMany}
 						onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
 						bind:attachments={attachmentsList.current}
@@ -289,6 +290,7 @@
 							autoScroll.scrollToBottom(false, 'instant');
 							return chatLayoutState.handleSubmit(opts);
 						}}
+						onStop={chatLayoutState.handleStop}
 						onUpload={chatAttachmentUploader.uploadMany}
 						onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
 						bind:attachments={attachmentsList.current}

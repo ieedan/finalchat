@@ -319,6 +319,47 @@ export const updateGenerating = internalMutation({
 	}
 });
 
+export const stopGenerating = mutation({
+	args: {
+		chatId: v.id('chats')
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new ConvexError('Unauthorized');
+
+		const chat = await ctx.db.get(args.chatId);
+		if (!chat || chat.userId !== user.subject)
+			throw new ConvexError('Chat not found or you are not authorized to access it');
+
+		if (!chat.generating) return;
+
+		await ctx.db.patch(args.chatId, {
+			stopRequested: true
+		});
+	}
+});
+
+export const isStopRequested = internalQuery({
+	args: {
+		chatId: v.id('chats')
+	},
+	handler: async (ctx, args): Promise<boolean> => {
+		const chat = await ctx.db.get(args.chatId);
+		return chat?.stopRequested ?? false;
+	}
+});
+
+export const clearStopRequested = internalMutation({
+	args: {
+		chatId: v.id('chats')
+	},
+	handler: async (ctx, args): Promise<void> => {
+		await ctx.db.patch(args.chatId, {
+			stopRequested: undefined
+		});
+	}
+});
+
 export const updateGeneratedTitle = internalMutation({
 	args: {
 		chatId: v.id('chats'),
