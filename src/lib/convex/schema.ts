@@ -86,6 +86,7 @@ export default defineSchema({
 	chats: defineTable({
 		generating: v.boolean(),
 		generatingTitle: v.optional(v.boolean()),
+		stopRequested: v.optional(v.boolean()),
 		userId: v.string(),
 		title: v.string(),
 		updatedAt: v.number(),

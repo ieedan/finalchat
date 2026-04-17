@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, type ButtonElementProps } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
-	import { RiSendPlaneLine as SendIcon } from 'remixicon-svelte';
+	import { RiSendPlaneLine as SendIcon, RiStopLargeLine as StopIcon } from 'remixicon-svelte';
 	import { usePromptInputSubmit } from '../prompt-input/prompt-input.svelte.js';
 	import { box } from 'svelte-toolbelt';
 
@@ -33,6 +33,8 @@
 >
 	{#if children}
 		{@render children()}
+	{:else if submitState.generating}
+		<StopIcon />
 	{:else if !submitState.rootState.loading}
 		<SendIcon class="group-data-[loading=true]:hidden" />
 	{/if}

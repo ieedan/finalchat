@@ -24,6 +24,7 @@ export type OnSubmit = (opts: {
 
 type PromptInputRootStateOptions = ReadableBoxedValues<{
 	onSubmit: OnSubmit;
+	onStop?: () => void | Promise<void>;
 	submitOnEnter?: boolean;
 	optimisticClear?: boolean;
 	generating: boolean;
@@ -123,6 +124,17 @@ class PromptInputRootState {
 			this.loading = false;
 		}
 	}
+
+	async stop() {
+		try {
+			await this.opts.onStop?.current?.();
+		} catch (error) {
+			this.error =
+				error instanceof Error
+					? error.message
+					: 'An unknown error occurred while trying to stop generation.';
+		}
+	}
 }
 
 type PromptInputTextareaStateOptions = ReadableBoxedValues<{
@@ -190,20 +202,31 @@ class PromptInputSubmitState {
 	) {}
 
 	onclick(e: Parameters<NonNullable<ButtonElementProps['onclick']>>[0]) {
-		this.rootState.submit(this.rootState.opts.value.current);
+		if (this.rootState.opts.generating.current) {
+			this.rootState.stop();
+		} else {
+			this.rootState.submit(this.rootState.opts.value.current);
+		}
 		this.opts.onclick?.current?.(e);
 	}
 
-	props = $derived.by(() => ({
-		onclick: this.onclick.bind(this),
-		disabled:
-			(this.rootState.opts.value.current.trim().length === 0 &&
-				!this.rootState.opts.generating.current) ||
-			this.rootState.uploadingAttachments.size > 0 ||
-			this.opts.disabled.current,
-		loading: this.rootState.loading,
-		'data-generating': this.rootState.opts.generating.current
-	}));
+	props = $derived.by(() => {
+		const generating = this.rootState.opts.generating.current;
+		return {
+			onclick: this.onclick.bind(this),
+			disabled:
+				(this.rootState.opts.value.current.trim().length === 0 && !generating) ||
+				this.rootState.uploadingAttachments.size > 0 ||
+				this.opts.disabled.current,
+			loading: this.rootState.loading && !generating,
+			'data-generating': generating,
+			'aria-label': generating ? 'Stop generation' : 'Send message'
+		};
+	});
+
+	get generating() {
+		return this.rootState.opts.generating.current;
+	}
 }
 
 type PromptInputBannerStateOptions = ReadableBoxedValues<{

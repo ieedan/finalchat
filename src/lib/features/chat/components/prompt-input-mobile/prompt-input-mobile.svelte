@@ -16,6 +16,7 @@
 		class: className,
 		children,
 		onSubmit,
+		onStop,
 		submitOnEnter = false,
 		optimisticClear = true,
 		value = $bindable(''),
@@ -28,6 +29,7 @@
 		...rest
 	}: HTMLAttributes<HTMLDivElement> & {
 		onSubmit: OnSubmit;
+		onStop?: () => void | Promise<void>;
 		onUpload: (files: File[]) => Promise<{ url: string; key: string; mediaType: string }[]>;
 		onDeleteAttachment: (key: string) => Promise<void>;
 		generating?: boolean;
@@ -44,6 +46,7 @@
 
 	const promptInputState = usePromptInput({
 		onSubmit: box.with(() => onSubmit),
+		onStop: box.with(() => onStop),
 		onUpload: box.with(() => onUpload),
 		onDeleteAttachment: box.with(() => onDeleteAttachment),
 		submitOnEnter: box.with(() => submitOnEnter),

@@ -383,6 +383,33 @@ ${systemPrompt}
 							}
 						: undefined;
 
+				let wasStopped = false;
+				let stopPollActive = true;
+
+				// Poll for stop requests in the background so the chunk loop below never
+				// has to wait on a database roundtrip. On stop, we flip a flag that the
+				// chunk loop checks; we deliberately don't abort the AI SDK stream because
+				// doing so rejects its internal promises in ways that conflict with the
+				// persistent-text-streaming library's writer cleanup.
+				const stopPoller = (async () => {
+					const intervalMs = 500;
+					while (stopPollActive) {
+						await new Promise((resolve) => setTimeout(resolve, intervalMs));
+						if (!stopPollActive) return;
+						try {
+							const stopRequested = await ctx.runQuery(internal.chats.isStopRequested, {
+								chatId
+							});
+							if (stopRequested) {
+								wasStopped = true;
+								return;
+							}
+						} catch {
+							// Transient query failure — try again on the next tick.
+						}
+					}
+				})();
+
 				if (last.userMessage.chatSettings.supportedParameters?.includes('tools')) {
 					const agent = new ToolLoopAgent({
 						model: openrouter.chat(last.userMessage.chatSettings.modelId),
@@ -434,6 +461,8 @@ ${systemPrompt}
 				const uploadPromises: Promise<void>[] = [];
 
 				for await (const chunk of fullStream) {
+					if (wasStopped) break;
+
 					if (chunk.type === 'text-delta') {
 						openRouterGenId = chunk.id;
 						appender.append({ type: 'text', text: chunk.text });
@@ -478,25 +507,41 @@ ${systemPrompt}
 					}
 				}
 
-				const usage = await totalUsage;
+				// Let the background poller exit.
+				stopPollActive = false;
+				await stopPoller;
 
-				// wait for uploads to complete
+				// Only await usage when the stream completed naturally — the promise
+				// never resolves once we've broken out early.
+				let usage: Awaited<typeof totalUsage> | null = null;
+				if (!wasStopped) {
+					usage = await totalUsage;
+				}
+
 				if (uploadPromises.length > 0) {
 					await Promise.all(uploadPromises);
 				}
 
-				const repackedContent = repackStream(content).expect('Failed to repack stream');
+				// If the stream was aborted before any content was emitted, `content` is
+				// empty and the protocol-versioned repack will fail — fall back to empty
+				// so we still clear `generating` on the chat.
+				const repackResult = content.length > 0 ? repackStream(content) : null;
+				const repackedContent = repackResult?.isOk() ? repackResult.value : '';
 
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
 					content: repackedContent,
 					meta: {
 						generationId: openRouterGenId,
-						tokenUsage: usage.totalTokens,
-						outputTokens: usage.outputTokens,
-						inputTokens: usage.inputTokens
+						tokenUsage: usage?.totalTokens,
+						outputTokens: usage?.outputTokens,
+						inputTokens: usage?.inputTokens
 					}
 				});
+
+				if (wasStopped) {
+					await ctx.runMutation(internal.chats.clearStopRequested, { chatId });
+				}
 
 				if (openRouterGenId) {
 					// we wait long enough for the gen to propagate to openrouter
@@ -614,7 +659,8 @@ export const startGenerating = internalMutation({
 				}
 			}),
 			ctx.db.patch(message.chatId, {
-				generating: true
+				generating: true,
+				stopRequested: undefined
 			})
 		]);
 	}
