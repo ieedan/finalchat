@@ -28,6 +28,7 @@ type PromptInputRootStateOptions = ReadableBoxedValues<{
 	submitOnEnter?: boolean;
 	optimisticClear?: boolean;
 	generating: boolean;
+	cancelling?: boolean;
 	onUpload: (files: File[]) => Promise<{ url: string; key: string; mediaType: string }[]>;
 	onDeleteAttachment: (key: string) => Promise<void>;
 }> &
@@ -41,6 +42,7 @@ type PromptInputRootStateOptions = ReadableBoxedValues<{
 class PromptInputRootState {
 	loading = $state(false);
 	error = $state<string | null>(null);
+	optimisticCancelling = $state(false);
 	uploadingAttachments: Map<string, File> = new SvelteMap();
 	textAreaRef = $state<HTMLTextAreaElement | null>(null);
 	isMobile: IsMobile;
@@ -48,6 +50,20 @@ class PromptInputRootState {
 	constructor(readonly opts: PromptInputRootStateOptions) {
 		this.onUpload = this.onUpload.bind(this);
 		this.isMobile = new IsMobile();
+
+		watch(
+			() => this.opts.generating.current,
+			(generating) => {
+				if (!generating) this.optimisticCancelling = false;
+			}
+		);
+	}
+
+	get cancelling() {
+		return (
+			this.opts.generating.current &&
+			(this.optimisticCancelling || (this.opts.cancelling?.current ?? false))
+		);
 	}
 
 	async onUpload(files: File[]) {
@@ -127,8 +143,10 @@ class PromptInputRootState {
 
 	async stop() {
 		try {
+			this.optimisticCancelling = true;
 			await this.opts.onStop?.current?.();
 		} catch (error) {
+			this.optimisticCancelling = false;
 			this.error =
 				error instanceof Error
 					? error.message
@@ -202,6 +220,7 @@ class PromptInputSubmitState {
 	) {}
 
 	onclick(e: Parameters<NonNullable<ButtonElementProps['onclick']>>[0]) {
+		if (this.rootState.cancelling) return;
 		if (this.rootState.opts.generating.current) {
 			this.rootState.stop();
 		} else {
@@ -212,20 +231,31 @@ class PromptInputSubmitState {
 
 	props = $derived.by(() => {
 		const generating = this.rootState.opts.generating.current;
+		const cancelling = this.rootState.cancelling;
 		return {
 			onclick: this.onclick.bind(this),
 			disabled:
 				(this.rootState.opts.value.current.trim().length === 0 && !generating) ||
 				this.rootState.uploadingAttachments.size > 0 ||
+				cancelling ||
 				this.opts.disabled.current,
 			loading: this.rootState.loading && !generating,
 			'data-generating': generating,
-			'aria-label': generating ? 'Stop generation' : 'Send message'
+			'data-cancelling': cancelling,
+			'aria-label': cancelling
+				? 'Cancelling generation'
+				: generating
+					? 'Stop generation'
+					: 'Send message'
 		};
 	});
 
 	get generating() {
 		return this.rootState.opts.generating.current;
+	}
+
+	get cancelling() {
+		return this.rootState.cancelling;
 	}
 }
 

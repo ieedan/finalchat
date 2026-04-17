@@ -27,6 +27,7 @@
 		modelId = $bindable(null),
 		reasoningEffort = $bindable('default'),
 		generating = false,
+		cancelling = false,
 		onUpload,
 		onDeleteAttachment,
 		attachments = $bindable([]),
@@ -37,6 +38,7 @@
 		onUpload: (files: File[]) => Promise<{ url: string; key: string; mediaType: string }[]>;
 		onDeleteAttachment: (key: string) => Promise<void>;
 		generating?: boolean;
+		cancelling?: boolean;
 		/**
 		 * Whether to submit the form on enter. Otherwise the form will be submitted on Ctrl/Cmd+Enter.
 		 */
@@ -55,6 +57,7 @@
 		onDeleteAttachment: box.with(() => onDeleteAttachment),
 		submitOnEnter: box.with(() => submitOnEnter),
 		generating: box.with(() => generating),
+		cancelling: box.with(() => cancelling),
 		value: box.with(
 			() => value,
 			(v) => (value = v)

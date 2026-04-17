@@ -212,6 +212,7 @@
 						bind:modelId={modelId.current}
 						bind:reasoningEffort={reasoningEffort.current}
 						generating={chatViewState.chatQuery.data?.generating}
+						cancelling={chatViewState.chatQuery.data?.stopRequested}
 						{submitOnEnter}
 						onSubmit={(opts) => {
 							autoScroll.scrollToBottom(false, 'instant');
@@ -285,6 +286,7 @@
 						bind:modelId={modelId.current}
 						bind:reasoningEffort={reasoningEffort.current}
 						generating={chatViewState.chatQuery.data?.generating}
+						cancelling={chatViewState.chatQuery.data?.stopRequested}
 						{submitOnEnter}
 						onSubmit={(opts) => {
 							autoScroll.scrollToBottom(false, 'instant');

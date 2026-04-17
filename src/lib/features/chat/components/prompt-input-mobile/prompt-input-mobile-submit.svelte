@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button, type ButtonElementProps } from '$lib/components/ui/button';
+	import { Spinner } from '$lib/components/ui/spinner';
 	import { cn } from '$lib/utils';
 	import { RiSendPlaneLine as SendIcon, RiStopLargeLine as StopIcon } from 'remixicon-svelte';
 	import { usePromptInputSubmit } from '../prompt-input/prompt-input.svelte.js';
@@ -33,6 +34,9 @@
 >
 	{#if children}
 		{@render children()}
+	{:else if submitState.cancelling}
+		<Spinner />
+		<span class="sr-only">Cancelling</span>
 	{:else if submitState.generating}
 		<StopIcon />
 	{:else if !submitState.rootState.loading}
