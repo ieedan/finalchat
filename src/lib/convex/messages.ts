@@ -212,8 +212,7 @@ export const editMessage = mutation({
 
 		const sourceMessage = await ctx.db.get(args.messageId);
 		if (!sourceMessage) throw new ConvexError('Message not found');
-		if (sourceMessage.role !== 'user')
-			throw new ConvexError('Only user messages can be edited');
+		if (sourceMessage.role !== 'user') throw new ConvexError('Only user messages can be edited');
 		if (sourceMessage.userId !== user.subject) throw new ConvexError('Unauthorized');
 
 		const chat = await ctx.db.get(sourceMessage.chatId);
