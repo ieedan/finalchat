@@ -34,9 +34,16 @@
 		createdMessages: Set<Id<'messages'>> | null;
 		apiKey: string | null;
 		systemPrompt: string | null;
+		onBeforeEditSubmit?: () => void;
 	};
 
-	let { message, createdMessages = $bindable(null), apiKey, systemPrompt }: Props = $props();
+	let {
+		message,
+		createdMessages = $bindable(null),
+		apiKey,
+		systemPrompt,
+		onBeforeEditSubmit
+	}: Props = $props();
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -113,6 +120,7 @@
 			initialModelId={(message.chatSettings.modelId as typeof modelIdCtx.current) ??
 				modelIdCtx.current}
 			initialReasoningEffort={message.chatSettings.reasoningEffort ?? reasoningEffortCtx.current}
+			onBeforeSubmit={onBeforeEditSubmit}
 			onDone={() => (editing = false)}
 		/>
 	{:else}

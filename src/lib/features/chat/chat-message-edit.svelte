@@ -21,6 +21,7 @@
 		initialModelId: ModelId | null;
 		initialReasoningEffort: ReasoningEffort;
 		onDone: () => void;
+		onBeforeSubmit?: () => void;
 	};
 
 	let {
@@ -29,7 +30,8 @@
 		initialAttachments,
 		initialModelId,
 		initialReasoningEffort,
-		onDone
+		onDone,
+		onBeforeSubmit
 	}: Props = $props();
 
 	const chatLayoutState = useChatLayout();
@@ -57,52 +59,55 @@
 		attachments: ChatPromptAttachment[];
 		reasoningEffort: ReasoningEffort;
 	}) {
+		onBeforeSubmit?.();
 		await chatLayoutState.handleEdit(messageId, opts);
 		onDone();
 	}
 </script>
 
-<PromptInput.Root
-	bind:value
-	bind:modelId
-	bind:reasoningEffort
-	bind:attachments
-	{submitOnEnter}
-	optimisticClear={false}
-	onSubmit={handleSubmit}
-	onUpload={uploader.uploadMany}
-	onDeleteAttachment={uploader.deleteAttachment}
-	class="group/prompt-input w-full"
->
-	<PromptInput.Banner dismissedByError={false} dismissed={!showImageUnsupportedBanner}>
-		<PromptInput.BannerContent>
-			<div class="flex items-center gap-2">
-				<AlertIcon class="size-4 text-destructive shrink-0" />
-				<p class="text-sm text-destructive">
-					This model doesn't support images. Remove attachments or switch models to avoid errors.
-				</p>
-			</div>
-		</PromptInput.BannerContent>
-	</PromptInput.Banner>
-	<PromptInput.Content>
-		<PromptInput.AttachmentList />
-		<PromptInput.Textarea placeholder="Edit your message..." />
-		<PromptInput.Footer class="justify-between">
-			<div class="flex items-center gap-2">
-				{#if chatLayoutState.isAdvancedMode}
-					<ModelPickerAdvanced />
-				{:else}
-					<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
-				{/if}
-				<PromptInput.AttachmentButton />
-				{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
-					<ReasoningEffortPicker />
-				{/if}
-			</div>
-			<div class="flex items-center gap-2">
-				<Button variant="ghost" size="sm" onclick={onDone}>Cancel</Button>
-				<PromptInput.Submit />
-			</div>
-		</PromptInput.Footer>
-	</PromptInput.Content>
-</PromptInput.Root>
+<div class="has-[[data-slot=prompt-input-banner][data-state=open]]:pt-8 transition-[padding]">
+	<PromptInput.Root
+		bind:value
+		bind:modelId
+		bind:reasoningEffort
+		bind:attachments
+		{submitOnEnter}
+		optimisticClear={false}
+		onSubmit={handleSubmit}
+		onUpload={uploader.uploadMany}
+		onDeleteAttachment={uploader.deleteAttachment}
+		class="group/prompt-input w-full"
+	>
+		<PromptInput.Banner dismissedByError={false} dismissed={!showImageUnsupportedBanner}>
+			<PromptInput.BannerContent>
+				<div class="flex items-center gap-2">
+					<AlertIcon class="size-4 text-destructive shrink-0" />
+					<p class="text-sm text-destructive">
+						This model doesn't support images. Remove attachments or switch models to avoid errors.
+					</p>
+				</div>
+			</PromptInput.BannerContent>
+		</PromptInput.Banner>
+		<PromptInput.Content>
+			<PromptInput.AttachmentList />
+			<PromptInput.Textarea placeholder="Edit your message..." />
+			<PromptInput.Footer class="justify-between">
+				<div class="flex items-center gap-2">
+					{#if chatLayoutState.isAdvancedMode}
+						<ModelPickerAdvanced />
+					{:else}
+						<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
+					{/if}
+					<PromptInput.AttachmentButton />
+					{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
+						<ReasoningEffortPicker />
+					{/if}
+				</div>
+				<div class="flex items-center gap-2">
+					<Button variant="ghost" size="sm" onclick={onDone}>Cancel</Button>
+					<PromptInput.Submit />
+				</div>
+			</PromptInput.Footer>
+		</PromptInput.Content>
+	</PromptInput.Root>
+</div>
