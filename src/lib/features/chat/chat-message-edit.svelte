@@ -9,7 +9,8 @@
 	import {
 		RiAlertLine as AlertIcon,
 		RiSendPlaneLine as SendIcon,
-		RiGitBranchLine as SplitIcon
+		RiGitBranchLine as SplitIcon,
+		RiCheckLine as CheckIcon
 	} from 'remixicon-svelte';
 	import { useChatLayout } from './chat.svelte.js';
 	import type { Id } from '$lib/convex/_generated/dataModel';
@@ -66,13 +67,10 @@
 		attachments: ChatPromptAttachment[];
 		reasoningEffort: ReasoningEffort;
 	}) {
-		const intent = submitIntent;
-		// reset intent so future Enter-key submits default to 'edit'
-		submitIntent = 'edit';
-		if (intent !== 'branch') onBeforeSubmit?.();
-		if (intent === 'branch') {
+		if (submitIntent === 'branch') {
 			await chatLayoutState.handleBranchEdit(messageId, opts);
 		} else {
+			onBeforeSubmit?.();
 			await chatLayoutState.handleEdit(messageId, opts);
 		}
 		onDone();
@@ -119,27 +117,30 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<Button variant="ghost" onclick={onDone}>Cancel</Button>
-					<PromptInput.SplitSubmit>
-						{#snippet children({ submit })}
-							<SplitButton.Item
-								onSelect={() => {
-									submitIntent = 'branch';
-									submit();
-								}}
-							>
+					<PromptInput.SplitSubmit
+						aria-label={submitIntent === 'branch' ? 'Branch and send' : 'Send message'}
+					>
+						{#snippet primaryIcon()}
+							{#if submitIntent === 'branch'}
 								<SplitIcon />
-								Branch and send
-							</SplitButton.Item>
-							<SplitButton.Item
-								onSelect={() => {
-									submitIntent = 'edit';
-									submit();
-								}}
-							>
+							{:else}
 								<SendIcon />
-								Send
-							</SplitButton.Item>
+							{/if}
 						{/snippet}
+						<SplitButton.Item onSelect={() => (submitIntent = 'edit')}>
+							<SendIcon />
+							<span class="flex-1">Send</span>
+							{#if submitIntent === 'edit'}
+								<CheckIcon class="size-4" />
+							{/if}
+						</SplitButton.Item>
+						<SplitButton.Item onSelect={() => (submitIntent = 'branch')}>
+							<SplitIcon />
+							<span class="flex-1">Branch and send</span>
+							{#if submitIntent === 'branch'}
+								<CheckIcon class="size-4" />
+							{/if}
+						</SplitButton.Item>
 					</PromptInput.SplitSubmit>
 				</div>
 			</PromptInput.Footer>

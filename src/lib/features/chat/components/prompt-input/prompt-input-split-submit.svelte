@@ -12,7 +12,8 @@
 	import type { Snippet } from 'svelte';
 
 	type Props = Omit<ButtonElementProps, 'loading' | 'children'> & {
-		children?: Snippet<[{ submit: () => Promise<void> }]>;
+		children?: Snippet;
+		primaryIcon?: Snippet;
 		menuAriaLabel?: string;
 	};
 
@@ -22,6 +23,7 @@
 		disabled,
 		onclick,
 		children,
+		primaryIcon,
 		menuAriaLabel = 'More send options',
 		...rest
 	}: Props = $props();
@@ -30,10 +32,6 @@
 		disabled: box.with(() => disabled),
 		onclick: box.with(() => onclick)
 	});
-
-	async function submit() {
-		await submitState.rootState.submit(submitState.rootState.opts.value.current);
-	}
 </script>
 
 <SplitButton.Root>
@@ -47,7 +45,11 @@
 		{#if submitState.generating}
 			<StopIcon />
 		{:else if !submitState.rootState.loading}
-			<SendIcon class="group-data-[loading=true]:hidden" />
+			{#if primaryIcon}
+				{@render primaryIcon()}
+			{:else}
+				<SendIcon class="group-data-[loading=true]:hidden" />
+			{/if}
 		{/if}
 	</Button>
 	<SplitButton.Trigger
@@ -59,6 +61,6 @@
 		<ChevronDownIcon />
 	</SplitButton.Trigger>
 	<SplitButton.Content align="end" side="top">
-		{@render children?.({ submit })}
+		{@render children?.()}
 	</SplitButton.Content>
 </SplitButton.Root>
