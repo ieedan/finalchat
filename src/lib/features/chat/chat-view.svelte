@@ -193,6 +193,7 @@
 							{message}
 							apiKey={chatLayoutState.apiKey}
 							systemPrompt={chatLayoutState.userSettingsQuery.data?.systemPrompt ?? null}
+							onBeforeEditSubmit={() => autoScroll.scrollToBottom(false, 'instant')}
 							bind:createdMessages={chatLayoutState.createdMessages}
 						/>
 					{/each}

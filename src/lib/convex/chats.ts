@@ -383,7 +383,18 @@ export const branchFromMessage = mutation({
 				supportedParameters: v.array(v.string()),
 				inputModalities: v.array(v.string()),
 				outputModalities: v.array(v.string()),
-				reasoningEffort: v.optional(ReasoningEffort)
+				reasoningEffort: v.optional(ReasoningEffort),
+				content: v.optional(v.string()),
+				attachments: v.optional(
+					v.array(
+						v.object({
+							url: v.string(),
+							key: v.string(),
+							mediaType: v.string(),
+							fileName: v.optional(v.string())
+						})
+					)
+				)
 			}),
 			v.object({
 				_id: v.id('messages'),
@@ -439,6 +450,8 @@ export const branchFromMessage = mutation({
 		// copy over the messages with attachments
 		await Promise.all(
 			messages.map(async (m, i) => {
+				const isEditedLastUserMessage =
+					m._id === args.message._id && args.message.role === 'user' && i === messages.length - 1;
 				const ogAttachments = relatedAttachments.filter((a) => a.messageId === m._id);
 				let newMessageId: Id<'messages'>;
 				if (m.role === 'user') {
@@ -446,12 +459,15 @@ export const branchFromMessage = mutation({
 						userId: user.subject,
 						role: 'user',
 						chatId: newChatId,
-						content: m.content,
+						content:
+							isEditedLastUserMessage &&
+							args.message.role === 'user' &&
+							args.message.content !== undefined
+								? args.message.content
+								: m.content,
 						chatSettings:
 							// only override the chat settings for the last user message
-							m._id === args.message._id &&
-							args.message.role === 'user' &&
-							i === messages.length - 1
+							isEditedLastUserMessage && args.message.role === 'user'
 								? {
 										modelId: args.message.modelId,
 										supportedParameters: args.message.supportedParameters,
@@ -472,19 +488,40 @@ export const branchFromMessage = mutation({
 						error: m.error
 					});
 				}
-				// copy over attachments
-				await Promise.all(
-					ogAttachments.map((a) =>
-						ctx.db.insert('chatAttachments', {
-							messageId: newMessageId,
-							chatId: newChatId,
-							userId: user.subject,
-							key: a.key,
-							mediaType: a.mediaType,
-							...(a.fileName !== undefined ? { fileName: a.fileName } : {})
-						})
-					)
-				);
+
+				// If this is the edited last user message and the caller supplied new
+				// attachments, use those instead of the original message's attachments.
+				if (
+					isEditedLastUserMessage &&
+					args.message.role === 'user' &&
+					args.message.attachments !== undefined
+				) {
+					await Promise.all(
+						args.message.attachments.map((a) =>
+							ctx.db.insert('chatAttachments', {
+								messageId: newMessageId,
+								chatId: newChatId,
+								userId: user.subject,
+								key: a.key,
+								mediaType: a.mediaType,
+								...(a.fileName !== undefined ? { fileName: a.fileName } : {})
+							})
+						)
+					);
+				} else {
+					await Promise.all(
+						ogAttachments.map((a) =>
+							ctx.db.insert('chatAttachments', {
+								messageId: newMessageId,
+								chatId: newChatId,
+								userId: user.subject,
+								key: a.key,
+								mediaType: a.mediaType,
+								...(a.fileName !== undefined ? { fileName: a.fileName } : {})
+							})
+						)
+					);
+				}
 			})
 		);
 

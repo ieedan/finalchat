@@ -13,6 +13,11 @@
 	import { useMedia } from '$lib/hooks/use-media.svelte';
 	import ChatAttachmentDisplay from './chat-attachment-display.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { Button } from '$lib/components/ui/button';
+	import { RiPencilLine as PencilIcon } from 'remixicon-svelte';
+	import { useChatLayout, useChatView } from './chat.svelte.js';
+	import ChatMessageEdit from './chat-message-edit.svelte';
+	import { ModelIdCtx, ReasoningEffortCtx } from '$lib/context.svelte.js';
 
 	const chatMessageVariants = tv({
 		base: 'rounded-lg max-w-full w-fit group/message',
@@ -29,9 +34,31 @@
 		createdMessages: Set<Id<'messages'>> | null;
 		apiKey: string | null;
 		systemPrompt: string | null;
+		onBeforeEditSubmit?: () => void;
 	};
 
-	let { message, createdMessages = $bindable(null), apiKey, systemPrompt }: Props = $props();
+	let {
+		message,
+		createdMessages = $bindable(null),
+		apiKey,
+		systemPrompt,
+		onBeforeEditSubmit
+	}: Props = $props();
+
+	const chatLayoutState = useChatLayout();
+	const chatViewState = useChatView();
+
+	const modelIdCtx = ModelIdCtx.get();
+	const reasoningEffortCtx = ReasoningEffortCtx.get();
+
+	let editing = $state(false);
+
+	const canEdit = $derived(
+		message.role === 'user' &&
+			chatLayoutState.user !== null &&
+			message.userId === chatLayoutState.user.id &&
+			!chatViewState.chat?.generating
+	);
 
 	// this is weird but basically we only care if we transition to a driven state not if we transition out of it
 	let driven = $state(false);
@@ -67,11 +94,11 @@
 
 <div
 	class={cn('flex flex-col gap-1 max-w-full w-full group/message-container', {
-		'self-end': message.role === 'user',
-		'self-start': message.role === 'assistant'
+		'self-end': message.role === 'user' && !editing,
+		'self-start': message.role === 'assistant' || editing
 	})}
 >
-	{#if message.role === 'user'}
+	{#if message.role === 'user' && !editing}
 		{#if message.attachments}
 			<div class="w-full justify-end flex items-center gap-2">
 				{#each message.attachments as attachment (attachment.key)}
@@ -80,22 +107,40 @@
 			</div>
 		{/if}
 	{/if}
-	<div data-message-role={message.role} class={chatMessageVariants({ role: message.role })}>
-		{#if message.role === 'assistant'}
-			{#if message.content !== undefined}
-				<ChatAssistantMessage {message} animationEnabled={false} />
-			{:else if message.error}
-				<span class="text-destructive">{message.error}</span>
+	{#if editing && message.role === 'user'}
+		<ChatMessageEdit
+			messageId={message._id}
+			initialContent={message.content}
+			initialAttachments={message.attachments.map((a) => ({
+				url: a.url,
+				key: a.key,
+				mediaType: a.mediaType,
+				fileName: a.fileName
+			}))}
+			initialModelId={(message.chatSettings.modelId as typeof modelIdCtx.current) ??
+				modelIdCtx.current}
+			initialReasoningEffort={message.chatSettings.reasoningEffort ?? reasoningEffortCtx.current}
+			onBeforeSubmit={onBeforeEditSubmit}
+			onDone={() => (editing = false)}
+		/>
+	{:else}
+		<div data-message-role={message.role} class={chatMessageVariants({ role: message.role })}>
+			{#if message.role === 'assistant'}
+				{#if message.content !== undefined}
+					<ChatAssistantMessage {message} animationEnabled={false} />
+				{:else if message.error}
+					<span class="text-destructive">{message.error}</span>
+				{:else}
+					{#key createdMessages?.has(message._id)}
+						<ChatStreamedContent {message} {driven} {apiKey} {systemPrompt} />
+					{/key}
+				{/if}
 			{:else}
-				{#key createdMessages?.has(message._id)}
-					<ChatStreamedContent {message} {driven} {apiKey} {systemPrompt} />
-				{/key}
+				<Streamdown content={message.content} animationEnabled={false} />
 			{/if}
-		{:else}
-			<Streamdown content={message.content} animationEnabled={false} />
-		{/if}
-	</div>
-	{#if message.content !== undefined}
+		</div>
+	{/if}
+	{#if message.content !== undefined && !editing}
 		<div
 			class="justify-between w-full group-hover/message-container:opacity-100 md:opacity-0 flex items-center gap-1 transition-opacity duration-200"
 		>
@@ -128,6 +173,23 @@
 				{/if}
 			</div>
 			<div class="flex items-center gap-1">
+				{#if canEdit}
+					<Tooltip.Provider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>
+								<Button
+									variant="ghost"
+									size="icon"
+									onclick={() => (editing = true)}
+									aria-label="Edit message"
+								>
+									<PencilIcon />
+								</Button>
+							</Tooltip.Trigger>
+							<Tooltip.Content>Edit message</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
+				{/if}
 				<ChatBranchButton {message} bind:createdMessages />
 				{#if message.content}
 					<Tooltip.Provider>

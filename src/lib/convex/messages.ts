@@ -195,6 +195,126 @@ export const create = mutation({
 	}
 });
 
+export const editMessage = mutation({
+	args: {
+		messageId: v.id('messages'),
+		prompt: Prompt,
+		apiKey: v.string()
+	},
+	handler: async (
+		ctx,
+		args
+	): Promise<{
+		assistantMessageId: Id<'messages'>;
+	}> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new ConvexError('Unauthorized');
+
+		const sourceMessage = await ctx.db.get(args.messageId);
+		if (!sourceMessage) throw new ConvexError('Message not found');
+		if (sourceMessage.role !== 'user') throw new ConvexError('Only user messages can be edited');
+		if (sourceMessage.userId !== user.subject) throw new ConvexError('Unauthorized');
+
+		const chat = await ctx.db.get(sourceMessage.chatId);
+		if (!chat) throw new ConvexError('Chat not found');
+		if (chat.userId !== user.subject) throw new ConvexError('Unauthorized');
+		if (chat.generating)
+			throw new ConvexError('Stop the current response before editing a message');
+
+		const isFreeUser = args.apiKey.trim() === '';
+
+		if (isFreeUser && !args.prompt.modelId.endsWith(':free')) {
+			throw new ConvexError('API key is required for non-free models');
+		}
+
+		if (isFreeUser) {
+			const status = await rateLimiter.limit(ctx, 'freeMessages', { key: user.subject });
+			if (!status.ok) {
+				throw new ConvexError(
+					`Rate limit exceeded. Try again in ${formatTimeUntil(status.retryAfter)}`
+				);
+			}
+		}
+
+		const allMessages = await ctx.db
+			.query('messages')
+			.withIndex('by_chat', (q) => q.eq('chatId', sourceMessage.chatId))
+			.collect();
+
+		// delete everything after the edited message (and the old attachments for it)
+		const messagesToRemove = allMessages.filter(
+			(m) => m._creationTime > sourceMessage._creationTime
+		);
+
+		for (const m of messagesToRemove) {
+			const attachments = await ctx.db
+				.query('chatAttachments')
+				.withIndex('by_message', (q) => q.eq('messageId', m._id))
+				.collect();
+			for (const a of attachments) {
+				await ctx.db.delete(a._id);
+			}
+			await ctx.db.delete(m._id);
+		}
+
+		// replace attachments for the edited message
+		const existingAttachments = await ctx.db
+			.query('chatAttachments')
+			.withIndex('by_message', (q) => q.eq('messageId', args.messageId))
+			.collect();
+		for (const a of existingAttachments) {
+			await ctx.db.delete(a._id);
+		}
+
+		await ctx.db.patch(args.messageId, {
+			content: args.prompt.input,
+			chatSettings: {
+				modelId: args.prompt.modelId,
+				supportedParameters: args.prompt.supportedParameters,
+				inputModalities: args.prompt.inputModalities,
+				outputModalities: args.prompt.outputModalities,
+				reasoningEffort: args.prompt.reasoningEffort
+			}
+		});
+
+		if (args.prompt.attachments && args.prompt.attachments.length > 0) {
+			await Promise.all(
+				args.prompt.attachments.map(async (attachment) => {
+					await ctx.runMutation(internal.chatAttachments.create, {
+						chatId: sourceMessage.chatId,
+						messageId: args.messageId,
+						key: attachment.key,
+						userId: user.subject,
+						mediaType: attachment.mediaType,
+						fileName: attachment.fileName
+					});
+				})
+			);
+		}
+
+		const isImageModel =
+			args.prompt.outputModalities.length === 1 && args.prompt.outputModalities[0] === 'image';
+
+		const streamId = await persistentTextStreaming.createStream(ctx);
+		const assistantMessageId = await ctx.db.insert('messages', {
+			chatId: sourceMessage.chatId,
+			userId: user.subject,
+			role: 'assistant',
+			streamId,
+			meta: {
+				modelId: args.prompt.modelId,
+				imageGen: isImageModel
+			}
+		});
+
+		await ctx.db.patch(sourceMessage.chatId, {
+			updatedAt: Date.now()
+		});
+
+		return { assistantMessageId };
+	}
+});
+
 export const getChatBody = query({
 	args: {
 		streamId: StreamIdValidator

@@ -2,7 +2,11 @@ import { useQueryWithFallback, type Query } from '$lib/convex.svelte';
 import { api } from '$lib/convex/_generated/api';
 import type { Doc, Id } from '$lib/convex/_generated/dataModel';
 import type { User } from '@workos-inc/node';
-import type { OnSubmit } from './components/prompt-input/prompt-input.svelte.js';
+import type {
+	ChatPromptAttachment,
+	OnSubmit
+} from './components/prompt-input/prompt-input.svelte.js';
+import type { ReasoningEffort } from '$lib/convex/schema.js';
 import { useConvexClient } from 'convex-svelte';
 import { page } from '$app/state';
 import { goto } from '$app/navigation';
@@ -59,6 +63,8 @@ class ChatLayoutState {
 
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleStop = this.handleStop.bind(this);
+		this.handleEdit = this.handleEdit.bind(this);
+		this.handleBranchEdit = this.handleBranchEdit.bind(this);
 	}
 
 	get isAdvancedMode() {
@@ -140,6 +146,107 @@ class ChatLayoutState {
 		await this.client.mutation(api.chats.stopGenerating, {
 			chatId: this.chatId
 		});
+	}
+
+	async handleBranchEdit(
+		messageId: Id<'messages'>,
+		{
+			input,
+			modelId,
+			attachments,
+			reasoningEffort
+		}: {
+			input: string;
+			modelId: ModelId;
+			attachments: ChatPromptAttachment[];
+			reasoningEffort: ReasoningEffort;
+		}
+	) {
+		if (!this.user) throw new Error('You must be signed in to branch a message!');
+
+		const model = this.models.find((m) => m.id === modelId);
+		if (!model) throw new Error(`Model with id: ${modelId} not found`);
+
+		try {
+			const { newChatId, newAssistantMessageId } = await this.client.mutation(
+				api.chats.branchFromMessage,
+				{
+					message: {
+						_id: messageId,
+						role: 'user',
+						modelId,
+						supportedParameters: model.supported_parameters,
+						inputModalities: model.architecture.input_modalities,
+						outputModalities: model.architecture.output_modalities,
+						reasoningEffort:
+							this.isAdvancedMode && this.modelSupportsReasoning(modelId)
+								? reasoningEffort
+								: 'default',
+						content: input,
+						attachments
+					},
+					apiKey: this.apiKey ?? ''
+				}
+			);
+
+			if (newAssistantMessageId) {
+				this.createdMessages.add(newAssistantMessageId);
+			}
+
+			await goto(resolve(`/chat/${newChatId}`));
+		} catch (error) {
+			if (error instanceof ConvexError) {
+				throw new Error(error.data, { cause: error });
+			}
+			throw error;
+		}
+	}
+
+	async handleEdit(
+		messageId: Id<'messages'>,
+		{
+			input,
+			modelId,
+			attachments,
+			reasoningEffort
+		}: {
+			input: string;
+			modelId: ModelId;
+			attachments: ChatPromptAttachment[];
+			reasoningEffort: ReasoningEffort;
+		}
+	) {
+		if (!this.user) throw new Error('You must be signed in to edit messages!');
+
+		const model = this.models.find((m) => m.id === modelId);
+		if (!model) throw new Error(`Model with id: ${modelId} not found`);
+
+		try {
+			const { assistantMessageId } = await this.client.mutation(api.messages.editMessage, {
+				messageId,
+				apiKey: this.apiKey ?? '',
+				prompt: {
+					input,
+					modelId,
+					attachments,
+					supportedParameters: model.supported_parameters,
+					inputModalities: model.architecture.input_modalities,
+					outputModalities: model.architecture.output_modalities,
+					reasoningEffort:
+						this.isAdvancedMode && this.modelSupportsReasoning(modelId)
+							? reasoningEffort
+							: 'default'
+				}
+			});
+
+			this.createdMessages.add(assistantMessageId);
+		} catch (error) {
+			if (error instanceof ConvexError) {
+				throw new Error(error.data, { cause: error });
+			}
+
+			throw error;
+		}
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments, reasoningEffort }) => {
