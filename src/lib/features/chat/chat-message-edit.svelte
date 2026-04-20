@@ -1,11 +1,16 @@
 <!-- svelte-ignore state_referenced_locally -->
 <script lang="ts">
 	import * as PromptInput from '$lib/features/chat/components/prompt-input';
+	import * as SplitButton from '$lib/components/ui/split-button';
 	import ModelPickerBasic from '$lib/features/models/components/models-picker-basic.svelte';
 	import ModelPickerAdvanced from '$lib/features/models/components/models-picker-advanced.svelte';
 	import ReasoningEffortPicker from './components/reasoning-effort-picker.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { RiAlertLine as AlertIcon } from 'remixicon-svelte';
+	import {
+		RiAlertLine as AlertIcon,
+		RiSendPlaneLine as SendIcon,
+		RiGitBranchLine as SplitIcon
+	} from 'remixicon-svelte';
 	import { useChatLayout } from './chat.svelte.js';
 	import type { Id } from '$lib/convex/_generated/dataModel';
 	import type { ModelId } from './types.js';
@@ -53,14 +58,23 @@
 		return attachments.length > 0 && model ? !supportsImages(model) : false;
 	});
 
+	let submitIntent = $state<'edit' | 'branch'>('edit');
+
 	async function handleSubmit(opts: {
 		input: string;
 		modelId: ModelId;
 		attachments: ChatPromptAttachment[];
 		reasoningEffort: ReasoningEffort;
 	}) {
-		onBeforeSubmit?.();
-		await chatLayoutState.handleEdit(messageId, opts);
+		const intent = submitIntent;
+		// reset intent so future Enter-key submits default to 'edit'
+		submitIntent = 'edit';
+		if (intent !== 'branch') onBeforeSubmit?.();
+		if (intent === 'branch') {
+			await chatLayoutState.handleBranchEdit(messageId, opts);
+		} else {
+			await chatLayoutState.handleEdit(messageId, opts);
+		}
 		onDone();
 	}
 </script>
@@ -105,7 +119,28 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<Button variant="ghost" onclick={onDone}>Cancel</Button>
-					<PromptInput.Submit />
+					<PromptInput.SplitSubmit>
+						{#snippet children({ submit })}
+							<SplitButton.Item
+								onSelect={() => {
+									submitIntent = 'branch';
+									submit();
+								}}
+							>
+								<SplitIcon />
+								Branch and send
+							</SplitButton.Item>
+							<SplitButton.Item
+								onSelect={() => {
+									submitIntent = 'edit';
+									submit();
+								}}
+							>
+								<SendIcon />
+								Send
+							</SplitButton.Item>
+						{/snippet}
+					</PromptInput.SplitSubmit>
 				</div>
 			</PromptInput.Footer>
 		</PromptInput.Content>

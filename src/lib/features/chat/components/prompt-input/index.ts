@@ -4,6 +4,7 @@ import AttachmentList from './prompt-input-attachment-list.svelte';
 import Textarea from './prompt-input-textarea.svelte';
 import Footer from './prompt-input-footer.svelte';
 import Submit from './prompt-input-submit.svelte';
+import SplitSubmit from './prompt-input-split-submit.svelte';
 import Banner from './prompt-input-banner.svelte';
 import BannerContent from './prompt-input-banner-content.svelte';
 import BannerDismiss from './prompt-input-banner-dismiss.svelte';
@@ -17,6 +18,7 @@ export {
 	Textarea,
 	Footer,
 	Submit,
+	SplitSubmit,
 	Banner,
 	Content,
 	BannerContent,
@@ -30,6 +32,7 @@ export {
 	Textarea as PromptInputTextarea,
 	Footer as PromptInputFooter,
 	Submit as PromptInputSubmit,
+	SplitSubmit as PromptInputSplitSubmit,
 	Banner as PromptInputBanner,
 	Content as PromptInputContent,
 	BannerContent as PromptInputBannerContent,
