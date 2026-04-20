@@ -104,7 +104,7 @@
 					{/if}
 				</div>
 				<div class="flex items-center gap-2">
-					<Button variant="ghost" size="sm" onclick={onDone}>Cancel</Button>
+					<Button variant="ghost" onclick={onDone}>Cancel</Button>
 					<PromptInput.Submit />
 				</div>
 			</PromptInput.Footer>
