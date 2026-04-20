@@ -53,11 +53,14 @@
 
 	let editing = $state(false);
 
+	const media = useMedia();
+
 	const canEdit = $derived(
 		message.role === 'user' &&
 			chatLayoutState.user !== null &&
 			message.userId === chatLayoutState.user.id &&
-			!chatViewState.chat?.generating
+			!chatViewState.chat?.generating &&
+			media.md
 	);
 
 	// this is weird but basically we only care if we transition to a driven state not if we transition out of it
@@ -88,8 +91,6 @@
 		}
 		return null;
 	});
-
-	const media = useMedia();
 </script>
 
 <div
