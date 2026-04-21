@@ -437,25 +437,13 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				// convert messages into model messages
 				const modelMessages: ModelMessage[] = messages.flatMap((message) => {
 					if (message.role === 'assistant') {
-						const modelMessages = partsToModelMessage(message.parts);
+						const assistantFileParts: FilePart[] = message.attachments.map((attachment) => ({
+							type: 'file',
+							data: attachment.url,
+							mediaType: attachment.mediaType
+						}));
 
-						return [
-							...modelMessages,
-							...(message.attachments.length > 0
-								? [
-										{
-											role: 'assistant' as const,
-											content: [
-												...message.attachments.map((attachment) => ({
-													type: 'file' as const,
-													data: attachment.url,
-													mediaType: attachment.mediaType
-												}))
-											]
-										}
-									]
-								: [])
-						];
+						return partsToModelMessage(message.parts, assistantFileParts);
 					}
 
 					const attachmentParts: (ImagePart | FilePart)[] =
