@@ -483,11 +483,7 @@ export const streamMessage = httpAction(async (ctx, request) => {
 
 					const userAttachmentParts = message.attachments?.map(toUserAttachmentPart) ?? [];
 
-					const content: (
-						| { type: 'text'; text: string }
-						| ImagePart
-						| FilePart
-					)[] = [];
+					const content: ({ type: 'text'; text: string } | ImagePart | FilePart)[] = [];
 
 					if (carriedAssistantAttachments.length > 0) {
 						content.push({
