@@ -2,6 +2,7 @@ import type { ToolCallPart, ToolResultPart } from 'ai';
 import type { Doc, Id } from '$lib/convex/_generated/dataModel';
 import type { SearchResult } from 'exa-js';
 import type { MatchedText } from '$lib/utils/full-text-search';
+import type { AskUserAnswer, AskUserQuestion } from '$lib/features/ai/tools/ask-user';
 
 /**
  * Tool-result shape as merged onto the tool-call in chat-tool-part (stream
@@ -65,4 +66,21 @@ export type GetChatTool = ChatTool & {
 		| undefined;
 };
 
-export type ChatToolUnion = FetchLinkContentTool | WebSearchTool | ChatSearchTool | GetChatTool;
+export type AskUserToolOutput = { answers: AskUserAnswer[] };
+
+export type AskUserTool = ChatTool & {
+	toolName: 'askUser';
+	input: { questions: AskUserQuestion[] };
+	result:
+		| (ChatToolResultPart & {
+				output: AskUserToolOutput;
+		  })
+		| undefined;
+};
+
+export type ChatToolUnion =
+	| FetchLinkContentTool
+	| WebSearchTool
+	| ChatSearchTool
+	| GetChatTool
+	| AskUserTool;

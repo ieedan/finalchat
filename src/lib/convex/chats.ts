@@ -289,6 +289,21 @@ export const updateTitle = mutation({
 	}
 });
 
+export const markRead = mutation({
+	args: {
+		chatId: v.id('chats')
+	},
+	handler: async (ctx, args): Promise<void> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) return;
+
+		const chat = await ctx.db.get(args.chatId);
+		if (!chat || chat.userId !== user.subject) return;
+
+		await ctx.db.patch(args.chatId, { unread: false });
+	}
+});
+
 export const remove = mutation({
 	args: {
 		ids: v.array(v.id('chats'))

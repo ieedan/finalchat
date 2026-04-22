@@ -14,7 +14,8 @@ import {
 	type ImagePart,
 	type FilePart,
 	streamText,
-	smoothStream
+	smoothStream,
+	hasToolCall
 } from 'ai';
 import {
 	getChatMessagesInternal,
@@ -23,15 +24,20 @@ import {
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
 import {
+	askUser,
 	chatSearchTool,
 	fetchLinkContentTool,
 	getChat,
-	webSearch
+	webSearch,
+	type AskUserAnswer
 } from '../features/ai/tools/index.js';
 import {
 	createChunkAppender,
+	deserializeStream,
 	partsToModelMessage,
-	repackStream
+	repackStream,
+	serializeParts,
+	type StreamResult
 } from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
@@ -314,7 +320,10 @@ export const editMessage = mutation({
 		});
 
 		await ctx.db.patch(sourceMessage.chatId, {
-			updatedAt: Date.now()
+			updatedAt: Date.now(),
+			// Editing truncates messages after the edit, so any pending askUser
+			// question is gone; clear the sidebar indicator.
+			needsInput: false
 		});
 
 		return { assistantMessageId };
@@ -558,12 +567,17 @@ ${systemPrompt}
 						tools: {
 							fetchLinkContent: fetchLinkContentTool,
 							webSearch: webSearch,
+							askUser,
 							...(memoryEnabled ? { chatSearch: chatSearchTool, getChat } : {})
 						},
 						stopWhen: [
 							({ steps }) => {
 								return steps.length >= 10;
-							}
+							},
+							// `askUser` has no server-side executor — it is answered by the
+							// user in the UI. Stop the loop as soon as the model calls it so
+							// the stream finalizes and the UI can render the form.
+							hasToolCall('askUser')
 						],
 						experimental_context: {
 							env: {
@@ -601,6 +615,7 @@ ${systemPrompt}
 				});
 
 				const uploadPromises: Promise<void>[] = [];
+				let askUserPending = false;
 
 				for await (const chunk of fullStream) {
 					if (wasStopped) break;
@@ -611,6 +626,13 @@ ${systemPrompt}
 					} else if (chunk.type === 'reasoning-delta') {
 						appender.append({ type: 'reasoning', text: chunk.text });
 					} else if (chunk.type === 'tool-call') {
+						if (chunk.toolName === 'askUser') {
+							// `askUser` has no server executor — the loop stops here (see
+							// `hasToolCall('askUser')` stopWhen) and the tool-result is
+							// injected later by `submitQuestionAnswers`. Flag the chat so
+							// the sidebar can surface a "needs input" indicator.
+							askUserPending = true;
+						}
 						appender.append(chunk);
 					} else if (chunk.type === 'tool-result') {
 						appender.append({
@@ -673,6 +695,7 @@ ${systemPrompt}
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
 					content: repackedContent,
+					needsInput: askUserPending && !wasStopped,
 					meta: {
 						generationId: openRouterGenId,
 						tokenUsage: usage?.totalTokens,
@@ -842,6 +865,7 @@ export const updateMessageContent = internalMutation({
 	args: {
 		messageId: v.id('messages'),
 		content: v.string(),
+		needsInput: v.optional(v.boolean()),
 		meta: v.object({
 			generationId: v.optional(v.string()),
 			tokenUsage: v.optional(v.number()),
@@ -864,7 +888,12 @@ export const updateMessageContent = internalMutation({
 			}),
 			ctx.db.patch(message.chatId, {
 				generating: false,
-				updatedAt: Date.now()
+				updatedAt: Date.now(),
+				needsInput: args.needsInput ?? false,
+				// Mark as unread when new assistant content lands. The client
+				// flips this back to false via `chats.markRead` whenever the
+				// user is actively viewing the chat.
+				unread: true
 			})
 		]);
 	}
@@ -892,5 +921,100 @@ export const updateMessageError = internalMutation({
 				updatedAt: Date.now()
 			})
 		]);
+	}
+});
+
+export const AskUserAnswerV = v.object({
+	questionId: v.string(),
+	selected: v.array(v.string()),
+	other: v.optional(v.string())
+});
+
+export const submitQuestionAnswers = mutation({
+	args: {
+		messageId: v.id('messages'),
+		answers: v.array(AskUserAnswerV)
+	},
+	handler: async (
+		ctx,
+		args
+	): Promise<{ chatId: Id<'chats'>; assistantMessageId: Id<'messages'> }> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new ConvexError('Unauthorized');
+
+		const message = await ctx.db.get(args.messageId);
+		if (!message) throw new ConvexError('Message not found');
+		if (message.role !== 'assistant')
+			throw new ConvexError('Only assistant messages can have question answers');
+		if (message.userId !== user.subject) throw new ConvexError('Unauthorized');
+
+		const chat = await ctx.db.get(message.chatId);
+		if (!chat) throw new ConvexError('Chat not found');
+		if (chat.userId !== user.subject) throw new ConvexError('Unauthorized');
+		if (chat.generating)
+			throw new ConvexError('Stop the current response before answering questions');
+
+		const parsed = deserializeStream({ text: message.content ?? '' });
+		if (parsed.isErr()) throw new ConvexError('Could not parse message');
+
+		const parts: StreamResult = [...parsed.value.stack];
+
+		// Find the most recent `askUser` tool-call that does not yet have a result.
+		let pendingCallIndex = -1;
+		for (let i = parts.length - 1; i >= 0; i--) {
+			const p = parts[i];
+			if (p.type !== 'tool-call' || p.toolName !== 'askUser') continue;
+			const hasResult = parts.some(
+				(r) => r.type === 'tool-result' && r.toolCallId === p.toolCallId
+			);
+			if (!hasResult) {
+				pendingCallIndex = i;
+				break;
+			}
+		}
+
+		if (pendingCallIndex === -1) {
+			throw new ConvexError('No pending question on this message');
+		}
+
+		const pendingCall = parts[pendingCallIndex];
+		if (pendingCall.type !== 'tool-call') {
+			throw new ConvexError('Internal error: expected tool-call');
+		}
+
+		// Match the shape used by server-executed tools: the raw result object is
+		// stored on `output` directly (e.g. webSearch stores `{ todaysDate, results }`
+		// without a `{ type: 'json', value: ... }` wrapper). `normalizeToolResultOutput`
+		// wraps it when converting to a ModelMessage for the next generation.
+		const output: { answers: AskUserAnswer[] } = { answers: args.answers };
+		parts.push({
+			type: 'tool-result',
+			toolCallId: pendingCall.toolCallId,
+			toolName: 'askUser',
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			output: output as any
+		});
+
+		await ctx.db.patch(args.messageId, {
+			content: serializeParts(parts)
+		});
+
+		const streamId = await persistentTextStreaming.createStream(ctx);
+		const assistantMessageId = await ctx.db.insert('messages', {
+			chatId: message.chatId,
+			userId: user.subject,
+			role: 'assistant',
+			streamId,
+			meta: {
+				modelId: message.meta.modelId
+			}
+		});
+
+		await ctx.db.patch(message.chatId, {
+			updatedAt: Date.now(),
+			needsInput: false
+		});
+
+		return { chatId: message.chatId, assistantMessageId };
 	}
 });
