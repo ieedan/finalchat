@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
 	import CheckIcon from 'remixicon-svelte/icons/check-line';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/convex/_generated/api';
@@ -10,6 +9,7 @@
 	import { useChatLayout } from './chat.svelte.js';
 	import type { AskUserAnswer, AskUserQuestion } from '$lib/features/ai/tools/ask-user';
 	import { tick } from 'svelte';
+	import { TextareaAutosize } from 'runed';
 
 	type Props = {
 		messageId: Id<'messages'>;
@@ -18,6 +18,8 @@
 
 	let { messageId, questions }: Props = $props();
 
+	// Sentinel value stored in `draft.selected` when the user chose the free-form
+	// "Other" option on a select-type question. Filtered out before submitting.
 	const OTHER_VALUE = '__other__';
 
 	const convex = useConvexClient();
@@ -31,14 +33,27 @@
 	}
 
 	let currentIndex = $state(0);
-	let otherInputRef = $state<HTMLInputElement | null>(null);
+	let textInputRef = $state<HTMLTextAreaElement | null>(null);
 
 	const activeQuestion = $derived<AskUserQuestion | undefined>(questions[currentIndex]);
 	const isLast = $derived(currentIndex === questions.length - 1);
 	const isFirst = $derived(currentIndex === 0);
 
+	// Auto-grow the free-form textarea (used both by "text" questions and by
+	// the "Other" row on select questions that opt in with `allowCustom`).
+	new TextareaAutosize({
+		element: () => textInputRef ?? undefined,
+		input: () => (activeQuestion ? getDraft(activeQuestion.id).other : ''),
+		maxHeight: 160
+	});
+
 	function isValid(q: AskUserQuestion, draft: Draft): boolean {
-		if (draft.selected.length === 0) return false;
+		if (q.type === 'text') {
+			if (q.optional) return true;
+			return draft.other.trim().length > 0;
+		}
+		if (draft.selected.length === 0) return !!q.optional;
+		// If the user picked the "Other" option they still owe us the custom text.
 		if (draft.selected.includes(OTHER_VALUE) && draft.other.trim().length === 0) return false;
 		return true;
 	}
@@ -74,10 +89,10 @@
 	function pickOption(q: AskUserQuestion, option: string) {
 		if (q.type === 'single-select') {
 			setSingle(q.id, option);
-			// Auto-advance on picking a concrete option (Other is handled separately
-			// because it requires follow-up text input on the same row).
+			// Auto-advance on picking a concrete option. "Other" is handled
+			// separately because it needs follow-up text input on the same row.
 			if (!isLast) currentIndex++;
-		} else {
+		} else if (q.type === 'multi-select') {
 			toggleMulti(q.id, option, !isSelected(q.id, option));
 		}
 	}
@@ -85,17 +100,14 @@
 	async function pickOther(q: AskUserQuestion) {
 		const currentlySelected = isSelected(q.id, OTHER_VALUE);
 		if (q.type === 'single-select') {
-			if (currentlySelected) {
-				// clicking again doesn't do anything meaningful for single-select
-				return;
-			}
+			if (currentlySelected) return;
 			setSingle(q.id, OTHER_VALUE);
-		} else {
+		} else if (q.type === 'multi-select') {
 			toggleMulti(q.id, OTHER_VALUE, !currentlySelected);
 		}
 		// Focus the inline text input once it appears.
 		await tick();
-		otherInputRef?.focus();
+		textInputRef?.focus();
 	}
 
 	function goNext() {
@@ -115,6 +127,10 @@
 		try {
 			const payload: AskUserAnswer[] = questions.map((q) => {
 				const draft = getDraft(q.id);
+				if (q.type === 'text') {
+					const text = draft.other.trim();
+					return { questionId: q.id, selected: [], ...(text ? { other: text } : {}) };
+				}
 				const pickedOther = draft.selected.includes(OTHER_VALUE);
 				const selected = draft.selected.filter((v) => v !== OTHER_VALUE);
 				return {
@@ -141,12 +157,31 @@
 		}
 	}
 
+	function handleTextareaKeydown(e: KeyboardEvent) {
+		// Don't let keystrokes bubble into outer row keyhandlers (which toggle
+		// selection). Enter advances/submits; Shift+Enter inserts a newline.
+		e.stopPropagation();
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			if (submitting) return;
+			if (isLast) {
+				if (allValid) submit();
+			} else if (activeIsValid) {
+				goNext();
+			}
+		}
+	}
+
 	function optionClass(selected: boolean) {
 		return cn(
 			// Base button-like layout and a11y states, lifted from buttonVariants
 			// so we get the same focus ring / disabled behavior as other controls.
-			'relative inline-flex w-full items-center justify-start gap-3 rounded-md border text-sm font-medium transition-all whitespace-normal text-left',
-			'min-h-11 h-auto px-3 py-2',
+			'relative inline-flex w-full items-start justify-start gap-3 rounded-md border text-sm font-medium transition-all whitespace-normal text-left',
+			// py-3 + leading-5 content = 44px min height (= min-h-11) so a
+			// single-line row is still row-centered. When a textarea inside the
+			// row grows, items-start keeps the indicator anchored to the first
+			// line rather than drifting to the vertical middle.
+			'min-h-11 h-auto px-3 py-3 leading-5',
 			'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring',
 			'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
 			'[&_svg]:pointer-events-none [&_svg]:shrink-0',
@@ -155,11 +190,15 @@
 				: 'bg-muted/40 text-foreground border-border hover:bg-muted hover:border-foreground/10'
 		);
 	}
+
+	// With items-start, a bare size-4 indicator sits 2px above the visual
+	// center of a leading-5 line. A 2px top-margin puts it on the first line.
+	const indicatorAlign = 'mt-0.5';
 </script>
 
 <div
 	data-slot="chat-question-prompt"
-	class="border border-border rounded-xl bg-background shadow-sm overflow-hidden"
+	class="relative z-20 border border-border rounded-xl bg-background shadow-sm overflow-hidden"
 >
 	{#if activeQuestion}
 		{@const q = activeQuestion}
@@ -168,6 +207,9 @@
 			<div class="flex items-start justify-between gap-4">
 				<h3 class="text-sm font-medium text-foreground min-w-0 wrap-break-word">
 					{q.question}
+					{#if q.optional}
+						<span class="ml-1 text-xs font-normal text-muted-foreground">(optional)</span>
+					{/if}
 				</h3>
 				{#if questions.length > 1}
 					<span class="text-xs text-muted-foreground shrink-0 whitespace-nowrap">
@@ -176,97 +218,124 @@
 				{/if}
 			</div>
 
-			<div class="flex flex-col gap-1.5">
-				{#each q.options as option, i (i)}
-					{@const selected = isSelected(q.id, option)}
-					<button
-						type="button"
-						disabled={submitting}
-						class={optionClass(selected)}
-						onclick={() => pickOption(q, option)}
-					>
-						<span
-							aria-hidden="true"
-							class={cn(
-								'flex items-center justify-center size-4 shrink-0 border',
-								q.type === 'single-select'
-									? 'rounded-full border-input bg-background'
-									: cn(
-											'rounded-[4px]',
-											selected
-												? 'bg-primary border-primary'
-												: 'border-input bg-background'
-										)
-							)}
+			{#if q.type === 'text'}
+				<textarea
+					bind:this={textInputRef}
+					rows="1"
+					placeholder="Type your answer..."
+					value={draft.other}
+					disabled={submitting}
+					onkeydown={handleTextareaKeydown}
+					oninput={(e) => setOtherText(q.id, (e.currentTarget as HTMLTextAreaElement).value)}
+					class={cn(
+						'w-full resize-none rounded-md border bg-muted/40 text-foreground transition-colors',
+						'px-3 py-3 leading-5 text-sm placeholder:text-muted-foreground',
+						'border-border hover:border-foreground/20',
+						'focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring',
+						'disabled:pointer-events-none disabled:opacity-50'
+					)}
+				></textarea>
+			{:else}
+				<div class="flex flex-col gap-1.5">
+					{#each q.options ?? [] as option, i (i)}
+						{@const selected = isSelected(q.id, option)}
+						<button
+							type="button"
+							disabled={submitting}
+							class={optionClass(selected)}
+							onclick={() => pickOption(q, option)}
 						>
-							{#if selected}
-								{#if q.type === 'single-select'}
-									<span class="size-2 rounded-full bg-primary"></span>
-								{:else}
-									<CheckIcon class="size-3 text-primary-foreground" />
+							<span
+								aria-hidden="true"
+								class={cn(
+									'flex items-center justify-center size-4 shrink-0 border',
+									indicatorAlign,
+									q.type === 'single-select'
+										? 'rounded-full border-input bg-background'
+										: cn(
+												'rounded-[4px]',
+												selected
+													? 'bg-primary border-primary'
+													: 'border-input bg-background'
+											)
+								)}
+							>
+								{#if selected}
+									{#if q.type === 'single-select'}
+										<span class="size-2 rounded-full bg-primary"></span>
+									{:else}
+										<CheckIcon class="size-3 text-primary-foreground" />
+									{/if}
 								{/if}
-							{/if}
-						</span>
-						<span class="flex-1 min-w-0">{option}</span>
-					</button>
-				{/each}
-				{#if true}
-					{@const otherSelected = isSelected(q.id, OTHER_VALUE)}
-					<div
-						role="button"
-						tabindex={submitting ? -1 : 0}
-						aria-pressed={otherSelected}
-						aria-disabled={submitting}
-						class={optionClass(otherSelected)}
-						onclick={() => !submitting && pickOther(q)}
-						onkeydown={(e) => {
-							if (submitting) return;
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								pickOther(q);
-							}
-						}}
-					>
-						<span
-							aria-hidden="true"
-							class={cn(
-								'flex items-center justify-center size-4 shrink-0 border',
-								q.type === 'single-select'
-									? 'rounded-full border-input bg-background'
-									: cn(
-											'rounded-[4px]',
-											otherSelected
-												? 'bg-primary border-primary'
-												: 'border-input bg-background'
-										)
-							)}
+							</span>
+							<span class="flex-1 min-w-0">{option}</span>
+						</button>
+					{/each}
+
+					{#if q.allowCustom}
+						{@const otherSelected = isSelected(q.id, OTHER_VALUE)}
+						<div
+							role="button"
+							tabindex={submitting ? -1 : 0}
+							aria-pressed={otherSelected}
+							aria-disabled={submitting}
+							class={optionClass(otherSelected)}
+							onclick={() => !submitting && pickOther(q)}
+							onkeydown={(e) => {
+								// Only react to key events originating on the div itself —
+								// keystrokes inside the textarea bubble up here and we don't
+								// want them to toggle selection.
+								if (e.target !== e.currentTarget) return;
+								if (submitting) return;
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									pickOther(q);
+								}
+							}}
 						>
+							<span
+								aria-hidden="true"
+								class={cn(
+									'flex items-center justify-center size-4 shrink-0 border',
+									indicatorAlign,
+									q.type === 'single-select'
+										? 'rounded-full border-input bg-background'
+										: cn(
+												'rounded-[4px]',
+												otherSelected
+													? 'bg-primary border-primary'
+													: 'border-input bg-background'
+											)
+								)}
+							>
+								{#if otherSelected}
+									{#if q.type === 'single-select'}
+										<span class="size-2 rounded-full bg-primary"></span>
+									{:else}
+										<CheckIcon class="size-3 text-primary-foreground" />
+									{/if}
+								{/if}
+							</span>
 							{#if otherSelected}
-								{#if q.type === 'single-select'}
-									<span class="size-2 rounded-full bg-primary"></span>
-								{:else}
-									<CheckIcon class="size-3 text-primary-foreground" />
-								{/if}
+								<textarea
+									bind:this={textInputRef}
+									rows="1"
+									placeholder="Type your answer..."
+									value={draft.other}
+									disabled={submitting}
+									onclick={(e) => e.stopPropagation()}
+									onkeydown={handleTextareaKeydown}
+									oninput={(e) =>
+										setOtherText(q.id, (e.currentTarget as HTMLTextAreaElement).value)}
+									class="flex-1 min-w-0 resize-none bg-transparent outline-none placeholder:text-muted-foreground p-0 leading-5"
+								></textarea>
+							{:else}
+								<span class="flex-1 min-w-0">Other</span>
 							{/if}
-						</span>
-						<span class="shrink-0">Other{otherSelected ? ':' : ''}</span>
-						{#if otherSelected}
-							<input
-								bind:this={otherInputRef}
-								type="text"
-								placeholder="Type your answer..."
-								value={draft.other}
-								disabled={submitting}
-								onclick={(e) => e.stopPropagation()}
-								onkeydown={(e) => e.stopPropagation()}
-								oninput={(e) =>
-									setOtherText(q.id, (e.currentTarget as HTMLInputElement).value)}
-								class="flex-1 min-w-0 bg-transparent outline-none placeholder:text-muted-foreground"
-							/>
-						{/if}
-					</div>
-				{/if}
-			</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
 
 			{#if submitError}
 				<p class="text-destructive text-xs">{submitError}</p>

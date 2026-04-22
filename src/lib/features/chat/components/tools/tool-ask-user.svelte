@@ -48,23 +48,36 @@
 				{@const a = answerFor(q.id)}
 				<div class="flex flex-col gap-1 min-w-0">
 					<dt class="font-medium text-foreground">{q.question}</dt>
-					<dd class="flex flex-wrap gap-1.5 text-muted-foreground">
+					<dd class="flex flex-col gap-1.5 text-muted-foreground">
 						{#if a}
-							{#each a.selected as s (s)}
-								<span
-									class="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs text-foreground"
-								>
-									<CheckIcon class="size-3" />
-									{s}
-								</span>
-							{/each}
-							{#if a.other}
-								<span
-									class="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs text-foreground"
-								>
-									<CheckIcon class="size-3" />
-									Other: {a.other}
-								</span>
+							{#if q.type === 'text'}
+								{#if a.other}
+									<p class="text-foreground whitespace-pre-wrap break-words">{a.other}</p>
+								{:else}
+									<span class="italic">No answer recorded</span>
+								{/if}
+							{:else}
+								<div class="flex flex-wrap gap-1.5">
+									{#each a.selected as s (s)}
+										<span
+											class="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs text-foreground"
+										>
+											<CheckIcon class="size-3" />
+											{s}
+										</span>
+									{/each}
+									{#if a.other}
+										<span
+											class="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs text-foreground"
+										>
+											<CheckIcon class="size-3" />
+											Other: {a.other}
+										</span>
+									{/if}
+									{#if a.selected.length === 0 && !a.other}
+										<span class="italic">No answer recorded</span>
+									{/if}
+								</div>
 							{/if}
 						{:else}
 							<span class="italic">No answer recorded</span>
