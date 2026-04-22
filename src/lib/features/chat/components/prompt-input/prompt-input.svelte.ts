@@ -32,9 +32,7 @@ type PromptInputRootStateOptions = ReadableBoxedValues<{
 	generating: boolean;
 	onUpload: (
 		files: File[]
-	) => Promise<
-		{ url: string; key: string; mediaType: string; width?: number; height?: number }[]
-	>;
+	) => Promise<{ url: string; key: string; mediaType: string; width?: number; height?: number }[]>;
 	onDeleteAttachment: (key: string) => Promise<void>;
 }> &
 	WritableBoxedValues<{

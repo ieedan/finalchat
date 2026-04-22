@@ -15,9 +15,7 @@ export type UploadedAttachment = {
 	height?: number;
 };
 
-async function readImageDimensions(
-	file: File
-): Promise<{ width: number; height: number } | null> {
+async function readImageDimensions(file: File): Promise<{ width: number; height: number } | null> {
 	const objectUrl = URL.createObjectURL(file);
 	try {
 		const img = new Image();
