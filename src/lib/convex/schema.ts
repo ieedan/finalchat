@@ -87,14 +87,7 @@ export default defineSchema({
 		generating: v.boolean(),
 		generatingTitle: v.optional(v.boolean()),
 		stopRequested: v.optional(v.boolean()),
-		// True when the last assistant message is waiting on the user to answer
-		// an `askUser` tool call. The sidebar shows a "needs input" indicator
-		// while this is set; cleared when the user submits answers or edits
-		// earlier in the conversation.
 		needsInput: v.optional(v.boolean()),
-		// True when an assistant message has finalized that the user hasn't
-		// viewed yet. Undefined or false both mean "read" (undefined kept for
-		// backwards compat with chats created before this field existed).
 		unread: v.optional(v.boolean()),
 		userId: v.string(),
 		title: v.string(),
