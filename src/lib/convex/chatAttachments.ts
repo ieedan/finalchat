@@ -2,8 +2,9 @@ import { ConvexError, v } from 'convex/values';
 import { internalMutation, mutation } from './functions';
 import { type R2Callbacks } from '@convex-dev/r2';
 import { internal } from './_generated/api';
-import { httpAction, internalQuery, query } from './_generated/server';
+import { httpAction, internalAction, internalQuery, query } from './_generated/server';
 import { createKey, parseUploadKey, type UploadKey } from './chatAttachments.utils';
+import { parseImageDimensions } from './parse-image-dimensions.utils';
 import { r2 } from './r2';
 
 const callbacks: R2Callbacks = {
@@ -164,6 +165,48 @@ export const remove = mutation({
 			// Delete from database
 			await ctx.db.delete(id);
 		}
+	}
+});
+
+/**
+ * Patch stored image dimensions on an attachment. Used by the backfill
+ * migration to avoid layout shift on pre-existing images that predate the
+ * `width`/`height` fields.
+ */
+export const patchDimensions = internalMutation({
+	args: {
+		id: v.id('chatAttachments'),
+		width: v.number(),
+		height: v.number()
+	},
+	handler: async (ctx, args) => {
+		await ctx.db.patch(args.id, { width: args.width, height: args.height });
+	}
+});
+
+/**
+ * For a single attachment: pull the bytes from R2, read the dimensions out of
+ * the image header, and patch the row. Scheduled one-per-doc by the migration
+ * so the actual network + decode work happens off the mutation path.
+ */
+export const backfillDimensions = internalAction({
+	args: {
+		id: v.id('chatAttachments'),
+		key: v.string(),
+		mediaType: v.string()
+	},
+	handler: async (ctx, args) => {
+		const url = await r2.getUrl(args.key, { expiresIn: undefined });
+		const res = await fetch(url);
+		if (!res.ok) return;
+		const bytes = new Uint8Array(await res.arrayBuffer());
+		const dims = parseImageDimensions(bytes, args.mediaType);
+		if (!dims || dims.width <= 0 || dims.height <= 0) return;
+		await ctx.runMutation(internal.chatAttachments.patchDimensions, {
+			id: args.id,
+			width: dims.width,
+			height: dims.height
+		});
 	}
 });
 
