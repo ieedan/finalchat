@@ -254,9 +254,7 @@
 										? 'rounded-full border-input bg-background'
 										: cn(
 												'rounded-[4px]',
-												selected
-													? 'bg-primary border-primary'
-													: 'border-input bg-background'
+												selected ? 'bg-primary border-primary' : 'border-input bg-background'
 											)
 								)}
 							>
@@ -302,9 +300,7 @@
 										? 'rounded-full border-input bg-background'
 										: cn(
 												'rounded-[4px]',
-												otherSelected
-													? 'bg-primary border-primary'
-													: 'border-input bg-background'
+												otherSelected ? 'bg-primary border-primary' : 'border-input bg-background'
 											)
 								)}
 							>

@@ -247,61 +247,124 @@
 							questions={pendingQuestion.questions}
 						/>
 					{:else}
-					<!-- Mobile prompt input -->
-					<PromptInputMobile.Root
-						bind:modelId={modelId.current}
-						bind:reasoningEffort={reasoningEffort.current}
-						generating={chatViewState.chatQuery.data?.generating}
-						{submitOnEnter}
-						onSubmit={(opts) => {
-							autoScroll.scrollToBottom(false, 'instant');
-							return chatLayoutState.handleSubmit(opts);
-						}}
-						onStop={chatLayoutState.handleStop}
-						onUpload={chatAttachmentUploader.uploadMany}
-						onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
-						bind:attachments={attachmentsList.current}
-						class="group/prompt-input z-20 md:hidden"
-					>
-						<PromptInputMobile.Plus>
-							<PromptInputMobile.NewChat />
-							<PromptInputMobile.PlusSeparator />
-							<PromptInputMobile.ModelPicker models={mobileModels} />
-							{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
+						<!-- Mobile prompt input -->
+						<PromptInputMobile.Root
+							bind:modelId={modelId.current}
+							bind:reasoningEffort={reasoningEffort.current}
+							generating={chatViewState.chatQuery.data?.generating}
+							{submitOnEnter}
+							onSubmit={(opts) => {
+								autoScroll.scrollToBottom(false, 'instant');
+								return chatLayoutState.handleSubmit(opts);
+							}}
+							onStop={chatLayoutState.handleStop}
+							onUpload={chatAttachmentUploader.uploadMany}
+							onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+							bind:attachments={attachmentsList.current}
+							class="group/prompt-input z-20 md:hidden"
+						>
+							<PromptInputMobile.Plus>
+								<PromptInputMobile.NewChat />
 								<PromptInputMobile.PlusSeparator />
-								<PromptInputMobile.ReasoningEffortPicker />
-							{/if}
-							<PromptInputMobile.PlusSeparator />
-							<PromptInputMobile.AddAttachment />
-						</PromptInputMobile.Plus>
+								<PromptInputMobile.ModelPicker models={mobileModels} />
+								{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
+									<PromptInputMobile.PlusSeparator />
+									<PromptInputMobile.ReasoningEffortPicker />
+								{/if}
+								<PromptInputMobile.PlusSeparator />
+								<PromptInputMobile.AddAttachment />
+							</PromptInputMobile.Plus>
 
-						<PromptInputMobile.BannerWrapper>
-							<PromptInputMobile.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
-								<PromptInputMobile.BannerContent>
+							<PromptInputMobile.BannerWrapper>
+								<PromptInputMobile.Banner
+									dismissedByError
+									dismissed={chatLayoutState.user !== null}
+								>
+									<PromptInputMobile.BannerContent>
+										<p>
+											<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
+										</p>
+									</PromptInputMobile.BannerContent>
+								</PromptInputMobile.Banner>
+								{#if chatLayoutState.user !== null}
+									<PromptInputMobile.Banner
+										dismissedByError
+										dismissed={apiKeyBannerDismissed}
+										onDismiss={() => (userDismissedApiKeyBanner.current = true)}
+									>
+										<PromptInputMobile.BannerContent>
+											<p>
+												<a href="/settings" class="font-medium underline">Setup API key</a>
+											</p>
+											<PromptInputMobile.BannerDismiss />
+										</PromptInputMobile.BannerContent>
+									</PromptInputMobile.Banner>
+								{/if}
+								<PromptInputMobile.Banner
+									dismissedByError={false}
+									dismissed={!showImageUnsupportedBanner}
+								>
+									<PromptInputMobile.BannerContent>
+										<div class="flex items-center gap-2">
+											<AlertIcon class="size-4 text-destructive shrink-0" />
+											<p class="text-sm text-destructive">
+												This model doesn't support images. Remove attachments or switch models to
+												avoid errors.
+											</p>
+										</div>
+									</PromptInputMobile.BannerContent>
+								</PromptInputMobile.Banner>
+								<PromptInputMobile.InputWrapper>
+									<PromptInputMobile.AttachmentList />
+									<PromptInputMobile.Input placeholder="Ask me anything..." />
+								</PromptInputMobile.InputWrapper>
+							</PromptInputMobile.BannerWrapper>
+
+							<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
+						</PromptInputMobile.Root>
+
+						<!-- Desktop Prompt Input -->
+						<PromptInput.Root
+							bind:modelId={modelId.current}
+							bind:reasoningEffort={reasoningEffort.current}
+							generating={chatViewState.chatQuery.data?.generating}
+							{submitOnEnter}
+							onSubmit={(opts) => {
+								autoScroll.scrollToBottom(false, 'instant');
+								return chatLayoutState.handleSubmit(opts);
+							}}
+							onStop={chatLayoutState.handleStop}
+							onUpload={chatAttachmentUploader.uploadMany}
+							onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
+							bind:attachments={attachmentsList.current}
+							class="group/prompt-input z-20 hidden md:block"
+						>
+							<PromptInput.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
+								<PromptInput.BannerContent>
 									<p>
 										<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
 									</p>
-								</PromptInputMobile.BannerContent>
-							</PromptInputMobile.Banner>
+								</PromptInput.BannerContent>
+							</PromptInput.Banner>
 							{#if chatLayoutState.user !== null}
-								<PromptInputMobile.Banner
+								<PromptInput.Banner
 									dismissedByError
 									dismissed={apiKeyBannerDismissed}
 									onDismiss={() => (userDismissedApiKeyBanner.current = true)}
 								>
-									<PromptInputMobile.BannerContent>
+									<PromptInput.BannerContent>
 										<p>
-											<a href="/settings" class="font-medium underline">Setup API key</a>
+											You're currently limited to free models. <a
+												href="/settings"
+												class="font-medium underline">Setup API key</a
+											>.
 										</p>
 										<PromptInputMobile.BannerDismiss />
-									</PromptInputMobile.BannerContent>
-								</PromptInputMobile.Banner>
+									</PromptInput.BannerContent>
+								</PromptInput.Banner>
 							{/if}
-							<PromptInputMobile.Banner
-								dismissedByError={false}
-								dismissed={!showImageUnsupportedBanner}
-							>
-								<PromptInputMobile.BannerContent>
+							<PromptInput.Banner dismissedByError={false} dismissed={!showImageUnsupportedBanner}>
+								<PromptInput.BannerContent>
 									<div class="flex items-center gap-2">
 										<AlertIcon class="size-4 text-destructive shrink-0" />
 										<p class="text-sm text-destructive">
@@ -309,102 +372,42 @@
 											avoid errors.
 										</p>
 									</div>
-								</PromptInputMobile.BannerContent>
-							</PromptInputMobile.Banner>
-							<PromptInputMobile.InputWrapper>
-								<PromptInputMobile.AttachmentList />
-								<PromptInputMobile.Input placeholder="Ask me anything..." />
-							</PromptInputMobile.InputWrapper>
-						</PromptInputMobile.BannerWrapper>
-
-						<PromptInputMobile.Submit disabled={chatLayoutState.user === null} />
-					</PromptInputMobile.Root>
-
-					<!-- Desktop Prompt Input -->
-					<PromptInput.Root
-						bind:modelId={modelId.current}
-						bind:reasoningEffort={reasoningEffort.current}
-						generating={chatViewState.chatQuery.data?.generating}
-						{submitOnEnter}
-						onSubmit={(opts) => {
-							autoScroll.scrollToBottom(false, 'instant');
-							return chatLayoutState.handleSubmit(opts);
-						}}
-						onStop={chatLayoutState.handleStop}
-						onUpload={chatAttachmentUploader.uploadMany}
-						onDeleteAttachment={chatAttachmentUploader.deleteAttachment}
-						bind:attachments={attachmentsList.current}
-						class="group/prompt-input z-20 hidden md:block"
-					>
-						<PromptInput.Banner dismissedByError dismissed={chatLayoutState.user !== null}>
-							<PromptInput.BannerContent>
-								<p>
-									<a href="/auth/login" class="font-medium underline">Sign in</a> to start chatting!
-								</p>
-							</PromptInput.BannerContent>
-						</PromptInput.Banner>
-						{#if chatLayoutState.user !== null}
-							<PromptInput.Banner
-								dismissedByError
-								dismissed={apiKeyBannerDismissed}
-								onDismiss={() => (userDismissedApiKeyBanner.current = true)}
-							>
-								<PromptInput.BannerContent>
-									<p>
-										You're currently limited to free models. <a
-											href="/settings"
-											class="font-medium underline">Setup API key</a
-										>.
-									</p>
-									<PromptInputMobile.BannerDismiss />
 								</PromptInput.BannerContent>
 							</PromptInput.Banner>
-						{/if}
-						<PromptInput.Banner dismissedByError={false} dismissed={!showImageUnsupportedBanner}>
-							<PromptInput.BannerContent>
-								<div class="flex items-center gap-2">
-									<AlertIcon class="size-4 text-destructive shrink-0" />
-									<p class="text-sm text-destructive">
-										This model doesn't support images. Remove attachments or switch models to avoid
-										errors.
-									</p>
-								</div>
-							</PromptInput.BannerContent>
-						</PromptInput.Banner>
-						<PromptInput.ScrollToBottom
-							isNearBottom={autoScroll.isNearBottom}
-							scrollToBottom={autoScroll.scrollToBottom}
-						/>
-						<PromptInput.Content>
-							<PromptInput.AttachmentList />
-							<PromptInput.Textarea placeholder="Ask me anything..." />
-							<PromptInput.Footer class="justify-between">
-								<div class="flex items-center gap-2">
-									{#if chatLayoutState.isAdvancedMode}
-										<ModelPickerAdvanced />
-									{:else}
-										<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
-									{/if}
-									<PromptInput.AttachmentButton />
-									{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
-										<ReasoningEffortPicker />
-									{/if}
-								</div>
-								<div class="flex items-center gap-2">
-									{#if chatLayoutState.isAdvancedMode}
-										{#if lastAssistantMessage?.meta.tokenUsage !== undefined && selectedModel?.context_length !== undefined}
-											<PromptInput.ContextIndicator
-												class="hidden md:block"
-												tokensUsed={lastAssistantMessage.meta.tokenUsage}
-												contextLength={selectedModel.context_length}
-											/>
+							<PromptInput.ScrollToBottom
+								isNearBottom={autoScroll.isNearBottom}
+								scrollToBottom={autoScroll.scrollToBottom}
+							/>
+							<PromptInput.Content>
+								<PromptInput.AttachmentList />
+								<PromptInput.Textarea placeholder="Ask me anything..." />
+								<PromptInput.Footer class="justify-between">
+									<div class="flex items-center gap-2">
+										{#if chatLayoutState.isAdvancedMode}
+											<ModelPickerAdvanced />
+										{:else}
+											<ModelPickerBasic models={chatLayoutState.availableBasicModels} />
 										{/if}
-									{/if}
-									<PromptInput.Submit disabled={chatLayoutState.user === null} />
-								</div>
-							</PromptInput.Footer>
-						</PromptInput.Content>
-					</PromptInput.Root>
+										<PromptInput.AttachmentButton />
+										{#if chatLayoutState.isAdvancedMode && modelSupportsReasoning}
+											<ReasoningEffortPicker />
+										{/if}
+									</div>
+									<div class="flex items-center gap-2">
+										{#if chatLayoutState.isAdvancedMode}
+											{#if lastAssistantMessage?.meta.tokenUsage !== undefined && selectedModel?.context_length !== undefined}
+												<PromptInput.ContextIndicator
+													class="hidden md:block"
+													tokensUsed={lastAssistantMessage.meta.tokenUsage}
+													contextLength={selectedModel.context_length}
+												/>
+											{/if}
+										{/if}
+										<PromptInput.Submit disabled={chatLayoutState.user === null} />
+									</div>
+								</PromptInput.Footer>
+							</PromptInput.Content>
+						</PromptInput.Root>
 					{/if}
 				</div>
 			</div>

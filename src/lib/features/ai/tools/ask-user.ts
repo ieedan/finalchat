@@ -35,7 +35,9 @@ export const askUserInput = z.object({
 	questions: z
 		.array(askUserQuestion)
 		.min(1)
-		.describe('One or more questions to ask the user in a single turn. They will all be answered together.')
+		.describe(
+			'One or more questions to ask the user in a single turn. They will all be answered together.'
+		)
 });
 
 export type AskUserInput = z.infer<typeof askUserInput>;

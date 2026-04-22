@@ -300,10 +300,6 @@ export const markRead = mutation({
 		const chat = await ctx.db.get(args.chatId);
 		if (!chat || chat.userId !== user.subject) return;
 
-		// Skip the write when already read — undefined and false both mean
-		// "read" and we don't want needless reactivity fan-out.
-		if (chat.unread !== true) return;
-
 		await ctx.db.patch(args.chatId, { unread: false });
 	}
 });

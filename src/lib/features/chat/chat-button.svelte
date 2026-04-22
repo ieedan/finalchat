@@ -135,9 +135,7 @@
 								<span
 									class="absolute inset-0 inline-flex animate-ping rounded-full bg-yellow-400 opacity-75"
 								></span>
-								<span
-									class="relative inline-flex size-2 rounded-full bg-yellow-400"
-								></span>
+								<span class="relative inline-flex size-2 rounded-full bg-yellow-400"></span>
 							</span>
 						{:else if unread}
 							<span
