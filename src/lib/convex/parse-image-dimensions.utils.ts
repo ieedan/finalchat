@@ -9,10 +9,7 @@
 
 export type ImageDimensions = { width: number; height: number };
 
-export function parseImageDimensions(
-	bytes: Uint8Array,
-	mediaType: string
-): ImageDimensions | null {
+export function parseImageDimensions(bytes: Uint8Array, mediaType: string): ImageDimensions | null {
 	const mt = mediaType.toLowerCase().trim();
 	try {
 		if (mt === 'image/png') return parsePng(bytes);
