@@ -4,12 +4,14 @@ export const TITLE_GENERATION_MODEL = 'google/gemini-2.5-flash-lite' as ModelId;
 
 export const DEFAULT_ENABLED_MODEL_IDS = [
 	'google/gemini-3-pro-preview',
-	'anthropic/claude-opus-4.5',
-	'openai/gpt-5.2',
+	'anthropic/claude-opus-4.7',
+	'openai/gpt-5.4-mini',
 	'openai/gpt-oss-120b',
 	'google/gemini-3-flash-preview',
-	'google/gemini-2.5-flash-lite',
-	'moonshotai/kimi-k2.5'
+	'google/gemini-3.1-flash-lite-preview',
+	'moonshotai/kimi-k2.5',
+	'google/gemini-3-pro-image-preview',
+	'openai/gpt-5.4-image-2'
 ] as ModelId[];
 
 export const BASIC_MODELS: Model[] = [
@@ -24,12 +26,12 @@ export const BASIC_MODELS: Model[] = [
 		description: 'Fast and cheap model.'
 	},
 	{
-		id: 'openai/gpt-5.2' as ModelId,
+		id: 'openai/gpt-5.4-mini' as ModelId,
 		name: 'Thoughtful',
 		description: 'Smart and detailed.'
 	},
 	{
-		id: 'google/gemini-2.5-flash-image' as ModelId,
+		id: 'google/gemini-3-pro-image-preview' as ModelId,
 		name: 'Image',
 		description: 'Image generation model.'
 	}
