@@ -320,7 +320,10 @@ export const editMessage = mutation({
 		});
 
 		await ctx.db.patch(sourceMessage.chatId, {
-			updatedAt: Date.now()
+			updatedAt: Date.now(),
+			// Editing truncates messages after the edit, so any pending askUser
+			// question is gone; clear the sidebar indicator.
+			needsInput: false
 		});
 
 		return { assistantMessageId };
@@ -612,6 +615,7 @@ ${systemPrompt}
 				});
 
 				const uploadPromises: Promise<void>[] = [];
+				let askUserPending = false;
 
 				for await (const chunk of fullStream) {
 					if (wasStopped) break;
@@ -622,6 +626,13 @@ ${systemPrompt}
 					} else if (chunk.type === 'reasoning-delta') {
 						appender.append({ type: 'reasoning', text: chunk.text });
 					} else if (chunk.type === 'tool-call') {
+						if (chunk.toolName === 'askUser') {
+							// `askUser` has no server executor — the loop stops here (see
+							// `hasToolCall('askUser')` stopWhen) and the tool-result is
+							// injected later by `submitQuestionAnswers`. Flag the chat so
+							// the sidebar can surface a "needs input" indicator.
+							askUserPending = true;
+						}
 						appender.append(chunk);
 					} else if (chunk.type === 'tool-result') {
 						appender.append({
@@ -684,6 +695,7 @@ ${systemPrompt}
 				await ctx.runMutation(internal.messages.updateMessageContent, {
 					messageId: last.assistantMessage._id,
 					content: repackedContent,
+					needsInput: askUserPending && !wasStopped,
 					meta: {
 						generationId: openRouterGenId,
 						tokenUsage: usage?.totalTokens,
@@ -853,6 +865,7 @@ export const updateMessageContent = internalMutation({
 	args: {
 		messageId: v.id('messages'),
 		content: v.string(),
+		needsInput: v.optional(v.boolean()),
 		meta: v.object({
 			generationId: v.optional(v.string()),
 			tokenUsage: v.optional(v.number()),
@@ -875,7 +888,12 @@ export const updateMessageContent = internalMutation({
 			}),
 			ctx.db.patch(message.chatId, {
 				generating: false,
-				updatedAt: Date.now()
+				updatedAt: Date.now(),
+				needsInput: args.needsInput ?? false,
+				// Mark as unread when new assistant content lands. The client
+				// flips this back to false via `chats.markRead` whenever the
+				// user is actively viewing the chat.
+				unread: true
 			})
 		]);
 	}
@@ -993,7 +1011,8 @@ export const submitQuestionAnswers = mutation({
 		});
 
 		await ctx.db.patch(message.chatId, {
-			updatedAt: Date.now()
+			updatedAt: Date.now(),
+			needsInput: false
 		});
 
 		return { chatId: message.chatId, assistantMessageId };

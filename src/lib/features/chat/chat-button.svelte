@@ -77,6 +77,12 @@
 
 	const sidebar = useSidebar();
 
+	const isActive = $derived(page.url.pathname.includes(`/chat/${chat._id}`));
+	// Only surface the unread dot for chats the user isn't currently viewing —
+	// the active chat's `unread` flag is flipped off by the chat layout on
+	// mount and on each new message, but avoiding flicker here is cheap.
+	const unread = $derived(!isActive && chat.unread === true);
+
 	$effect(() => {
 		navigating.complete?.then(() => {
 			sidebar.setOpenMobile(false);
@@ -120,6 +126,25 @@
 					>
 						{#if chat.generating}
 							<Spinner />
+						{:else if chat.needsInput}
+							<span
+								aria-label="Waiting for your input"
+								title="Waiting for your input"
+								class="relative flex size-2 shrink-0"
+							>
+								<span
+									class="absolute inset-0 inline-flex animate-ping rounded-full bg-yellow-400 opacity-75"
+								></span>
+								<span
+									class="relative inline-flex size-2 rounded-full bg-yellow-400"
+								></span>
+							</span>
+						{:else if unread}
+							<span
+								aria-label="Unread"
+								title="Unread"
+								class="inline-flex size-2 shrink-0 rounded-full bg-blue-500"
+							></span>
 						{:else if chat.branchedFrom}
 							<button
 								type="button"
