@@ -29,6 +29,9 @@
 	import { BASIC_MODELS } from '$lib/ai.js';
 	import ReasoningEffortPicker from './components/reasoning-effort-picker.svelte';
 	import { supportsImages } from '$lib/features/models/openrouter';
+	import ChatQuestionPrompt from './chat-question-prompt.svelte';
+	import type { AskUserQuestion } from '$lib/features/ai/tools/ask-user';
+	import type { Id } from '$lib/convex/_generated/dataModel';
 
 	const chatLayoutState = useChatLayout();
 	const chatViewState = useChatView();
@@ -83,6 +86,36 @@
 
 	const lastAssistantMessage = $derived.by(() => {
 		return chatViewState.chat?.messages.findLast((message) => message.role === 'assistant');
+	});
+
+	// Detect an unanswered `askUser` tool-call on the most recent message. Only
+	// surface the question panel once the stream is done (`content !== undefined`
+	// and `chat.generating` is false) so we don't show a half-parsed tool-call.
+	const pendingQuestion = $derived.by<{
+		messageId: Id<'messages'>;
+		questions: AskUserQuestion[];
+	} | null>(() => {
+		const messages = chatViewState.chat?.messages ?? [];
+		if (chatViewState.chat?.generating) return null;
+		const last = messages[messages.length - 1];
+		if (!last || last.role !== 'assistant') return null;
+		if (last.content === undefined) return null;
+
+		const parts = last.parts;
+		for (let i = parts.length - 1; i >= 0; i--) {
+			const p = parts[i];
+			if (p.type !== 'tool-call' || p.toolName !== 'askUser') continue;
+			const hasResult = parts.some(
+				(r) => r.type === 'tool-result' && r.toolCallId === p.toolCallId
+			);
+			if (!hasResult) {
+				return {
+					messageId: last._id,
+					questions: (p.input as { questions: AskUserQuestion[] }).questions
+				};
+			}
+		}
+		return null;
 	});
 
 	const isChatOwner = $derived(chatViewState.chatQuery.data?.userId === chatLayoutState.user?.id);
@@ -208,6 +241,12 @@
 			{/if}
 			<div class="flex justify-center w-full">
 				<div class="w-full max-w-3xl px-4">
+					{#if pendingQuestion}
+						<ChatQuestionPrompt
+							messageId={pendingQuestion.messageId}
+							questions={pendingQuestion.questions}
+						/>
+					{:else}
 					<!-- Mobile prompt input -->
 					<PromptInputMobile.Root
 						bind:modelId={modelId.current}
@@ -366,6 +405,7 @@
 							</PromptInput.Footer>
 						</PromptInput.Content>
 					</PromptInput.Root>
+					{/if}
 				</div>
 			</div>
 		</div>

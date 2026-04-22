@@ -133,7 +133,18 @@ export function getLastUserAndAssistantMessages(messages: Doc<'messages'>[]): {
 		return null;
 	}
 
-	const userMessage = messages[messages.length - 2];
+	// The most recent user message. There may be intervening assistant messages
+	// (e.g. an earlier assistant turn that paused on a client-side tool like
+	// `askUser`), so we walk backwards rather than assuming the user message is
+	// always the one immediately before the assistant.
+	let userMessage: Doc<'messages'> | undefined;
+	for (let i = messages.length - 2; i >= 0; i--) {
+		const m = messages[i];
+		if (m.role === 'user') {
+			userMessage = m;
+			break;
+		}
+	}
 	if (!userMessage || userMessage.role !== 'user') {
 		return null;
 	}

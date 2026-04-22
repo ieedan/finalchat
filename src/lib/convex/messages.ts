@@ -14,7 +14,8 @@ import {
 	type ImagePart,
 	type FilePart,
 	streamText,
-	smoothStream
+	smoothStream,
+	hasToolCall
 } from 'ai';
 import {
 	getChatMessagesInternal,
@@ -23,15 +24,20 @@ import {
 } from './chats.utils';
 import { TITLE_GENERATION_MODEL } from '../ai.js';
 import {
+	askUser,
 	chatSearchTool,
 	fetchLinkContentTool,
 	getChat,
-	webSearch
+	webSearch,
+	type AskUserAnswer
 } from '../features/ai/tools/index.js';
 import {
 	createChunkAppender,
+	deserializeStream,
 	partsToModelMessage,
-	repackStream
+	repackStream,
+	serializeParts,
+	type StreamResult
 } from '../utils/stream-transport-protocol';
 import { persistentTextStreaming } from './persistent-text-streaming.utils';
 import { r2 } from './r2';
@@ -558,12 +564,17 @@ ${systemPrompt}
 						tools: {
 							fetchLinkContent: fetchLinkContentTool,
 							webSearch: webSearch,
+							askUser,
 							...(memoryEnabled ? { chatSearch: chatSearchTool, getChat } : {})
 						},
 						stopWhen: [
 							({ steps }) => {
 								return steps.length >= 10;
-							}
+							},
+							// `askUser` has no server-side executor — it is answered by the
+							// user in the UI. Stop the loop as soon as the model calls it so
+							// the stream finalizes and the UI can render the form.
+							hasToolCall('askUser')
 						],
 						experimental_context: {
 							env: {
@@ -892,5 +903,99 @@ export const updateMessageError = internalMutation({
 				updatedAt: Date.now()
 			})
 		]);
+	}
+});
+
+export const AskUserAnswerV = v.object({
+	questionId: v.string(),
+	selected: v.array(v.string()),
+	other: v.optional(v.string())
+});
+
+export const submitQuestionAnswers = mutation({
+	args: {
+		messageId: v.id('messages'),
+		answers: v.array(AskUserAnswerV)
+	},
+	handler: async (
+		ctx,
+		args
+	): Promise<{ chatId: Id<'chats'>; assistantMessageId: Id<'messages'> }> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new ConvexError('Unauthorized');
+
+		const message = await ctx.db.get(args.messageId);
+		if (!message) throw new ConvexError('Message not found');
+		if (message.role !== 'assistant')
+			throw new ConvexError('Only assistant messages can have question answers');
+		if (message.userId !== user.subject) throw new ConvexError('Unauthorized');
+
+		const chat = await ctx.db.get(message.chatId);
+		if (!chat) throw new ConvexError('Chat not found');
+		if (chat.userId !== user.subject) throw new ConvexError('Unauthorized');
+		if (chat.generating)
+			throw new ConvexError('Stop the current response before answering questions');
+
+		const parsed = deserializeStream({ text: message.content ?? '' });
+		if (parsed.isErr()) throw new ConvexError('Could not parse message');
+
+		const parts: StreamResult = [...parsed.value.stack];
+
+		// Find the most recent `askUser` tool-call that does not yet have a result.
+		let pendingCallIndex = -1;
+		for (let i = parts.length - 1; i >= 0; i--) {
+			const p = parts[i];
+			if (p.type !== 'tool-call' || p.toolName !== 'askUser') continue;
+			const hasResult = parts.some(
+				(r) => r.type === 'tool-result' && r.toolCallId === p.toolCallId
+			);
+			if (!hasResult) {
+				pendingCallIndex = i;
+				break;
+			}
+		}
+
+		if (pendingCallIndex === -1) {
+			throw new ConvexError('No pending question on this message');
+		}
+
+		const pendingCall = parts[pendingCallIndex];
+		if (pendingCall.type !== 'tool-call') {
+			throw new ConvexError('Internal error: expected tool-call');
+		}
+
+		// Match the shape used by server-executed tools: the raw result object is
+		// stored on `output` directly (e.g. webSearch stores `{ todaysDate, results }`
+		// without a `{ type: 'json', value: ... }` wrapper). `normalizeToolResultOutput`
+		// wraps it when converting to a ModelMessage for the next generation.
+		const output: { answers: AskUserAnswer[] } = { answers: args.answers };
+		parts.push({
+			type: 'tool-result',
+			toolCallId: pendingCall.toolCallId,
+			toolName: 'askUser',
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			output: output as any
+		});
+
+		await ctx.db.patch(args.messageId, {
+			content: serializeParts(parts)
+		});
+
+		const streamId = await persistentTextStreaming.createStream(ctx);
+		const assistantMessageId = await ctx.db.insert('messages', {
+			chatId: message.chatId,
+			userId: user.subject,
+			role: 'assistant',
+			streamId,
+			meta: {
+				modelId: message.meta.modelId
+			}
+		});
+
+		await ctx.db.patch(message.chatId, {
+			updatedAt: Date.now()
+		});
+
+		return { chatId: message.chatId, assistantMessageId };
 	}
 });

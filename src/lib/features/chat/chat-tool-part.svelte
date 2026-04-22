@@ -1,9 +1,11 @@
 <script lang="ts">
 	import {
+		ToolAskUser,
 		ToolChatSearch,
 		ToolFetchLinkContent,
 		ToolGetChat,
 		ToolWebSearch,
+		type AskUserTool,
 		type ChatSearchTool,
 		type FetchLinkContentTool,
 		type GetChatTool,
@@ -38,5 +40,7 @@
 		<ToolChatSearch tool={tool as ChatSearchTool} />
 	{:else if tool.toolName === 'getChat'}
 		<ToolGetChat tool={tool as GetChatTool} />
+	{:else if tool.toolName === 'askUser'}
+		<ToolAskUser tool={tool as AskUserTool} />
 	{/if}
 </animated.div>
