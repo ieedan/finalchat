@@ -6,7 +6,7 @@ import {
 	createChunkAppender,
 	serializeParts
 } from './v2';
-import type { FilePart, ModelMessage, ReasoningOutput, TextPart, ToolResultPart } from 'ai';
+import type { ModelMessage, ReasoningOutput, TextPart, ToolResultPart } from 'ai';
 
 type ToolResultOutput = ToolResultPart['output'];
 
@@ -42,16 +42,13 @@ export function deserializeStream({
 	}
 }
 
-export function partsToModelMessage(
-	parts: StreamResult,
-	trailingFileParts: FilePart[] = []
-): ModelMessage[] {
+export function partsToModelMessage(parts: StreamResult): ModelMessage[] {
 	const messages: ModelMessage[] = [];
 
 	let currentMessage:
 		| {
 				role: 'assistant';
-				content: (TextPart | ReasoningOutput | FilePart)[];
+				content: (TextPart | ReasoningOutput)[];
 		  }
 		| undefined = undefined;
 
@@ -111,20 +108,6 @@ export function partsToModelMessage(
 				});
 			}
 		}
-	}
-
-	// Merge assistant-generated files (e.g. images) into the final assistant
-	// message so the model sees them as part of that turn. Splitting them into a
-	// separate assistant message breaks the user/assistant alternation many
-	// providers require and causes the image to be dropped when iterating.
-	if (trailingFileParts.length > 0) {
-		if (!currentMessage) {
-			currentMessage = {
-				role: 'assistant',
-				content: []
-			};
-		}
-		currentMessage.content.push(...trailingFileParts);
 	}
 
 	flushMessage();

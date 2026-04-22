@@ -441,39 +441,71 @@ export const streamMessage = httpAction(async (ctx, request) => {
 				});
 
 				// convert messages into model messages
-				const modelMessages: ModelMessage[] = messages.flatMap((message) => {
-					if (message.role === 'assistant') {
-						const assistantFileParts: FilePart[] = message.attachments.map((attachment) => ({
-							type: 'file',
-							data: attachment.url,
-							mediaType: attachment.mediaType
-						}));
+				const toUserAttachmentPart = (attachment: {
+					url: string;
+					mediaType: string;
+				}): ImagePart | FilePart =>
+					attachment.mediaType.startsWith('image/')
+						? ({ type: 'image', image: attachment.url } satisfies ImagePart)
+						: ({
+								type: 'file',
+								data: attachment.url,
+								mediaType: attachment.mediaType
+							} satisfies FilePart);
 
-						return partsToModelMessage(message.parts, assistantFileParts);
+				// Assistant-generated attachments (e.g. images from an image model)
+				// have to ride on the *next* user turn: the OpenRouter/OpenAI chat
+				// schema has no slot for files on an assistant message and the
+				// provider adapter drops them silently, so the follow-up model would
+				// otherwise never see the image it produced.
+				const modelMessages: ModelMessage[] = [];
+				let carriedAssistantAttachments: (ImagePart | FilePart)[] = [];
+
+				for (const message of messages) {
+					if (message.role === 'assistant') {
+						const assistantMessages = partsToModelMessage(message.parts);
+						const carried = message.attachments.map(toUserAttachmentPart);
+
+						if (assistantMessages.length === 0 && carried.length > 0) {
+							// Preserve user/assistant alternation when the assistant turn
+							// was image-only with no text or reasoning.
+							modelMessages.push({
+								role: 'assistant',
+								content: [{ type: 'text', text: '[generated attachment]' }]
+							});
+						} else {
+							modelMessages.push(...assistantMessages);
+						}
+
+						carriedAssistantAttachments = carried;
+						continue;
 					}
 
-					const attachmentParts: (ImagePart | FilePart)[] =
-						message.attachments?.map((attachment) =>
-							attachment.mediaType.startsWith('image/')
-								? ({ type: 'image', image: attachment.url } satisfies ImagePart)
-								: ({
-										type: 'file',
-										data: attachment.url,
-										mediaType: attachment.mediaType
-									} satisfies FilePart)
-						) ?? [];
+					const userAttachmentParts = message.attachments?.map(toUserAttachmentPart) ?? [];
 
-					return {
-						role: message.role,
-						content: [
-							{
-								type: 'text',
-								text: message.content ?? ''
-							},
-							...attachmentParts
-						]
-					} satisfies ModelMessage;
-				});
+					const content: (
+						| { type: 'text'; text: string }
+						| ImagePart
+						| FilePart
+					)[] = [];
+
+					if (carriedAssistantAttachments.length > 0) {
+						content.push({
+							type: 'text',
+							text: 'Your previous response included the following generated attachment(s):'
+						});
+						content.push(...carriedAssistantAttachments);
+						carriedAssistantAttachments = [];
+					}
+
+					content.push({ type: 'text', text: message.content ?? '' });
+					content.push(...userAttachmentParts);
+
+					modelMessages.push({
+						role: 'user',
+						content
+					});
+				}
 
 				if (systemPrompt) {
 					modelMessages.unshift({

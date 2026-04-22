@@ -70,55 +70,6 @@ describe('stream transport protocol index', () => {
 	});
 
 	describe('partsToModelMessage', () => {
-		it('merges trailing file parts into the final assistant message so generated images are kept with that turn', () => {
-			const parts = [{ type: 'text', text: "Here's your image" }] as StreamResult;
-
-			const fileParts = [
-				{
-					type: 'file' as const,
-					data: 'https://r2.example/cat.png',
-					mediaType: 'image/png'
-				}
-			];
-
-			expect(partsToModelMessage(parts, fileParts)).toEqual([
-				{
-					role: 'assistant',
-					content: [
-						{ type: 'text', text: "Here's your image" },
-						{
-							type: 'file',
-							data: 'https://r2.example/cat.png',
-							mediaType: 'image/png'
-						}
-					]
-				}
-			]);
-		});
-
-		it('creates an assistant message containing just the file parts when the stream has no text/reasoning', () => {
-			const fileParts = [
-				{
-					type: 'file' as const,
-					data: 'https://r2.example/cat.png',
-					mediaType: 'image/png'
-				}
-			];
-
-			expect(partsToModelMessage([], fileParts)).toEqual([
-				{
-					role: 'assistant',
-					content: [
-						{
-							type: 'file',
-							data: 'https://r2.example/cat.png',
-							mediaType: 'image/png'
-						}
-					]
-				}
-			]);
-		});
-
 		it('wraps raw persisted tool output in { type: "json", value } for AI SDK prompts', () => {
 			const parts = [
 				{
