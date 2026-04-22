@@ -13,6 +13,8 @@ export type ChatPromptAttachment = {
 	key: string;
 	mediaType: string;
 	fileName?: string;
+	width?: number;
+	height?: number;
 };
 
 export type OnSubmit = (opts: {
@@ -28,7 +30,9 @@ type PromptInputRootStateOptions = ReadableBoxedValues<{
 	submitOnEnter?: boolean;
 	optimisticClear?: boolean;
 	generating: boolean;
-	onUpload: (files: File[]) => Promise<{ url: string; key: string; mediaType: string }[]>;
+	onUpload: (
+		files: File[]
+	) => Promise<{ url: string; key: string; mediaType: string; width?: number; height?: number }[]>;
 	onDeleteAttachment: (key: string) => Promise<void>;
 }> &
 	WritableBoxedValues<{
@@ -79,7 +83,9 @@ class PromptInputRootState {
 					url: uploadedImage.url,
 					key: uploadedImage.key,
 					mediaType: uploadedImage.mediaType,
-					fileName: files[i]?.name
+					fileName: files[i]?.name,
+					...(uploadedImage.width !== undefined ? { width: uploadedImage.width } : {}),
+					...(uploadedImage.height !== undefined ? { height: uploadedImage.height } : {})
 				}))
 			];
 		} catch (error) {

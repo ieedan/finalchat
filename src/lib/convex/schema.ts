@@ -110,7 +110,9 @@ export default defineSchema({
 		messageId: v.id('messages'),
 		key: v.string(),
 		mediaType: v.string(),
-		fileName: v.optional(v.string())
+		fileName: v.optional(v.string()),
+		width: v.optional(v.number()),
+		height: v.optional(v.number())
 	})
 		.index('by_chat', ['chatId'])
 		.index('by_message', ['messageId'])
