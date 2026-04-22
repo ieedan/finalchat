@@ -116,7 +116,9 @@
 				url: a.url,
 				key: a.key,
 				mediaType: a.mediaType,
-				fileName: a.fileName
+				fileName: a.fileName,
+				width: a.width,
+				height: a.height
 			}))}
 			initialModelId={(message.chatSettings.modelId as typeof modelIdCtx.current) ??
 				modelIdCtx.current}

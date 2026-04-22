@@ -30,7 +30,11 @@
 	}: HTMLAttributes<HTMLDivElement> & {
 		onSubmit: OnSubmit;
 		onStop?: () => void | Promise<void>;
-		onUpload: (files: File[]) => Promise<{ url: string; key: string; mediaType: string }[]>;
+		onUpload: (
+			files: File[]
+		) => Promise<
+			{ url: string; key: string; mediaType: string; width?: number; height?: number }[]
+		>;
 		onDeleteAttachment: (key: string) => Promise<void>;
 		generating?: boolean;
 		/**

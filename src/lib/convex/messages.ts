@@ -52,7 +52,9 @@ export const Prompt = v.object({
 				url: v.string(),
 				key: v.string(),
 				mediaType: v.string(),
-				fileName: v.optional(v.string())
+				fileName: v.optional(v.string()),
+				width: v.optional(v.number()),
+				height: v.optional(v.number())
 			})
 		)
 	),
@@ -167,7 +169,9 @@ export const create = mutation({
 						key: attachment.key,
 						userId: user.subject,
 						mediaType: attachment.mediaType,
-						fileName: attachment.fileName
+						fileName: attachment.fileName,
+						width: attachment.width,
+						height: attachment.height
 					});
 				})
 			);
@@ -286,7 +290,9 @@ export const editMessage = mutation({
 						key: attachment.key,
 						userId: user.subject,
 						mediaType: attachment.mediaType,
-						fileName: attachment.fileName
+						fileName: attachment.fileName,
+						width: attachment.width,
+						height: attachment.height
 					});
 				})
 			);
