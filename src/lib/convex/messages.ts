@@ -47,7 +47,7 @@ import type { ContextType } from '../features/ai/tools/index.js';
 import { truncateRight } from '../utils/strings';
 import { rateLimiter } from './rateLimiter';
 import { formatTimeUntil } from '../utils/time';
-import type { RateLimitErrorData } from './rate-limit-error';
+import type { RateLimitErrorData } from './rateLimitError';
 import { ReasoningEffort } from './schema';
 
 export const Prompt = v.object({

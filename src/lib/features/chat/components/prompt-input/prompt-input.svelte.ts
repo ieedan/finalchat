@@ -7,7 +7,7 @@ import { SvelteMap } from 'svelte/reactivity';
 import imageCompression from 'browser-image-compression';
 import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 import type { ReasoningEffort } from '$lib/convex/schema';
-import { getRateLimitErrorData } from '$lib/convex/rate-limit-error';
+import { getRateLimitErrorData } from '$lib/convex/rateLimitError';
 
 export type ChatPromptAttachment = {
 	url: string;

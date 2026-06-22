@@ -24,7 +24,7 @@ import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 import { BASIC_MODELS, DEFAULT_ENABLED_MODEL_IDS } from '$lib/ai.js';
 import type { Model, ModelId } from './types.js';
 import { ConvexError } from 'convex/values';
-import { convexErrorMessage } from '$lib/convex/rate-limit-error';
+import { convexErrorMessage } from '$lib/convex/rateLimitError';
 
 type ChatLayoutOptions = {
 	user: User | null;
