@@ -7,6 +7,7 @@ import { SvelteMap } from 'svelte/reactivity';
 import imageCompression from 'browser-image-compression';
 import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 import type { ReasoningEffort } from '$lib/convex/schema';
+import { getRateLimitErrorData } from '$lib/convex/rate-limit-error';
 
 export type ChatPromptAttachment = {
 	url: string;
@@ -44,14 +45,66 @@ type PromptInputRootStateOptions = ReadableBoxedValues<{
 
 class PromptInputRootState {
 	loading = $state(false);
-	error = $state<string | null>(null);
 	uploadingAttachments: Map<string, File> = new SvelteMap();
 	textAreaRef = $state<HTMLTextAreaElement | null>(null);
 	isMobile: IsMobile;
 
+	/** Manually surfaced error (uploads, generic submit failures, etc.). */
+	#error = $state<string | null>(null);
+	/** Timestamp (ms) at which the user may retry after being rate limited. */
+	#rateLimitedUntil = $state<number | null>(null);
+	/** Reactive clock that drives the rate-limit countdown re-render. */
+	#now = $state(Date.now());
+
 	constructor(readonly opts: PromptInputRootStateOptions) {
 		this.onUpload = this.onUpload.bind(this);
 		this.isMobile = new IsMobile();
+
+		// While rate limited, tick the clock so the countdown updates, and clear
+		// the limit once it elapses. The effect re-runs when the deadline changes
+		// (and is cleaned up on unmount), so no interval leaks.
+		$effect(() => {
+			if (this.#rateLimitedUntil === null) return;
+
+			const interval = setInterval(() => {
+				this.#now = Date.now();
+				if (this.#rateLimitedUntil !== null && this.#now >= this.#rateLimitedUntil) {
+					this.#rateLimitedUntil = null;
+				}
+			}, 250);
+
+			return () => clearInterval(interval);
+		});
+	}
+
+	/**
+	 * The error shown in the banner. When rate limited this is a live countdown
+	 * string that updates every tick until the limit elapses.
+	 */
+	get error(): string | null {
+		if (this.#rateLimitedUntil !== null) {
+			const secondsLeft = Math.ceil((this.#rateLimitedUntil - this.#now) / 1000);
+			if (secondsLeft > 0) {
+				return `Rate limit exceeded. Try again in ${secondsLeft}s`;
+			}
+		}
+		return this.#error;
+	}
+
+	set error(value: string | null) {
+		this.#error = value;
+		// Setting the error to null (e.g. dismissing the banner) also dismisses an
+		// active rate-limit countdown.
+		if (value === null) {
+			this.#rateLimitedUntil = null;
+		}
+	}
+
+	/** Begins a rate-limit countdown lasting `retryAfter` milliseconds. */
+	setRateLimited(retryAfter: number) {
+		this.#error = null;
+		this.#now = Date.now();
+		this.#rateLimitedUntil = Date.now() + retryAfter;
 	}
 
 	async onUpload(files: File[]) {
@@ -121,10 +174,15 @@ class PromptInputRootState {
 			this.opts.value.current = '';
 			this.opts.attachments.current = [];
 		} catch (error) {
-			this.error =
-				error instanceof Error
-					? error.message
-					: 'An unknown error occurred while trying to submit your message.';
+			const rateLimit = getRateLimitErrorData(error);
+			if (rateLimit) {
+				this.setRateLimited(rateLimit.retryAfter);
+			} else {
+				this.error =
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred while trying to submit your message.';
+			}
 			this.opts.value.current = previousValue;
 		} finally {
 			this.loading = false;
