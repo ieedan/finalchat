@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { afterNavigate } from '$app/navigation';
 	import { useConvexClient } from 'convex-svelte';
 	import type { Id } from '$lib/convex/_generated/dataModel';
 	import { api } from '$lib/convex/_generated/api';
@@ -13,10 +12,12 @@
 
 	const convex = useConvexClient();
 
-	// set unread to false once we navigate to the chat
-	afterNavigate(() => {
+	// Mark the chat as read while the user is viewing it. This reacts to the
+	// chat's `unread` flag, so it covers both navigating into the chat and a
+	// new response landing while we're already on it.
+	$effect(() => {
 		const id = page.params.chatId as Id<'chats'> | undefined;
-		if (!id || chatViewState.chat?.unread === false) return;
+		if (!id || chatViewState.chat?.unread !== true) return;
 		convex.mutation(api.chats.markRead, { chatId: id });
 	});
 </script>
