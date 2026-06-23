@@ -24,6 +24,7 @@ import type { MessageWithAttachments } from '$lib/convex/chats.utils.js';
 import { BASIC_MODELS, DEFAULT_ENABLED_MODEL_IDS } from '$lib/ai.js';
 import type { Model, ModelId } from './types.js';
 import { ConvexError } from 'convex/values';
+import { convexErrorMessage } from '$lib/convex/rateLimitError';
 
 type ChatLayoutOptions = {
 	user: User | null;
@@ -196,7 +197,7 @@ class ChatLayoutState {
 			await goto(resolve(`/chat/${newChatId}`));
 		} catch (error) {
 			if (error instanceof ConvexError) {
-				throw new Error(error.data, { cause: error });
+				throw new Error(convexErrorMessage(error.data), { cause: error });
 			}
 			throw error;
 		}
@@ -242,7 +243,7 @@ class ChatLayoutState {
 			this.createdMessages.add(assistantMessageId);
 		} catch (error) {
 			if (error instanceof ConvexError) {
-				throw new Error(error.data, { cause: error });
+				throw new Error(convexErrorMessage(error.data), { cause: error });
 			}
 
 			throw error;
@@ -281,7 +282,7 @@ class ChatLayoutState {
 			}
 		} catch (error) {
 			if (error instanceof ConvexError) {
-				throw new Error(error.data, { cause: error });
+				throw new Error(convexErrorMessage(error.data), { cause: error });
 			}
 
 			throw error;

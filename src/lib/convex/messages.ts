@@ -47,6 +47,7 @@ import type { ContextType } from '../features/ai/tools/index.js';
 import { truncateRight } from '../utils/strings';
 import { rateLimiter } from './rateLimiter';
 import { formatTimeUntil } from '../utils/time';
+import type { RateLimitErrorData } from './rateLimitError';
 import { ReasoningEffort } from './schema';
 
 export const Prompt = v.object({
@@ -95,9 +96,11 @@ export const create = mutation({
 		if (isFreeUser) {
 			const status = await rateLimiter.limit(ctx, 'freeMessages', { key: user.subject });
 			if (!status.ok) {
-				throw new ConvexError(
-					`Rate limit exceeded. Try again in ${formatTimeUntil(status.retryAfter)}`
-				);
+				throw new ConvexError({
+					kind: 'rate_limit',
+					message: `Rate limit exceeded. Try again in ${formatTimeUntil(status.retryAfter)}`,
+					retryAfter: status.retryAfter
+				} satisfies RateLimitErrorData);
 			}
 		}
 
@@ -240,9 +243,11 @@ export const editMessage = mutation({
 		if (isFreeUser) {
 			const status = await rateLimiter.limit(ctx, 'freeMessages', { key: user.subject });
 			if (!status.ok) {
-				throw new ConvexError(
-					`Rate limit exceeded. Try again in ${formatTimeUntil(status.retryAfter)}`
-				);
+				throw new ConvexError({
+					kind: 'rate_limit',
+					message: `Rate limit exceeded. Try again in ${formatTimeUntil(status.retryAfter)}`,
+					retryAfter: status.retryAfter
+				} satisfies RateLimitErrorData);
 			}
 		}
 
