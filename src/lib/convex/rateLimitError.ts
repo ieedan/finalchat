@@ -32,12 +32,13 @@ export function getRateLimitErrorData(error: unknown): RateLimitErrorData | null
 	if (error instanceof ConvexError && isRateLimitErrorData(error.data)) {
 		return error.data;
 	}
-	if (
-		error instanceof Error &&
-		error.cause instanceof ConvexError &&
-		isRateLimitErrorData(error.cause.data)
-	) {
-		return error.cause.data;
+	// Access `cause` without relying on the `Error.cause` lib typing — the Convex
+	// directory is typechecked against an older `lib` that doesn't include it.
+	if (error instanceof Error) {
+		const cause = (error as { cause?: unknown }).cause;
+		if (cause instanceof ConvexError && isRateLimitErrorData(cause.data)) {
+			return cause.data;
+		}
 	}
 	return null;
 }
