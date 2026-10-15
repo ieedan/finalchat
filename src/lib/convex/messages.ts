@@ -74,6 +74,8 @@ export const Prompt = v.object({
 export const create = mutation({
 	args: {
 		chatId: v.optional(v.id('chats')),
+		/** A pre-created draft chat to use when starting a new chat (ignored if `chatId` is set). */
+		draftChatId: v.optional(v.id('chats')),
 		prompt: Prompt,
 		apiKey: v.string()
 	},
@@ -106,13 +108,26 @@ export const create = mutation({
 
 		let chatId: Id<'chats'>;
 		if (!args.chatId) {
-			chatId = await ctx.db.insert('chats', {
-				userId: user.subject,
-				title: isFreeUser ? truncateRight(args.prompt.input, 30) : 'Untitled Chat',
-				generating: false,
-				updatedAt: Date.now(),
-				pinned: false
-			});
+			const title = isFreeUser ? truncateRight(args.prompt.input, 30) : 'Untitled Chat';
+			const draft = args.draftChatId ? await ctx.db.get(args.draftChatId) : null;
+
+			// only claim the draft if it's still unused (e.g. another tab may have claimed it already)
+			if (draft && draft.userId === user.subject && draft.draft) {
+				chatId = draft._id;
+				await ctx.db.patch(chatId, {
+					title,
+					draft: false,
+					updatedAt: Date.now()
+				});
+			} else {
+				chatId = await ctx.db.insert('chats', {
+					userId: user.subject,
+					title,
+					generating: false,
+					updatedAt: Date.now(),
+					pinned: false
+				});
+			}
 
 			if (!isFreeUser) {
 				ctx.scheduler.runAfter(0, internal.messages.generateChatTitle, {

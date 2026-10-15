@@ -7,12 +7,12 @@ import type {
 	OnSubmit
 } from './components/prompt-input/prompt-input.svelte.js';
 import type { ReasoningEffort } from '$lib/convex/schema.js';
-import { useConvexClient } from 'convex-svelte';
+import { useConvexClient, useQuery } from 'convex-svelte';
 import { page } from '$app/state';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { Context, PersistedState } from 'runed';
-import type { ConvexClient } from 'convex/browser';
+import type { ConvexClient, OptimisticLocalStore } from 'convex/browser';
 import type { RemoteQuery } from '@sveltejs/kit';
 import { getApiKey } from '../api-keys/api-keys.remote.js';
 import { useLocalApiKey } from '../api-keys/local-key-storage.svelte.js';
@@ -25,6 +25,9 @@ import { BASIC_MODELS, DEFAULT_ENABLED_MODEL_IDS } from '$lib/ai.js';
 import type { Model, ModelId } from './types.js';
 import { ConvexError } from 'convex/values';
 import { convexErrorMessage } from '$lib/convex/rateLimitError';
+import { truncateRight } from '$lib/utils/strings';
+import { untrack } from 'svelte';
+import { toast } from 'svelte-sonner';
 
 type ChatLayoutOptions = {
 	user: User | null;
@@ -41,6 +44,9 @@ class ChatLayoutState {
 	apiKeysQuery: RemoteQuery<Doc<'apiKeys'> | null>;
 	localApiKey: PersistedState<string | null>;
 	client: ConvexClient;
+	/** An empty chat created ahead of time so starting a new chat doesn't wait on chat creation. */
+	draftChatId = $state<Id<'chats'> | null>(null);
+	#preparingDraft = false;
 	constructor(readonly opts: ChatLayoutOptions) {
 		this.client = useConvexClient();
 		this.userSettingsQuery = useQueryWithFallback(
@@ -61,6 +67,13 @@ class ChatLayoutState {
 
 		this.apiKeysQuery = getApiKey();
 		this.localApiKey = useLocalApiKey();
+
+		// keep a draft chat ready (and its query subscribed) so a new chat can open instantly
+		$effect(() => {
+			if (!this.user || this.draftChatId !== null) return;
+			untrack(() => this.prepareDraft());
+		});
+		useQuery(api.chats.get, () => (this.draftChatId ? { chatId: this.draftChatId } : 'skip'));
 
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleStop = this.handleStop.bind(this);
@@ -140,6 +153,19 @@ class ChatLayoutState {
 		return (
 			this.localApiKey.current ?? this.apiKeysQuery.current?.key ?? this.opts.apiKey?.key ?? null
 		);
+	}
+
+	async prepareDraft() {
+		if (this.#preparingDraft) return;
+		this.#preparingDraft = true;
+		try {
+			this.draftChatId = await this.client.mutation(api.chats.getOrCreateDraft, {});
+		} catch (error) {
+			// not critical, new chats will just be created when the first message is sent
+			console.error('Failed to prepare draft chat', error);
+		} finally {
+			this.#preparingDraft = false;
+		}
 	}
 
 	async handleStop() {
@@ -251,29 +277,65 @@ class ChatLayoutState {
 	}
 
 	handleSubmit: OnSubmit = async ({ input, modelId, attachments, reasoningEffort }) => {
-		if (!this.user) throw new Error('You must be signed in to start chatting!');
+		const user = this.user;
+		if (!user) throw new Error('You must be signed in to start chatting!');
 
 		const model = this.models.find((m) => m.id === modelId);
 		if (!model) throw new Error(`Model with id: ${modelId} not found`);
 
-		try {
-			const { chatId, assistantMessageId } = await this.client.mutation(api.messages.create, {
-				chatId: this.chatId,
+		const currentChatId = this.chatId;
+		// when starting a new chat use the draft so we can navigate to it right away
+		const draftChatId = currentChatId ? undefined : (this.draftChatId ?? undefined);
+		const isFreeUser = (this.apiKey ?? '').trim() === '';
+
+		const prompt = {
+			input,
+			modelId,
+			attachments,
+			supportedParameters: model.supported_parameters,
+			inputModalities: model.architecture.input_modalities,
+			outputModalities: model.architecture.output_modalities,
+			// when not advanced mode or model doesn't support reasoning, send 'default'
+			reasoningEffort:
+				this.isAdvancedMode && this.modelSupportsReasoning(modelId) ? reasoningEffort : 'default'
+		} as const;
+
+		const mutation = this.client.mutation(
+			api.messages.create,
+			{
+				chatId: currentChatId,
+				draftChatId,
 				apiKey: this.apiKey ?? '',
-				prompt: {
-					input,
-					modelId,
-					attachments,
-					supportedParameters: model.supported_parameters,
-					inputModalities: model.architecture.input_modalities,
-					outputModalities: model.architecture.output_modalities,
-					// when not advanced mode or model doesn't support reasoning, send 'default'
-					reasoningEffort:
-						this.isAdvancedMode && this.modelSupportsReasoning(modelId)
-							? reasoningEffort
-							: 'default'
+				prompt
+			},
+			{
+				optimisticUpdate: (store) => {
+					const chatId = currentChatId ?? draftChatId;
+					if (!chatId) return;
+					addOptimisticUserMessage(store, {
+						chatId,
+						userId: user.id,
+						prompt,
+						newChatTitle: draftChatId
+							? isFreeUser
+								? truncateRight(input, 30)
+								: 'Untitled Chat'
+							: undefined
+					});
 				}
-			});
+			}
+		);
+		// errors are handled below once we've navigated
+		mutation.catch(() => {});
+
+		if (draftChatId) {
+			await goto(resolve(`/chat/${draftChatId}`));
+			// the draft is now in use, this will prepare a new one
+			this.draftChatId = null;
+		}
+
+		try {
+			const { chatId, assistantMessageId } = await mutation;
 
 			this.createdMessages.add(assistantMessageId);
 
@@ -281,13 +343,107 @@ class ChatLayoutState {
 				await goto(resolve(`/chat/${chatId}`));
 			}
 		} catch (error) {
+			const message = error instanceof ConvexError ? convexErrorMessage(error.data) : String(error);
+
+			if (draftChatId) {
+				// we already left the new chat page so bring the user back with their input restored
+				await goto(`${resolve('/chat')}?q=${encodeURIComponent(input)}`, { replaceState: true });
+				toast.error(message);
+			}
+
 			if (error instanceof ConvexError) {
-				throw new Error(convexErrorMessage(error.data), { cause: error });
+				throw new Error(message, { cause: error });
 			}
 
 			throw error;
 		}
 	};
+}
+
+/**
+ * Optimistically shows the user's message (including attachments) in the chat while
+ * `messages.create` is in flight.
+ */
+function addOptimisticUserMessage(
+	store: OptimisticLocalStore,
+	{
+		chatId,
+		userId,
+		prompt,
+		newChatTitle
+	}: {
+		chatId: Id<'chats'>;
+		userId: string;
+		prompt: {
+			input: string;
+			modelId: string;
+			attachments: ChatPromptAttachment[];
+			supportedParameters: string[];
+			inputModalities: string[];
+			outputModalities: string[];
+			reasoningEffort: ReasoningEffort;
+		};
+		/** Set when the message starts a new chat. */
+		newChatTitle?: string;
+	}
+) {
+	const now = Date.now();
+	const chat = store.getQuery(api.chats.get, { chatId });
+	// non owners fork the chat on the server so there is nothing to show here
+	if (!chat || chat.userId !== userId) return;
+
+	const messageId = `optimistic:${now}` as Id<'messages'>;
+
+	const updatedChat = {
+		...chat,
+		...(newChatTitle !== undefined ? { title: newChatTitle, draft: false } : {}),
+		updatedAt: now
+	};
+
+	store.setQuery(
+		api.chats.get,
+		{ chatId },
+		{
+			...updatedChat,
+			messages: [
+				...chat.messages,
+				{
+					_id: messageId,
+					_creationTime: now,
+					userId,
+					chatId,
+					role: 'user',
+					content: prompt.input,
+					chatSettings: {
+						modelId: prompt.modelId,
+						supportedParameters: prompt.supportedParameters,
+						inputModalities: prompt.inputModalities,
+						outputModalities: prompt.outputModalities,
+						reasoningEffort: prompt.reasoningEffort
+					},
+					attachments: prompt.attachments.map((attachment) => ({
+						_id: `optimistic:${attachment.key}` as Id<'chatAttachments'>,
+						_creationTime: now,
+						userId,
+						chatId,
+						messageId,
+						key: attachment.key,
+						url: attachment.url,
+						mediaType: attachment.mediaType,
+						fileName: attachment.fileName,
+						width: attachment.width,
+						height: attachment.height
+					}))
+				}
+			]
+		}
+	);
+
+	const chats = store.getQuery(api.chats.getAll, {});
+	if (chats) {
+		const { messages: _messages, ...chatDoc } = updatedChat;
+		store.setQuery(api.chats.getAll, {}, [chatDoc, ...chats.filter((c) => c._id !== chatId)]);
+	}
 }
 
 const ChatLayoutCtx = new Context<ChatLayoutState>('chat-layout-state');
