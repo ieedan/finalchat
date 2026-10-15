@@ -1,5 +1,6 @@
 import { env } from '$lib/env.server';
-import { redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
+import { json, redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
+import { jwtDecode } from 'jwt-decode';
 import {
 	WorkOS,
 	type AuthenticationResponse,
@@ -37,10 +38,27 @@ export type AuthKitOptions = {
 	 * Random secret string used to seal the session cookie
 	 */
 	cookiePassword: string;
+	/**
+	 * Refresh the access token when it expires within this many seconds instead of waiting until
+	 * it has already expired. Defaults to 60.
+	 */
+	refreshLeewaySeconds?: number;
 	hooks?: {
 		onAuthenticated?: (opts: { event: RequestEvent; auth: AuthResult }) => Promise<void>;
 	};
 };
+
+const REFRESH_ATTEMPTS = 3;
+
+function expiresWithin(accessToken: string, seconds: number) {
+	try {
+		const { exp } = jwtDecode(accessToken);
+		if (!exp) return false;
+		return exp * 1000 - Date.now() < seconds * 1000;
+	} catch {
+		return true;
+	}
+}
 
 export class AuthKitAuth {
 	private workos: WorkOS;
@@ -112,7 +130,9 @@ export class AuthKitAuth {
 
 	handle() {
 		return async ({ event, resolve }: Parameters<Handle>[0]) => {
-			event.locals.auth = () => this.auth(event);
+			// memoize so that concurrent loads in the same request don't each refresh the session
+			let authPromise: Promise<AuthResult | null> | undefined;
+			event.locals.auth = () => (authPromise ??= this.auth(event));
 
 			return resolve(event);
 		};
@@ -126,6 +146,28 @@ export class AuthKitAuth {
 		};
 	}
 
+	/**
+	 * Refreshes the session and returns a fresh access token. Responds with 401 (rather than
+	 * redirecting) when the user is no longer signed in so that client side callers can tell
+	 * the difference between being signed out and a transient failure (503).
+	 */
+	handleRefresh() {
+		return async (event: RequestEvent) => {
+			const headers = { 'cache-control': 'no-store' };
+			const sessionData = getSessionCookie(event.cookies);
+			if (!sessionData) return json({ error: 'unauthenticated' }, { status: 401, headers });
+
+			const result = await this.refresh(event, sessionData);
+			if (result.status === 'ok') {
+				return json({ accessToken: result.auth.accessToken }, { headers });
+			}
+			if (result.status === 'signed_out') {
+				return json({ error: 'unauthenticated' }, { status: 401, headers });
+			}
+			return json({ error: 'refresh_failed' }, { status: 503, headers });
+		};
+	}
+
 	private async auth(event: RequestEvent): Promise<AuthResult | null> {
 		const sessionData = getSessionCookie(event.cookies);
 		if (!sessionData) return null;
@@ -134,20 +176,12 @@ export class AuthKitAuth {
 			cookiePassword: this.opts.cookiePassword
 		});
 
-		const authenticatedResult = await session.authenticate();
-
-		if (authenticatedResult.authenticated) {
-			const authResult: AuthResult = {
-				user: authenticatedResult.user,
-				accessToken: authenticatedResult.accessToken,
-				impersonator: authenticatedResult.impersonator,
-				organizationId: authenticatedResult.organizationId,
-				permissions: authenticatedResult.permissions,
-				role: authenticatedResult.role,
-				sessionId: authenticatedResult.sessionId
-			};
-			this.opts.hooks?.onAuthenticated?.({ event, auth: authResult });
-			return authResult;
+		let authenticatedResult: Awaited<ReturnType<typeof session.authenticate>>;
+		try {
+			authenticatedResult = await session.authenticate();
+		} catch {
+			// the cookie couldn't be unsealed
+			return null;
 		}
 
 		if (
@@ -157,28 +191,91 @@ export class AuthKitAuth {
 			return null;
 		}
 
-		// attempt to refresh the session
-		try {
-			const authenticatedResult = await session.refresh();
-
-			if (!authenticatedResult.authenticated) return null;
-			if (!authenticatedResult.session) return null;
-
-			setSessionCookie(event.cookies, authenticatedResult.sealedSession!);
-
-			const authResult: AuthResult = {
+		const leeway = this.opts.refreshLeewaySeconds ?? 60;
+		if (
+			authenticatedResult.authenticated &&
+			!expiresWithin(authenticatedResult.accessToken, leeway)
+		) {
+			return this.authenticated(event, {
 				user: authenticatedResult.user,
-				accessToken: authenticatedResult.session?.accessToken,
+				accessToken: authenticatedResult.accessToken,
 				impersonator: authenticatedResult.impersonator,
 				organizationId: authenticatedResult.organizationId,
 				permissions: authenticatedResult.permissions,
 				role: authenticatedResult.role,
 				sessionId: authenticatedResult.sessionId
-			};
-			this.opts.hooks?.onAuthenticated?.({ event, auth: authResult });
-			return authResult;
-		} catch {
-			return null;
+			});
 		}
+
+		const result = await this.refresh(event, sessionData);
+		if (result.status === 'ok') return result.auth;
+
+		// refreshing failed for a transient reason (network error, rate limit, WorkOS outage) but the
+		// current access token is still valid so keep using it instead of signing the user out
+		if (result.status === 'error' && authenticatedResult.authenticated) {
+			return this.authenticated(event, {
+				user: authenticatedResult.user,
+				accessToken: authenticatedResult.accessToken,
+				impersonator: authenticatedResult.impersonator,
+				organizationId: authenticatedResult.organizationId,
+				permissions: authenticatedResult.permissions,
+				role: authenticatedResult.role,
+				sessionId: authenticatedResult.sessionId
+			});
+		}
+
+		return null;
+	}
+
+	/**
+	 * Exchanges the refresh token for a new session. Only a definitive answer from WorkOS (e.g.
+	 * `invalid_grant`) is treated as being signed out, transient failures are retried.
+	 */
+	private async refresh(
+		event: RequestEvent,
+		sessionData: string
+	): Promise<{ status: 'ok'; auth: AuthResult } | { status: 'signed_out' } | { status: 'error' }> {
+		for (let attempt = 0; attempt < REFRESH_ATTEMPTS; attempt++) {
+			if (attempt > 0) await new Promise((r) => setTimeout(r, 250 * 2 ** (attempt - 1)));
+
+			const session = this.workos.userManagement.loadSealedSession({
+				sessionData,
+				cookiePassword: this.opts.cookiePassword
+			});
+
+			let refreshResult: Awaited<ReturnType<typeof session.refresh>>;
+			try {
+				refreshResult = await session.refresh();
+			} catch (e) {
+				console.error(`Failed to refresh session (attempt ${attempt + 1})`, e);
+				continue;
+			}
+
+			if (!refreshResult.authenticated || !refreshResult.session) {
+				return { status: 'signed_out' };
+			}
+
+			setSessionCookie(event.cookies, refreshResult.sealedSession!);
+
+			return {
+				status: 'ok',
+				auth: this.authenticated(event, {
+					user: refreshResult.user,
+					accessToken: refreshResult.session.accessToken,
+					impersonator: refreshResult.impersonator,
+					organizationId: refreshResult.organizationId,
+					permissions: refreshResult.permissions,
+					role: refreshResult.role,
+					sessionId: refreshResult.sessionId
+				})
+			};
+		}
+
+		return { status: 'error' };
+	}
+
+	private authenticated(event: RequestEvent, auth: AuthResult) {
+		this.opts.hooks?.onAuthenticated?.({ event, auth });
+		return auth;
 	}
 }

@@ -43,26 +43,89 @@
 	);
 
 	const client = setupConvex(env.PUBLIC_CONVEX_URL);
-	client.setAuth(async () => {
-		if (!accessToken) return null;
-		const claims = jwtDecode(accessToken);
-		// if expired
-		if (claims.exp && claims.exp * 1000 < Date.now()) {
-			const response = await fetch('/auth/refresh');
-			if (!response.ok) return null;
-			const data = await response.json();
-			const next = data.accessToken as string | undefined;
-			if (!next) return null;
-			accessTokenCtx.current = next;
-			return next;
+
+	// set when the server tells us we are signed out so that we stop trying to refresh
+	let signedOut = false;
+	// set when convex dropped our auth (e.g. refreshing failed while offline) so that we can try again
+	let authLost = false;
+	let refreshing: Promise<string | null> | null = null;
+
+	function expiresWithin(token: string, seconds: number) {
+		try {
+			const { exp } = jwtDecode(token);
+			return exp !== undefined && exp * 1000 - Date.now() < seconds * 1000;
+		} catch {
+			return true;
 		}
-		return accessToken;
-	});
+	}
+
+	async function requestAccessToken(): Promise<string | null> {
+		const MAX_ATTEMPTS = 5;
+		for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+			if (attempt > 0) await new Promise((r) => setTimeout(r, 500 * 2 ** (attempt - 1)));
+			try {
+				const response = await fetch('/auth/refresh', { cache: 'no-store' });
+				if (response.status === 401) {
+					signedOut = true;
+					return null;
+				}
+				// transient failure, try again
+				if (!response.ok) continue;
+				const data = await response.json();
+				const next = data.accessToken as string | undefined;
+				if (!next) continue;
+				accessTokenCtx.current = next;
+				return next;
+			} catch {
+				// network error (offline, just woke from sleep, etc.)
+			}
+		}
+		// we couldn't reach the server, keep using the current token if it's still valid
+		if (accessToken && !expiresWithin(accessToken, 0)) return accessToken;
+		return null;
+	}
+
+	// only ever have one refresh in flight
+	function refreshAccessToken() {
+		refreshing ??= requestAccessToken().finally(() => (refreshing = null));
+		return refreshing;
+	}
+
+	function setConvexAuth() {
+		client.setAuth(
+			async ({ forceRefreshToken }) => {
+				if (!accessToken || signedOut) return null;
+				// convex asks for a forced refresh shortly before the token expires and when the server
+				// rejects it. refreshing here (rather than only once the token is expired) keeps the
+				// session alive for as long as the app is open.
+				if (forceRefreshToken || expiresWithin(accessToken, 30)) {
+					return refreshAccessToken();
+				}
+				return accessToken;
+			},
+			(isAuthenticated) => {
+				authLost = !isAuthenticated;
+			}
+		);
+	}
+
+	setConvexAuth();
+
+	function recoverAuth() {
+		if (!authLost || signedOut || !accessToken) return;
+		authLost = false;
+		setConvexAuth();
+	}
 
 	const metaTags = $derived(deepMerge(data.baseMetaTags, page.data.pageMetaTags));
 </script>
 
 <MetaTags {...metaTags} />
+
+<svelte:window ononline={recoverAuth} />
+<svelte:document
+	onvisibilitychange={() => document.visibilityState === 'visible' && recoverAuth()}
+/>
 
 <ModeWatcher />
 <Startup />
