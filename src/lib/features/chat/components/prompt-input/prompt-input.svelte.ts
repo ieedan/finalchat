@@ -156,8 +156,10 @@ class PromptInputRootState {
 	async submit(input: string) {
 		if (this.opts.value.current.trim().length === 0) return;
 		const previousValue = this.opts.value.current;
+		const previousAttachments = this.opts.attachments.current;
 		if (this.opts.optimisticClear?.current) {
 			this.opts.value.current = '';
+			this.opts.attachments.current = [];
 		}
 		this.loading = true;
 
@@ -167,12 +169,15 @@ class PromptInputRootState {
 			await this.opts.onSubmit.current({
 				input,
 				modelId: this.opts.modelId.current!,
-				attachments: this.opts.attachments.current,
+				attachments: previousAttachments,
 				reasoningEffort: this.opts.reasoningEffort.current
 			});
 
-			this.opts.value.current = '';
-			this.opts.attachments.current = [];
+			// when optimistically cleared the user may have started their next message already
+			if (!this.opts.optimisticClear?.current) {
+				this.opts.value.current = '';
+				this.opts.attachments.current = [];
+			}
 		} catch (error) {
 			const rateLimit = getRateLimitErrorData(error);
 			if (rateLimit) {
@@ -184,6 +189,7 @@ class PromptInputRootState {
 						: 'An unknown error occurred while trying to submit your message.';
 			}
 			this.opts.value.current = previousValue;
+			this.opts.attachments.current = previousAttachments;
 		} finally {
 			this.loading = false;
 		}

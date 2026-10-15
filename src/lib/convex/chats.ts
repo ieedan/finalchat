@@ -28,7 +28,34 @@ export const getAll = query({
 			.withIndex('by_user', (q) => q.eq('userId', user.subject))
 			.collect();
 
-		return chats.sort((a, b) => b.updatedAt - a.updatedAt);
+		return chats.filter((chat) => !chat.draft).sort((a, b) => b.updatedAt - a.updatedAt);
+	}
+});
+
+/**
+ * Returns the user's draft chat, creating one if it doesn't exist yet. The client keeps a draft
+ * ready so that sending the first message of a new chat doesn't have to wait on chat creation.
+ */
+export const getOrCreateDraft = mutation({
+	args: {},
+	handler: async (ctx): Promise<Id<'chats'>> => {
+		const user = await ctx.auth.getUserIdentity();
+		if (!user) throw new ConvexError('Unauthorized');
+
+		const existing = await ctx.db
+			.query('chats')
+			.withIndex('by_user_draft', (q) => q.eq('userId', user.subject).eq('draft', true))
+			.first();
+		if (existing) return existing._id;
+
+		return await ctx.db.insert('chats', {
+			userId: user.subject,
+			title: 'Untitled Chat',
+			generating: false,
+			updatedAt: Date.now(),
+			pinned: false,
+			draft: true
+		});
 	}
 });
 
@@ -72,7 +99,7 @@ export const search = query({
 				.collect()
 		]);
 
-		const allResults = [...chatResults, ...messageResults].filter(
+		const allResults = [...chatResults.filter((chat) => !chat.draft), ...messageResults].filter(
 			(result) => !args.excludeChatIds?.includes('chatId' in result ? result.chatId : result._id)
 		);
 

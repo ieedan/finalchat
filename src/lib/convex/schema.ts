@@ -99,9 +99,12 @@ export default defineSchema({
 				messageId: v.id('messages')
 			})
 		),
-		public: v.optional(v.boolean())
+		public: v.optional(v.boolean()),
+		/** A pre-created, empty chat waiting for the user's first message. Hidden from chat lists. */
+		draft: v.optional(v.boolean())
 	})
 		.index('by_user', ['userId'])
+		.index('by_user_draft', ['userId', 'draft'])
 		.searchIndex('search_title', {
 			searchField: 'title',
 			filterFields: ['userId']
